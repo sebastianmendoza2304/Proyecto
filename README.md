@@ -1,4 +1,3 @@
-[Untitled-1.html](https://github.com/user-attachments/files/25219366/Untitled-1.html)
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,7 +5,7 @@
 </head>
 <body>
 <h1>¡Bienvenido!</h1>
-<p>Este es mi primer sitio web creado con HTML.</p>
+<p>El Sistema de Alerta de Riesgo Acadmico Universitario es una herramineta digital creada para ayudar a la iniversidad a detectar pronto a los estudiante que enfrentan problemas con su rendimineto academico, analizando datos como calificaciones, asistencias y desempeño. esta plataforma reune y procesa la informacion usando indicadores academicos, lo que permite identificar a los estudiantes en riesgo y ofrecerles apoyo personalizado para mejorar su rendimiento. El objetivo es brindar a los estudiantes las herramientas necesarias para superar sus dificultades academicas y alcanzar el exito en su vida universitaria.</p>
 <img src="mi_foto.jpg" alt="Mi foto">
 <ul>
 <li>Item 1</li>
