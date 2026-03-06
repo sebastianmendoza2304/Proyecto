@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Panel Docentes</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+<img src="LOGO SISTEMA DE ALERTAS.jpeg" class="logo">
+<h2>Sistema de Alertas Académicas - Docentes</h2>
+</header>
+
+<div class="container">
+
+<h2>Buscar Estudiante</h2>
+
+<div class="buscador">
+
+<input type="text" id="buscarDocumento" placeholder="Documento">
+<input type="text" id="buscarNombre" placeholder="Nombre o Apellido">
+
+<button onclick="buscarEstudiante()">Buscar</button>
+
+</div>
+
+
+<table>
+
+<thead>
+<tr>
+<th>Documento</th>
+<th>Nombre</th>
+<th>Carrera</th>
+<th>Teléfono</th>
+<th>Correo</th>
+<th>Acciones</th>
+</tr>
+</thead>
+
+<tbody id="tablaEstudiantes">
+</tbody>
+
+</table>
+
+
+<div class="formulario">
+
+<h3>Reportar Estudiante</h3>
+
+<input type="text" id="docReporte" placeholder="Documento estudiante">
+
+<textarea id="observacion" placeholder="Escriba la observación"></textarea>
+
+
+<div class="preguntas">
+
+<h4>Motivo del reporte</h4>
+
+<label>
+<input type="radio" name="motivo" value="Bajo rendimiento">
+Bajo rendimiento académico
+</label>
+
+<label>
+<input type="radio" name="motivo" value="Inasistencia">
+Inasistencia frecuente
+</label>
+
+<label>
+<input type="radio" name="motivo" value="Problemas personales">
+Problemas personales
+</label>
+
+<label>
+<input type="radio" name="motivo" value="Otro">
+Otro
+</label>
+
+</div>
+
+<button onclick="reportarEstudiante()">Enviar Reporte</button>
+
+</div>
+
+</div>
+
+
+<footer class="footer">
+
+<p>© 2026 Sistema de Alertas Académicas</p>
+
+<div class="redes">
+
+<a href="#">Facebook</a>
+<a href="#">Instagram</a>
+<a href="#">Twitter</a>
+
+</div>
+
+</footer>
+
+
+<script>
+
+let estudiantes = JSON.parse(localStorage.getItem("estudiantes")) || [];
+
+
+function mostrarEstudiantes(){
+
+let tabla = document.getElementById("tablaEstudiantes");
+tabla.innerHTML = "";
+
+estudiantes.forEach(est => {
+
+tabla.innerHTML += `
+<tr>
+
+<td>${est.documento}</td>
+<td>${est.nombre}</td>
+<td>${est.carrera}</td>
+<td>${est.telefono}</td>
+<td>${est.correo}</td>
+
+<td>
+
+<button onclick="editar('${est.documento}')">Editar</button>
+<button onclick="verReportes('${est.documento}')">Ver</button>
+
+</td>
+
+</tr>
+`;
+
+});
+
+}
+
+
+function buscarEstudiante(){
+
+let doc = document.getElementById("buscarDocumento").value.toLowerCase();
+let nombre = document.getElementById("buscarNombre").value.toLowerCase();
+
+let resultado = estudiantes.filter(est =>
+
+est.documento.includes(doc) ||
+est.nombre.toLowerCase().includes(nombre)
+
+);
+
+let tabla = document.getElementById("tablaEstudiantes");
+tabla.innerHTML = "";
+
+resultado.forEach(est => {
+
+tabla.innerHTML += `
+<tr>
+
+<td>${est.documento}</td>
+<td>${est.nombre}</td>
+<td>${est.carrera}</td>
+<td>${est.telefono}</td>
+<td>${est.correo}</td>
+
+<td>
+
+<button onclick="editar('${est.documento}')">Editar</button>
+<button onclick="verReportes('${est.documento}')">Ver</button>
+
+</td>
+
+</tr>
+`;
+
+});
+
+}
+
+
+function editar(doc){
+
+let estudiante = estudiantes.find(e => e.documento == doc);
+
+let nuevoTelefono = prompt("Nuevo teléfono:", estudiante.telefono);
+
+if(nuevoTelefono){
+
+estudiante.telefono = nuevoTelefono;
+
+localStorage.setItem("estudiantes", JSON.stringify(estudiantes));
+
+mostrarEstudiantes();
+
+}
+
+}
+
+
+function reportarEstudiante(){
+
+let doc = document.getElementById("docReporte").value;
+let observacion = document.getElementById("observacion").value;
+let motivo = document.querySelector('input[name="motivo"]:checked');
+
+let estudiante = estudiantes.find(e => e.documento == doc);
+
+if(estudiante){
+
+if(!estudiante.reportes){
+estudiante.reportes = [];
+}
+
+estudiante.reportes.push({
+
+motivo: motivo ? motivo.value : "",
+observacion: observacion,
+fecha: new Date().toLocaleDateString()
+
+});
+
+localStorage.setItem("estudiantes", JSON.stringify(estudiantes));
+
+alert("Reporte guardado");
+
+}
+
+}
+
+
+function verReportes(doc){
+
+let estudiante = estudiantes.find(e => e.documento == doc);
+
+alert(JSON.stringify(estudiante.reportes, null, 2));
+
+}
+
+
+mostrarEstudiantes();
+
+</script>
+
+</body>
+
+</html>
