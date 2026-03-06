@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Lista de Estudiantes</title>
+<link rel="stylesheet" href="Style.css">
+</head>
+<body>
+
+<h2>Listado de Estudiantes - Facultad de Ingeniería</h2>
+
+<table border="1" width="100%" cellpadding="10">
+<thead>
+<tr>
+<th>Documento</th>
+<th>Nombre</th>
+<th>Carrera</th>
+<th>Teléfono</th>
+<th>Correo</th>
+<th>Estado</th>
+<th>Remisión</th>
+<th>Observaciones</th>
+<th>Reportes</th>
+</tr>
+</thead>
+<tbody id="tablaEstudiantes">
+</tbody>
+</table>
+
+<script>
+
+const estudiantes = JSON.parse(localStorage.getItem("estudiantes")) || [];
+
+const tabla = document.getElementById("tablaEstudiantes");
+
+estudiantes.forEach(est => {
+tabla.innerHTML += `
+<tr>
+<td>${est.documento}</td>
+<td>${est.nombre}</td>
+<td>${est.carrera}</td>
+<td>${est.telefono}</td>
+<td>${est.correo}</td>
+<td>${est.estado}</td>
+<td>${est.remision}</td>
+<td>${est.observaciones.length > 0 ? est.observaciones.join("<br>") : "Sin observaciones"}</td>
+<td>${est.reportes.length > 0 ? est.reportes.join("<br>") : "Sin reportes"}</td>
+</tr>
+`;
+});
+
+</script>
+
+</body>
+</html>
