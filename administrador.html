@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Administrador</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="header">
+    <img src="escudo-unilibre.png" alt="Escudo Universidad Libre de Colombia" class="logo">
+    <h2>Panel de Administrador - Gestión Académica</h2>
+  </div>
+
+  <!-- Selector de periodo académico -->
+  <div class="login-container" style="width:600px;">
+    <h3>Periodo Académico</h3>
+    <form>
+      <label for="periodo">Seleccione periodo:</label>
+      <select id="periodo" name="periodo">
+        <option value="2026-1">2026-1</option>
+        <option value="2026-2">2026-2</option>
+      </select>
+    </form>
+  </div>
+
+  <!-- Registro de Estudiantes -->
+  <div class="login-container" style="width:600px;">
+    <h3>Registrar Estudiante</h3>
+    <form action="guardar_estudiante.php" method="POST">
+      <label>Número de Documento:</label>
+      <input type="text" name="documento" required>
+      <label>Nombres:</label>
+      <input type="text" name="nombres" required>
+      <label>Apellidos:</label>
+      <input type="text" name="apellidos" required>
+      <label>Carrera:</label>
+      <input type="text" name="carrera" required>
+      <label>Teléfono:</label>
+      <input type="text" name="telefono">
+      <label>Correo Institucional:</label>
+      <input type="email" name="correo">
+      <label>Estado:</label>
+      <select name="estado">
+        <option value="Activo">Activo</option>
+        <option value="Inactivo">Inactivo</option>
+      </select>
+      <button type="submit">Registrar Estudiante</button>
+    </form>
+  </div>
+
+  <!-- Registro de Decanatura -->
+  <div class="login-container" style="width:600px;">
+    <h3>Registrar Integrante Decanatura</h3>
+    <form action="guardar_decanatura.php" method="POST">
+      <label>Documento:</label>
+      <input type="text" name="documento" required>
+      <label>Nombres:</label>
+      <input type="text" name="nombres" required>
+      <label>Apellidos:</label>
+      <input type="text" name="apellidos" required>
+      <label>Teléfono:</label>
+      <input type="text" name="telefono">
+      <label>Correo Institucional:</label>
+      <input type="email" name="correo">
+      <label>Rol:</label>
+      <input type="text" name="rol" required>
+      <label>Estado:</label>
+      <select name="estado">
+        <option value="Activo">Activo</option>
+        <option value="Inactivo">Inactivo</option>
+      </select>
+      <button type="submit">Registrar Decanatura</button>
+    </form>
+  </div>
+
+  <!-- Registro de Bienestar -->
+  <div class="login-container" style="width:600px;">
+    <h3>Registrar Integrante Bienestar</h3>
+    <form action="guardar_bienestar.php" method="POST">
+      <label>Documento:</label>
+      <input type="text" name="documento" required>
+      <label>Nombres:</label>
+      <input type="text" name="nombres" required>
+      <label>Apellidos:</label>
+      <input type="text" name="apellidos" required>
+      <label>Teléfono:</label>
+      <input type="text" name="telefono">
+      <label>Correo Institucional:</label>
+      <input type="email" name="correo">
+      <label>Rol:</label>
+      <input type="text" name="rol" required>
+      <label>Estado:</label>
+      <select name="estado">
+        <option value="Activo">Activo</option>
+        <option value="Inactivo">Inactivo</option>
+      </select>
+      <button type="submit">Registrar Bienestar</button>
+    </form>
+  </div>
+
+  <!-- Registro de Docentes -->
+  <div class="login-container" style="width:600px;">
+    <h3>Registrar Docente</h3>
+    <form action="guardar_docente.php" method="POST">
+      <label>Documento:</label>
+      <input type="text" name="documento" required>
+      <label>Nombres:</label>
+      <input type="text" name="nombres" required>
+      <label>Apellidos:</label>
+      <input type="text" name="apellidos" required>
+      <label>Teléfono:</label>
+      <input type="text" name="telefono">
+      <label>Correo Institucional:</label>
+      <input type="email" name="correo">
+      <label>Rol:</label>
+      <input type="text" name="rol" required>
+      <label>Estado:</label>
+      <select name="estado">
+        <option value="Activo">Activo</option>
+        <option value="Inactivo">Inactivo</option>
+      </select>
+      <button type="submit">Registrar Docente</button>
+    </form>
+  </div>
+
+  <a href="index.html" class="volver">Cerrar sesión</a>
+</body>
+</html>
