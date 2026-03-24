@@ -1,24 +1,30 @@
 <!DOCTYPE html>
 <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <title>Inicio de Sesión</title>
-        <link rel="stylesheet" href="css/estilos.css">
-        <meta charset="UTF-8"> 
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-        <meta name="description" content="Página web sistema de alertas UNILIBRE."> 
-        <meta name="keywords" content="HTML, metadatos, SEO">
-    </head>
-    <body>
-        <div class="login">
-            <h2>Sistema de Alertas Académicas</h2>
-            <form id="loginForm">
-                <input type="text" id="documento" placeholder="Documento" required>
-                <input type="password" id="password" placeholder="Contraseña" required>
-                <button type="submit">Ingresar</button>
-            </form>
-            <p id="mensaje"></p>
-        </div>
-        <script src="js/sistema.js"></script>
-    </body>
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio - Seguimiento Estudiantes</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="menu-container">
+        <h2 id="bienvenida"></h2>
+        <p>Seleccione el apartado al que desea ingresar:</p>
+        <nav>
+            <ul>
+                <li><a href="docentes.html">Docentes</a></li>
+                <li><a href="decanatura.html">Decanatura</a></li>
+                <li><a href="bienestar.html">Bienestar Universitario</a></li>
+            </ul>
+        </nav>
+        <a href="index.html" class="volver">Cerrar sesión</a>
+    </div>
+
+    <script>
+        // Recuperamos datos del login
+        const nombre = localStorage.getItem("nombreUsuario");
+        const rol = localStorage.getItem("rolUsuario");
+        document.getElementById("bienvenida").textContent = 
+            "Bienvenido " + nombre + " (" + rol + ")";
+    </script>
+</body>
 </html>

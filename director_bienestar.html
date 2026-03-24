@@ -2,13 +2,13 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Panel Profesional de Bienestar</title>
+  <title>Panel Director de Bienestar</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="header">
     <img src="escudo-unilibre.png" alt="Escudo Universidad Libre de Colombia" class="logo">
-    <h2>Panel Profesional de Bienestar</h2>
+    <h2>Panel Director de Bienestar</h2>
   </div>
 
   <!-- Actualizar estado -->
@@ -20,44 +20,32 @@
 
       <label>Nuevo Estado:</label>
       <select id="estado">
+        <option value="En revisión">En revisión</option>
         <option value="En seguimiento">En seguimiento</option>
+        <option value="Remitido">Remitido</option>
         <option value="Cerrado">Cerrado</option>
       </select>
+
+      <label>Remitido a:</label>
+      <input type="text" id="remitido">
+
+      <label>Motivo de la remisión:</label>
+      <textarea id="motivo" rows="3"></textarea>
 
       <button type="submit">Actualizar Caso</button>
     </form>
   </div>
 
-  <!-- Registrar seguimiento -->
+  <!-- Consultar reportes -->
   <div class="login-container" style="width:700px;">
-    <h3>Registrar Seguimiento del Caso</h3>
-    <form id="formSeguimiento">
-      <label>ID del Reporte:</label>
-      <input type="text" id="idReporteSeg" required>
-
-      <label>Tipo de intervención:</label>
-      <input type="text" id="intervencion" required>
-
-      <label>Observaciones:</label>
-      <textarea id="observaciones" rows="3"></textarea>
-
-      <label>Recomendaciones:</label>
-      <textarea id="recomendaciones" rows="3"></textarea>
-
-      <button type="submit">Registrar Seguimiento</button>
-    </form>
-  </div>
-
-  <!-- Informe general -->
-  <div class="login-container" style="width:700px;">
-    <h3>Informe General de Casos</h3>
+    <h3>Consultar Reportes</h3>
     <form id="formConsulta">
-      <label>Semestre Académico:</label>
-      <input type="text" id="semestre">
-
+      <label>Fecha:</label>
+      <input type="date" id="fecha">
       <label>Programa Académico:</label>
       <input type="text" id="programa">
-
+      <label>Periodo Académico:</label>
+      <input type="text" id="periodo">
       <label>Estado:</label>
       <select id="estadoConsulta">
         <option value="">Todos</option>
@@ -67,7 +55,6 @@
         <option value="Remitido">Remitido</option>
         <option value="Cerrado">Cerrado</option>
       </select>
-
       <button type="submit">Filtrar</button>
     </form>
 
@@ -121,30 +108,11 @@
       const id = parseInt(document.getElementById("idReporte").value) - 1;
       if(reportes[id]) {
         reportes[id].estado = document.getElementById("estado").value;
+        reportes[id].remitido = document.getElementById("remitido").value;
+        reportes[id].motivo = document.getElementById("motivo").value;
         localStorage.setItem("reportes", JSON.stringify(reportes));
         mostrarReportes(reportes);
         alert("Caso actualizado correctamente.");
-      } else {
-        alert("ID de reporte no encontrado.");
-      }
-    });
-
-    // Registrar seguimiento
-    document.getElementById("formSeguimiento").addEventListener("submit", e => {
-      e.preventDefault();
-      const id = parseInt(document.getElementById("idReporteSeg").value) - 1;
-      if(reportes[id]) {
-        const seguimiento = {
-          fecha: new Date().toLocaleString(),
-          intervencion: document.getElementById("intervencion").value,
-          observaciones: document.getElementById("observaciones").value,
-          recomendaciones: document.getElementById("recomendaciones").value
-        };
-        reportes[id].seguimiento = seguimiento;
-        reportes[id].estado = "En seguimiento";
-        localStorage.setItem("reportes", JSON.stringify(reportes));
-        mostrarReportes(reportes);
-        alert("Seguimiento registrado correctamente.");
       } else {
         alert("ID de reporte no encontrado.");
       }

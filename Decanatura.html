@@ -1,10 +1,114 @@
 <!DOCTYPE html>
-<html> 
-    <head> 
-        <meta charset="UTF-8"> 
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-        <title>SISTEMA DE ALERTAS POR RIESGO ACADÉMICO</title>
-        <meta name="description" content="Página web sistema de alertas UNILIBRE."> 
-        <meta name="keywords" content="HTML, metadatos, SEO">
-        <title>Mi primera página web</title> 
-    </head>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Decanatura</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="header">
+    <img src="escudo-unilibre.png" alt="Escudo Universidad Libre de Colombia" class="logo">
+    <h2>Panel Decanatura</h2>
+  </div>
+
+  <!-- Notificaciones -->
+  <div class="login-container" style="width:700px;">
+    <h3>Notificaciones</h3>
+    <div id="notificaciones">
+      <!-- Aquí se mostrarán las notificaciones automáticas -->
+    </div>
+  </div>
+
+  <!-- Informe consolidado -->
+  <div class="login-container" style="width:700px;">
+    <h3>Informe Consolidado de Casos</h3>
+    <form id="formConsulta">
+      <label>Semestre Académico:</label>
+      <input type="text" id="semestre">
+
+      <label>Materia:</label>
+      <input type="text" id="materia">
+
+      <label>Estudiante:</label>
+      <input type="text" id="estudiante">
+
+      <button type="submit">Filtrar</button>
+    </form>
+
+    <table border="1" width="100%" id="tablaReportes">
+      <tr>
+        <th>ID</th>
+        <th>Estudiante</th>
+        <th>Materia</th>
+        <th>Docente</th>
+        <th>Estado</th>
+        <th>Fecha</th>
+      </tr>
+    </table>
+  </div>
+
+  <a href="index.html" class="volver">Cerrar sesión</a>
+
+  <script>
+    // Simulación con localStorage
+    let reportes = JSON.parse(localStorage.getItem("reportes")) || [];
+
+    const tabla = document.getElementById("tablaReportes");
+    const notificaciones = document.getElementById("notificaciones");
+
+    function mostrarReportes(lista) {
+      tabla.innerHTML = `
+        <tr>
+          <th>ID</th>
+          <th>Estudiante</th>
+          <th>Materia</th>
+          <th>Docente</th>
+          <th>Estado</th>
+          <th>Fecha</th>
+        </tr>`;
+      lista.forEach((r, i) => {
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+          <td>${i+1}</td>
+          <td>${r.estudiante}</td>
+          <td>${r.materia}</td>
+          <td>${r.docente || "N/A"}</td>
+          <td>${r.estado}</td>
+          <td>${r.fecha}</td>
+        `;
+        tabla.appendChild(fila);
+      });
+    }
+    mostrarReportes(reportes);
+
+    // Filtrar reportes
+    document.getElementById("formConsulta").addEventListener("submit", e => {
+      e.preventDefault();
+      const materia = document.getElementById("materia").value.toLowerCase();
+      const estudiante = document.getElementById("estudiante").value.toLowerCase();
+      let filtrados = reportes;
+      if(materia) filtrados = filtrados.filter(r => r.materia.toLowerCase().includes(materia));
+      if(estudiante) filtrados = filtrados.filter(r => r.estudiante.toLowerCase().includes(estudiante));
+      mostrarReportes(filtrados);
+    });
+
+    // Notificaciones automáticas (simulación)
+    function generarNotificaciones() {
+      notificaciones.innerHTML = "";
+      reportes.forEach((r, i) => {
+        if(r.estado === "Reportado") {
+          const aviso = document.createElement("p");
+          aviso.textContent = `Nuevo caso reportado: Estudiante ${r.estudiante}, Materia ${r.materia}`;
+          notificaciones.appendChild(aviso);
+        }
+        if(r.estado === "Cerrado") {
+          const aviso = document.createElement("p");
+          aviso.textContent = `Caso cerrado: Estudiante ${r.estudiante}, Materia ${r.materia}`;
+          notificaciones.appendChild(aviso);
+        }
+      });
+    }
+    generarNotificaciones();
+  </script>
+</body>
+</html>

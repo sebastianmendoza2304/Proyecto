@@ -1,99 +1,125 @@
 <!DOCTYPE html>
-<html lang="es"> 
+<html lang="es">
 <head>
-    <title>Mi Primera Pagina Web</title>
-    <link rel="stylesheet" href="style.css"> 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <meta charset="UTF-8"> 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <meta name="description" content="Página web sistema de alertas UNILIBRE."> 
-    <meta name="keywords" content="HTML, metadatos, SEO">
+  <meta charset="UTF-8">
+  <title>Sistema de Alertas Académicas</title>
+  <link rel="stylesheet" href="style.css">
 
-    <meta name="DC.title" content="estudiantes y + estudiantes">
-    <meta name="DC.creator" content="Juan Pérez">
-    <meta name="DC.subject" content="novelas, obras literarias, premios nobels, y muchos mas">
-    <meta name="DC.publisher" content="Mi Sitio Web">
-    <meta name="DC.date" content="2024-09-06">
-    <meta name="DC.type" content="Text">
-    <meta name="DC.format" content="text/html">
+  <!-- Metadatos Dublin Core -->
+  <meta name="DC.title" content="Sistema de Alertas Académicas - Universidad Libre de Colombia">
+  <meta name="DC.creator" content="Cristian Quintero">
+  <meta name="DC.subject" content="Gestión académica, alertas de riesgo, estudiantes, docentes, decanatura, bienestar universitario">
+  <meta name="DC.description" content="Plataforma institucional para el registro y gestión de alertas académicas en la Universidad Libre de Colombia.">
+  <meta name="DC.publisher" content="Universidad Libre de Colombia">
+  <meta name="DC.contributor" content="Facultad de Ingeniería TIC">
+  <meta name="DC.date" content="2026-03-24">
+  <meta name="DC.type" content="Website">
+  <meta name="DC.format" content="text/html">
+  <meta name="DC.identifier" content="http://www.unilibre.edu.co/sistema-alertas">
+  <meta name="DC.language" content="es">
+  <meta name="DC.coverage" content="Colombia">
+  <meta name="DC.rights" content="© 2026 Universidad Libre de Colombia. Todos los derechos reservados.">
 </head>
-
 <body>
-    <header>
-        <h1>Mi Página Web</h1>
-        <img src="LOGO SISTEMA DE ALERTAS.jpeg" alt="Logo" class="logo">
-        <h1>Sistema de Alertas</h1>
-    </header>
+  <!-- Encabezado con escudo -->
+  <div class="header">
+    <img src="escudo-unilibre.png" alt="Escudo Universidad Libre de Colombia" class="logo">
+    <h1>Sistema de Alertas Académicas</h1>
+  </div>
 
-    <nav>
+  <!-- Contenedor del login -->
+  <div class="login-container">
+    <h2>Ingreso al Sistema</h2>
+    <form onsubmit="validarUsuario(event)">
+      <label for="usuario">Usuario:</label>
+      <input type="text" id="usuario" required>
+
+      <label for="password">Contraseña:</label>
+      <input type="password" id="password" required>
+
+      <button type="submit">Ingresar</button>
+    </form>
+  </div>
+
+  <!-- Footer institucional -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h3>Universidad Libre</h3>
+        <p>CAMINANDO EN LA EXCELENCIA</p>
+        <p>Reacreditación Institucional MULTICAMPUS 2015-2027</p>
+        <p>ALTA CALIDAD - Resolución MEN N.º 01565 (25-08-2021)</p>
+        <p>Línea Gratuita Nacional: 01 8000 180560</p>
+      </div>
+      <div class="footer-col">
+        <h3>Universidad</h3>
         <ul>
-            <li><a href="Paginainicio.html">Pagina de Inicio</a></li>
-            <li><a href="Estudiantes.html">Estudiantes</a></li>
-            <li><a href="Docentes.html">Docentes</a></li>
-            <li><a href="Bienestar.html">Bienestar</a></li>
+          <li><a href="#">Estudia en La Libre</a></li>
+          <li><a href="#">Directorio Institucional</a></li>
+          <li><a href="#">Prensa</a></li>
+          <li><a href="#">Investigación</a></li>
         </ul>
-    </nav>
-
-    <main>
-        <section>
-            <h2>Bienvenido</h2>
-            <p>
-                Esta es la página principal del sistema de alertas por riesgo académico, te ayudará a saber qué estudiantes han sido reportados por docentes.
-            </p>
-        </section>
-
-        <section class="featured">
-            <h2>Destacados</h2>
-
-            <div class="card">
-                <h3>Card 1</h3>
-                <p>Contenido de la tarjeta 1.</p>
-            </div>
-
-            <div class="card">
-                <h3>Card 2</h3>
-                <p>Contenido de la tarjeta 2.</p>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        <div class="footer-col">
-            <h3> Contacto</h3>
-            <p>PBX : (607) 582 9810</p>
-            <p> info.cucuta@unilibre.edu.co</p>
-            <p> Av. 4ta #12-81 El Bosque</p>
+      </div>
+      <div class="footer-col">
+        <h3>Reglamentos</h3>
+        <ul>
+          <li><a href="#">Estatutos</a></li>
+          <li><a href="#">Docentes</a></li>
+          <li><a href="#">Estudiantes</a></li>
+          <li><a href="#">Bienestar</a></li>
+          <li><a href="#">PIDI</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Seccionales</h3>
+        <ul>
+          <li><a href="#">Cúcuta</a></li>
+          <li><a href="#">Bogotá</a></li>
+          <li><a href="#">Cali</a></li>
+          <li><a href="#">Barranquilla</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Contacto</h3>
+        <p>Avenida 4ta n.º 12n-81 - Urbanización El Bosque</p>
+        <p>PBX: (607) 582 9810</p>
+        <div class="social-icons">
+          <a href="#">Facebook</a>
+          <a href="#">Twitter</a>
+          <a href="#">Instagram</a>
+          <a href="#">YouTube</a>
         </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Universidad Libre de Colombia - Institución de Educación Superior sujeta a inspección y vigilancia por el Ministerio de Educación</p>
+    </div>
+  </footer>
 
-        <div class="footer-col">
-            <h3> Enlaces rápidos</h3>
-            <ul>
-                <li><a href="#">Inicio</a></li>
-                <li><a href="#">Biblioteca</a></li>
-                <li><a href="#">Seccional Cúcuta</a></li>
-                <li><a href="#">PQRS</a></li>
-            </ul>
-        </div>
+  <script>
+    const usuarios = [
+      { nombre: "admin", password: "admin123", rol: "administrador.html" },
+      { nombre: "docente1", password: "1234", rol: "docentes.html" },
+      { nombre: "decano1", password: "abcd", rol: "decanatura.html" },
+      { nombre: "bienestar1", password: "xyz", rol: "bienestar.html" },
+      { nombre: "bienestar_director", password: "12345", rol: "director_bienestar.html" } // Nuevo usuario Director de Bienestar
+    ];
 
-        <div class="footer-col">
-            <h3>Síguenos</h3>
-            <div class="social-icons">
-                <a href="https://www.facebook.com/UniLibreCucuta1/"><i class="fab fa-facebook"></i></a>
-                <a href="https://www.instagram.com/unilibrecucuta1/"><i class="fab fa-instagram"></i></a>
-                <a href="https://x.com/Unilibrebog"><i class="fab fa-twitter"></i></a>
-                <a href="https://www.youtube.com/c/CanalUnilibre"><i class="fab fa-youtube"></i></a>
-            </div>
-        </div>
+    function validarUsuario(event) {
+      event.preventDefault();
+      const usuario = document.getElementById("usuario").value;
+      const password = document.getElementById("password").value;
 
-        <div class="footer-col">
-            <h3>Ubicación</h3>
-            <iframe src="https://maps.app.goo.gl/CL2Et7r1Z8saR2rx7" loading="lazy"
-        </div>
+      const encontrado = usuarios.find(u => u.nombre === usuario && u.password === password);
 
-        <div class="footer-bottom">
-            <p> 2026 Universidad Libre. Todos los derechos reservados.</p>
-            <p>Desarrollado por: Paula Vera, Cristian Alfonso, Sebastian Mendoza</p>
-        </div>
-    </footer>
+      if (encontrado) {
+        localStorage.setItem("nombreUsuario", encontrado.nombre);
+        localStorage.setItem("rolUsuario", encontrado.rol);
+        window.location.href = encontrado.rol;
+      } else {
+        alert("Usuario o contraseña incorrectos.");
+      }
+    }
+  </script>
 </body>
 </html>

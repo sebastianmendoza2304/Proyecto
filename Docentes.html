@@ -1,160 +1,112 @@
 <!DOCTYPE html>
 <html lang="es">
-    <head>
-        <meta charset="UTF-8"> 
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-        <title>Panel de Docentes</title>
-        <meta name="description" content="Página web sistema de alertas UNILIBRE."> 
-        <meta name="keywords" content="HTML, metadatos, SEO">
-        <link rel="stylesheet" href="style.css">
-    </head>
-    <body>
-        <header>
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Docente</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="header">
+    <img src="escudo-unilibre.png" alt="Escudo Universidad Libre de Colombia" class="logo">
+    <h2>Panel Docente</h2>
+  </div>
 
-        </header><img src="LOGO SISTEMA DE ALERTAS.jpeg" class="logo">
-        <h2>Sistema de Alertas Académicas - Docentes</h2>
-    </header>
-    <div class="container">
-        <h2>Buscar Estudiante</h2>
-        <div class="buscador">
-            <input type="text" id="buscarDocumento" placeholder="Documento">
-            <input type="text" id="buscarNombre" placeholder="Nombre o Apellido">
-            <button onclick="buscarEstudiante()">Buscar</button>
-        </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Documento</th>
-                    <th>Nombre</th>
-                    <th>Carrera</th>
-                    <th>Teléfono</th>
-                    <th>Correo</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="tablaEstudiantes">
+  <!-- Formulario de reporte -->
+  <div class="login-container" style="width:600px;">
+    <h3>Registrar Reporte de Riesgo Académico</h3>
+    <form id="formReporte">
+      <label>Estudiante:</label>
+      <input type="text" id="estudiante" placeholder="Nombre del estudiante" required>
 
-            </tbody>
-        </table>
-        <div class="formulario">
-            <h3>Reportar Estudiante</h3>
-            <input type="text" id="docReporte" placeholder="Documento estudiante">
-            <textarea id="observacion" placeholder="Escriba la observación"></textarea>
-            <div class="preguntas">
-                <h4>Motivo del reporte</h4>
-                <label>
-                    <input type="radio" name="motivo" value="Bajo rendimiento">
-                    Bajo rendimiento académico
-                </label>
-                
-                <label>
-                    <input type="radio" name="motivo" value="Inasistencia">
-                    Inasistencia frecuente
-                </label>
-                
-                <label>
-                    <input type="radio" name="motivo" value="Problemas personales">
-                    Problemas personales
-                </label>
-                
-                <label>
-                    <input type="radio" name="motivo" value="Otro">
-                    Otro
-                </label>
-            </div>
-            
-            <button onclick="reportarEstudiante()">Enviar Reporte</button>
-        </div>
-    </div>
-    <footer class="footer">
-        <p>© 2026 Sistema de Alertas Académicas</p>
-        <div class="redes">
-            <a href="#">Facebook</a>
-            <a href="#">Instagram</a>
-            <a href="#">Twitter</a>
-        </div>
-    </footer>
-    <script>
-    let estudiantes = JSON.parse(localStorage.getItem("estudiantes")) || [];
-    function mostrarEstudiantes(){
-        let tabla = document.getElementById("tablaEstudiantes");
-        tabla.innerHTML = "";
-        estudiantes.forEach
-        (est => {tabla.innerHTML += `
-            <tr>
-                <td>${est.documento}</td>
-                <td>${est.nombre}</td>
-                <td>${est.carrera}</td>
-                <td>${est.telefono}</td>
-                <td>${est.correo}</td>
-                <td>
-                    <button onclick="editar('${est.documento}')">Editar</button>
-                    <button onclick="verReportes('${est.documento}')">Ver</button>
-                    </td>
-                    </tr>`;
-                });
+      <label>Materia:</label>
+      <input type="text" id="materia" required>
 
-}
+      <label>Motivo:</label>
+      <select id="motivo">
+        <option value="Bajo rendimiento">Bajo rendimiento</option>
+        <option value="Inasistencia">Inasistencia</option>
+        <option value="Seguimiento">Seguimiento</option>
+      </select>
 
+      <label>Observaciones:</label>
+      <textarea id="observaciones" rows="4"></textarea>
 
-function buscarEstudiante(){
-    let doc = document.getElementById("buscarDocumento").value.toLowerCase();
-    let nombre = document.getElementById("buscarNombre").value.toLowerCase();
-    let resultado = estudiantes.filter(est =>
-    est.documento.includes(doc) ||
-    est.nombre.toLowerCase().includes(nombre));
-    let tabla = document.getElementById("tablaEstudiantes");
-    tabla.innerHTML = "";
-    resultado.forEach(est => 
-    {
-        tabla.innerHTML += `
+      <button type="submit">Registrar Reporte</button>
+    </form>
+  </div>
+
+  <!-- Consulta de casos -->
+  <div class="login-container" style="width:600px;">
+    <h3>Mis Reportes</h3>
+    <table border="1" width="100%" id="tablaReportes">
+      <tr>
+        <th>Estudiante</th>
+        <th>Materia</th>
+        <th>Motivo</th>
+        <th>Estado</th>
+        <th>Fecha</th>
+      </tr>
+    </table>
+  </div>
+
+  <a href="index.html" class="volver">Cerrar sesión</a>
+
+  <script>
+    // Simulación de almacenamiento en localStorage
+    const form = document.getElementById("formReporte");
+    const tabla = document.getElementById("tablaReportes");
+
+    // Cargar reportes previos
+    let reportes = JSON.parse(localStorage.getItem("reportes")) || [];
+
+    function mostrarReportes() {
+      // limpiar filas viejas
+      tabla.innerHTML = `
         <tr>
-            <td>${est.documento}</td>
-            <td>${est.nombre}</td>
-            <td>${est.carrera}</td>
-            <td>${est.telefono}</td>
-            <td>${est.correo}</td>
-            <td>
-                <button onclick="editar('${est.documento}')">Editar</button>
-                <button onclick="verReportes('${est.documento}')">Ver</button>
-                </td>
-                </tr>
-                `;
-            });
-        }
-        function editar(doc){
-            let estudiante = estudiantes.find(e => e.documento == doc);
-            let nuevoTelefono = prompt("Nuevo teléfono:", estudiante.telefono);
-            if(nuevoTelefono){
-                estudiante.telefono = nuevoTelefono;
-                localStorage.setItem("estudiantes", JSON.stringify(estudiantes));
-                mostrarEstudiantes();
-            }
-        }
-        
-        function reportarEstudiante(){
-            let doc = document.getElementById("docReporte").value;
-            let observacion = document.getElementById("observacion").value;
-            let motivo = document.querySelector('input[name="motivo"]:checked');
-            let estudiante = estudiantes.find(e => e.documento == doc);
-            if(estudiante){
-                if(!estudiante.reportes){
-                    estudiante.reportes = [];
-                }
-                estudiante.reportes.push({
-                    motivo: motivo ? motivo.value : "",
-                    observacion: observacion,
-                    fecha: new Date().toLocaleDateString()
-                });
-                localStorage.setItem("estudiantes", JSON.stringify(estudiantes));
-                alert("Reporte guardado");
-            }
-        }
-        function verReportes(doc){
-            let estudiante = estudiantes.find(e => e.documento == doc);
-            alert(JSON.stringify(estudiante.reportes, null, 2));
-        }
-        mostrarEstudiantes();
-        </script>
-        </body>
-        </html>
+          <th>Estudiante</th>
+          <th>Materia</th>
+          <th>Motivo</th>
+          <th>Estado</th>
+          <th>Fecha</th>
+        </tr>`;
+      reportes.forEach(r => {
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+          <td>${r.estudiante}</td>
+          <td>${r.materia}</td>
+          <td>${r.motivo}</td>
+          <td>${r.estado}</td>
+          <td>${r.fecha}</td>
+        `;
+        tabla.appendChild(fila);
+      });
+    }
+
+    mostrarReportes();
+
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      const estudiante = document.getElementById("estudiante").value;
+      const materia = document.getElementById("materia").value;
+      const motivo = document.getElementById("motivo").value;
+      const observaciones = document.getElementById("observaciones").value;
+      const fecha = new Date().toLocaleString();
+
+      const nuevoReporte = {
+        estudiante,
+        materia,
+        motivo,
+        observaciones,
+        fecha,
+        estado: "Reportado"
+      };
+
+      reportes.push(nuevoReporte);
+      localStorage.setItem("reportes", JSON.stringify(reportes));
+      mostrarReportes();
+      form.reset();
+      alert("Reporte registrado correctamente.");
+    });
+  </script>
+</body>
+</html>
