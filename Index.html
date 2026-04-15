@@ -4,30 +4,14 @@
   <meta charset="UTF-8">
   <title>Sistema de Alertas Académicas</title>
   <link rel="stylesheet" href="style.css">
-
-  <!-- Metadatos Dublin Core -->
-  <meta name="DC.title" content="Sistema de Alertas Académicas - Universidad Libre de Colombia">
-  <meta name="DC.creator" content="Cristian Quintero">
-  <meta name="DC.subject" content="Gestión académica, alertas de riesgo, estudiantes, docentes, decanatura, bienestar universitario">
-  <meta name="DC.description" content="Plataforma institucional para el registro y gestión de alertas académicas en la Universidad Libre de Colombia.">
-  <meta name="DC.publisher" content="Universidad Libre de Colombia">
-  <meta name="DC.contributor" content="Facultad de Ingeniería TIC">
-  <meta name="DC.date" content="2026-03-24">
-  <meta name="DC.type" content="Website">
-  <meta name="DC.format" content="text/html">
-  <meta name="DC.identifier" content="http://www.unilibre.edu.co/sistema-alertas">
-  <meta name="DC.language" content="es">
-  <meta name="DC.coverage" content="Colombia">
-  <meta name="DC.rights" content="© 2026 Universidad Libre de Colombia. Todos los derechos reservados.">
 </head>
 <body>
-  <!-- Encabezado con escudo -->
+  <!-- Encabezado -->
   <div class="header">
-    <img src="escudo-unilibre.png" alt="Escudo Universidad Libre de Colombia" class="logo">
     <h1>Sistema de Alertas Académicas</h1>
   </div>
 
-  <!-- Contenedor del login -->
+  <!-- Login -->
   <div class="login-container">
     <h2>Ingreso al Sistema</h2>
     <form onsubmit="validarUsuario(event)">
@@ -96,30 +80,7 @@
     </div>
   </footer>
 
-  <script>
-    const usuarios = [
-      { nombre: "admin", password: "admin123", rol: "administrador.html" },
-      { nombre: "docente1", password: "1234", rol: "docentes.html" },
-      { nombre: "decano1", password: "abcd", rol: "decanatura.html" },
-      { nombre: "bienestar1", password: "xyz", rol: "bienestar.html" },
-      { nombre: "bienestar_director", password: "12345", rol: "director_bienestar.html" } // Nuevo usuario Director de Bienestar
-    ];
-
-    function validarUsuario(event) {
-      event.preventDefault();
-      const usuario = document.getElementById("usuario").value;
-      const password = document.getElementById("password").value;
-
-      const encontrado = usuarios.find(u => u.nombre === usuario && u.password === password);
-
-      if (encontrado) {
-        localStorage.setItem("nombreUsuario", encontrado.nombre);
-        localStorage.setItem("rolUsuario", encontrado.rol);
-        window.location.href = encontrado.rol;
-      } else {
-        alert("Usuario o contraseña incorrectos.");
-      }
-    }
-  </script>
+  <!-- Enlace al JS -->
+  <script src="index.js"></script>
 </body>
 </html>

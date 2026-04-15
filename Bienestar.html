@@ -2,162 +2,54 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Panel Profesional de Bienestar</title>
+  <title>Panel Bienestar</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="header">
-    <img src="escudo-unilibre.png" alt="Escudo Universidad Libre de Colombia" class="logo">
-    <h2>Panel Profesional de Bienestar</h2>
+    <h2>Panel Bienestar</h2>
   </div>
 
-  <!-- Actualizar estado -->
   <div class="login-container" style="width:700px;">
     <h3>Actualizar Estado del Caso</h3>
-    <form id="formEstado">
+    <form onsubmit="actualizarEstadoBienestar(
+      document.getElementById('idReporte').value,
+      document.getElementById('estado').value
+    ); return false;">
       <label>ID del Reporte:</label>
       <input type="text" id="idReporte" required>
-
       <label>Nuevo Estado:</label>
       <select id="estado">
         <option value="En seguimiento">En seguimiento</option>
         <option value="Cerrado">Cerrado</option>
       </select>
-
       <button type="submit">Actualizar Caso</button>
     </form>
   </div>
 
-  <!-- Registrar seguimiento -->
   <div class="login-container" style="width:700px;">
-    <h3>Registrar Seguimiento del Caso</h3>
-    <form id="formSeguimiento">
+    <h3>Registrar Seguimiento</h3>
+    <form onsubmit="registrarSeguimiento(
+      document.getElementById('idReporteSeg').value,
+      document.getElementById('intervencion').value,
+      document.getElementById('observaciones').value,
+      document.getElementById('recomendaciones').value,
+      localStorage.getItem('nombreUsuario')
+    ); return false;">
       <label>ID del Reporte:</label>
       <input type="text" id="idReporteSeg" required>
-
       <label>Tipo de intervención:</label>
       <input type="text" id="intervencion" required>
-
       <label>Observaciones:</label>
-      <textarea id="observaciones" rows="3"></textarea>
-
+      <textarea id="observaciones"></textarea>
       <label>Recomendaciones:</label>
-      <textarea id="recomendaciones" rows="3"></textarea>
-
+      <textarea id="recomendaciones"></textarea>
       <button type="submit">Registrar Seguimiento</button>
     </form>
   </div>
 
-  <!-- Informe general -->
-  <div class="login-container" style="width:700px;">
-    <h3>Informe General de Casos</h3>
-    <form id="formConsulta">
-      <label>Semestre Académico:</label>
-      <input type="text" id="semestre">
+  <a href="index.html">Cerrar sesión</a>
 
-      <label>Programa Académico:</label>
-      <input type="text" id="programa">
-
-      <label>Estado:</label>
-      <select id="estadoConsulta">
-        <option value="">Todos</option>
-        <option value="Reportado">Reportado</option>
-        <option value="En revisión">En revisión</option>
-        <option value="En seguimiento">En seguimiento</option>
-        <option value="Remitido">Remitido</option>
-        <option value="Cerrado">Cerrado</option>
-      </select>
-
-      <button type="submit">Filtrar</button>
-    </form>
-
-    <table border="1" width="100%" id="tablaReportes">
-      <tr>
-        <th>ID</th>
-        <th>Estudiante</th>
-        <th>Materia</th>
-        <th>Docente</th>
-        <th>Estado</th>
-        <th>Fecha</th>
-      </tr>
-    </table>
-  </div>
-
-  <a href="index.html" class="volver">Cerrar sesión</a>
-
-  <script>
-    // Simulación con localStorage
-    let reportes = JSON.parse(localStorage.getItem("reportes")) || [];
-
-    const tabla = document.getElementById("tablaReportes");
-    function mostrarReportes(lista) {
-      tabla.innerHTML = `
-        <tr>
-          <th>ID</th>
-          <th>Estudiante</th>
-          <th>Materia</th>
-          <th>Docente</th>
-          <th>Estado</th>
-          <th>Fecha</th>
-        </tr>`;
-      lista.forEach((r, i) => {
-        const fila = document.createElement("tr");
-        fila.innerHTML = `
-          <td>${i+1}</td>
-          <td>${r.estudiante}</td>
-          <td>${r.materia}</td>
-          <td>${r.docente || "N/A"}</td>
-          <td>${r.estado}</td>
-          <td>${r.fecha}</td>
-        `;
-        tabla.appendChild(fila);
-      });
-    }
-    mostrarReportes(reportes);
-
-    // Actualizar estado
-    document.getElementById("formEstado").addEventListener("submit", e => {
-      e.preventDefault();
-      const id = parseInt(document.getElementById("idReporte").value) - 1;
-      if(reportes[id]) {
-        reportes[id].estado = document.getElementById("estado").value;
-        localStorage.setItem("reportes", JSON.stringify(reportes));
-        mostrarReportes(reportes);
-        alert("Caso actualizado correctamente.");
-      } else {
-        alert("ID de reporte no encontrado.");
-      }
-    });
-
-    // Registrar seguimiento
-    document.getElementById("formSeguimiento").addEventListener("submit", e => {
-      e.preventDefault();
-      const id = parseInt(document.getElementById("idReporteSeg").value) - 1;
-      if(reportes[id]) {
-        const seguimiento = {
-          fecha: new Date().toLocaleString(),
-          intervencion: document.getElementById("intervencion").value,
-          observaciones: document.getElementById("observaciones").value,
-          recomendaciones: document.getElementById("recomendaciones").value
-        };
-        reportes[id].seguimiento = seguimiento;
-        reportes[id].estado = "En seguimiento";
-        localStorage.setItem("reportes", JSON.stringify(reportes));
-        mostrarReportes(reportes);
-        alert("Seguimiento registrado correctamente.");
-      } else {
-        alert("ID de reporte no encontrado.");
-      }
-    });
-
-    // Filtrar reportes
-    document.getElementById("formConsulta").addEventListener("submit", e => {
-      e.preventDefault();
-      const estado = document.getElementById("estadoConsulta").value;
-      let filtrados = reportes;
-      if(estado) filtrados = filtrados.filter(r => r.estado === estado);
-      mostrarReportes(filtrados);
-    });
-  </script>
+  <script src="bienestar.js"></script>
 </body>
 </html>

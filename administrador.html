@@ -7,122 +7,84 @@
 </head>
 <body>
   <div class="header">
-    <img src="escudo-unilibre.png" alt="Escudo Universidad Libre de Colombia" class="logo">
-    <h2>Panel de Administrador - Gestión Académica</h2>
+    <h2>Panel Administrador</h2>
   </div>
 
-  <!-- Selector de periodo académico -->
-  <div class="login-container" style="width:600px;">
-    <h3>Periodo Académico</h3>
-    <form>
-      <label for="periodo">Seleccione periodo:</label>
-      <select id="periodo" name="periodo">
-        <option value="2026-1">2026-1</option>
-        <option value="2026-2">2026-2</option>
+  <!-- Registro de usuarios -->
+  <div class="login-container" style="width:700px;">
+    <h3>Registrar Usuario</h3>
+    <form onsubmit="registrarUsuario(
+      document.getElementById('tipoUsuario').value,
+      {
+        nombre: document.getElementById('nombreUsuario').value,
+        password: document.getElementById('passwordUsuario').value,
+        correo: document.getElementById('correoUsuario').value
+      }
+    ); return false;">
+      <label>Tipo de Usuario:</label>
+      <select id="tipoUsuario">
+        <option value="administrador">Administrador</option>
+        <option value="docente">Docente</option>
+        <option value="bienestar">Bienestar</option>
+        <option value="director_bienestar">Director de Bienestar</option>
+        <option value="decanatura">Decanatura</option>
       </select>
+
+      <label>Nombre de Usuario:</label>
+      <input type="text" id="nombreUsuario" required>
+
+      <label>Contraseña:</label>
+      <input type="password" id="passwordUsuario" required>
+
+      <label>Correo Institucional:</label>
+      <input type="email" id="correoUsuario">
+
+      <button type="submit">Registrar Usuario</button>
     </form>
   </div>
 
-  <!-- Registro de Estudiantes -->
-  <div class="login-container" style="width:600px;">
+  <!-- Registro de estudiantes -->
+  <div class="login-container" style="width:700px;">
     <h3>Registrar Estudiante</h3>
-    <form action="guardar_estudiante.php" method="POST">
-      <label>Número de Documento:</label>
-      <input type="text" name="documento" required>
+    <form onsubmit="registrarUsuario(
+      'estudiante',
+      {
+        documento: document.getElementById('documentoEst').value,
+        nombres: document.getElementById('nombresEst').value,
+        apellidos: document.getElementById('apellidosEst').value,
+        carrera: document.getElementById('carreraEst').value,
+        telefono: document.getElementById('telefonoEst').value,
+        correo: document.getElementById('correoEst').value,
+        periodo: document.getElementById('periodoEst').value
+      }
+    ); return false;">
+      <label>Documento:</label>
+      <input type="text" id="documentoEst" required>
+
       <label>Nombres:</label>
-      <input type="text" name="nombres" required>
+      <input type="text" id="nombresEst" required>
+
       <label>Apellidos:</label>
-      <input type="text" name="apellidos" required>
+      <input type="text" id="apellidosEst" required>
+
       <label>Carrera:</label>
-      <input type="text" name="carrera" required>
+      <input type="text" id="carreraEst" required>
+
       <label>Teléfono:</label>
-      <input type="text" name="telefono">
-      <label>Correo Institucional:</label>
-      <input type="email" name="correo">
-      <label>Estado:</label>
-      <select name="estado">
-        <option value="Activo">Activo</option>
-        <option value="Inactivo">Inactivo</option>
-      </select>
+      <input type="text" id="telefonoEst">
+
+      <label>Correo:</label>
+      <input type="email" id="correoEst">
+
+      <label>Periodo Académico:</label>
+      <input type="text" id="periodoEst">
+
       <button type="submit">Registrar Estudiante</button>
     </form>
   </div>
 
-  <!-- Registro de Decanatura -->
-  <div class="login-container" style="width:600px;">
-    <h3>Registrar Integrante Decanatura</h3>
-    <form action="guardar_decanatura.php" method="POST">
-      <label>Documento:</label>
-      <input type="text" name="documento" required>
-      <label>Nombres:</label>
-      <input type="text" name="nombres" required>
-      <label>Apellidos:</label>
-      <input type="text" name="apellidos" required>
-      <label>Teléfono:</label>
-      <input type="text" name="telefono">
-      <label>Correo Institucional:</label>
-      <input type="email" name="correo">
-      <label>Rol:</label>
-      <input type="text" name="rol" required>
-      <label>Estado:</label>
-      <select name="estado">
-        <option value="Activo">Activo</option>
-        <option value="Inactivo">Inactivo</option>
-      </select>
-      <button type="submit">Registrar Decanatura</button>
-    </form>
-  </div>
+  <a href="index.html">Cerrar sesión</a>
 
-  <!-- Registro de Bienestar -->
-  <div class="login-container" style="width:600px;">
-    <h3>Registrar Integrante Bienestar</h3>
-    <form action="guardar_bienestar.php" method="POST">
-      <label>Documento:</label>
-      <input type="text" name="documento" required>
-      <label>Nombres:</label>
-      <input type="text" name="nombres" required>
-      <label>Apellidos:</label>
-      <input type="text" name="apellidos" required>
-      <label>Teléfono:</label>
-      <input type="text" name="telefono">
-      <label>Correo Institucional:</label>
-      <input type="email" name="correo">
-      <label>Rol:</label>
-      <input type="text" name="rol" required>
-      <label>Estado:</label>
-      <select name="estado">
-        <option value="Activo">Activo</option>
-        <option value="Inactivo">Inactivo</option>
-      </select>
-      <button type="submit">Registrar Bienestar</button>
-    </form>
-  </div>
-
-  <!-- Registro de Docentes -->
-  <div class="login-container" style="width:600px;">
-    <h3>Registrar Docente</h3>
-    <form action="guardar_docente.php" method="POST">
-      <label>Documento:</label>
-      <input type="text" name="documento" required>
-      <label>Nombres:</label>
-      <input type="text" name="nombres" required>
-      <label>Apellidos:</label>
-      <input type="text" name="apellidos" required>
-      <label>Teléfono:</label>
-      <input type="text" name="telefono">
-      <label>Correo Institucional:</label>
-      <input type="email" name="correo">
-      <label>Rol:</label>
-      <input type="text" name="rol" required>
-      <label>Estado:</label>
-      <select name="estado">
-        <option value="Activo">Activo</option>
-        <option value="Inactivo">Inactivo</option>
-      </select>
-      <button type="submit">Registrar Docente</button>
-    </form>
-  </div>
-
-  <a href="index.html" class="volver">Cerrar sesión</a>
+  <script src="admin.js"></script>
 </body>
 </html>
