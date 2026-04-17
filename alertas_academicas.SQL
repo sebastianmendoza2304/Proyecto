@@ -1,9 +1,4 @@
--- ============================================================
---  BASE DE DATOS: Sistema de Alertas Académicas - Unilibre
---  Compatible con XAMPP / MySQL 5.7+
---  Importar desde phpMyAdmin o por consola:
---  mysql -u root -p < alertas_academicas.sql
--- ============================================================
+
 
 CREATE DATABASE IF NOT EXISTS alertas_academicas
   CHARACTER SET utf8mb4
