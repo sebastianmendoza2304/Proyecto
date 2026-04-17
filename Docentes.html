@@ -2,49 +2,441 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Panel Docente</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Docente - Sistema de Alertas</title>
+  <link rel="stylesheet" href="Style.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'DM Sans', Arial, sans-serif; background: #f5f5f5; margin: 0; }
+
+    /* Header */
+    .header { display:flex; align-items:center; gap:16px; justify-content:center;
+      background: linear-gradient(135deg,#ab1313,#f57c00); color:#fff; padding:16px 24px; }
+    .header img { width:54px; height:54px; border-radius:50%; border:2px solid rgba(255,255,255,0.5); }
+    .header-info h1 { margin:0; font-size:1.2rem; font-weight:600; }
+    .header-info p  { margin:0; font-size:0.82rem; opacity:0.85; }
+    .header-right { margin-left:auto; }
+    .btn-logout { background:rgba(255,255,255,0.18); color:#fff; border:1px solid rgba(255,255,255,0.4);
+      padding:7px 16px; border-radius:6px; cursor:pointer; font-size:0.85rem; text-decoration:none; }
+    .btn-logout:hover { background:rgba(255,255,255,0.3); }
+
+    /* Layout principal */
+    .main { max-width:1100px; margin:28px auto; padding:0 16px; }
+
+    /* Tabs */
+    .tabs { display:flex; gap:4px; margin-bottom:24px; border-bottom:2px solid #e0e0e0; }
+    .tab { padding:10px 22px; cursor:pointer; border-radius:8px 8px 0 0; font-size:0.9rem;
+      font-weight:500; color:#777; background:none; border:none; border-bottom:2px solid transparent;
+      margin-bottom:-2px; transition:all 0.2s; }
+    .tab.active { color:#b71c1c; border-bottom-color:#b71c1c; background:#fff3e0; }
+    .tab:hover:not(.active) { color:#b71c1c; background:#fafafa; }
+    .tab-panel { display:none; }
+    .tab-panel.active { display:block; }
+
+    /* Cards */
+    .card { background:#fff; border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,0.09); padding:24px; margin-bottom:20px; }
+    .card h2 { margin:0 0 20px; font-size:1.05rem; color:#b71c1c; font-weight:600;
+      border-left:4px solid #f57c00; padding-left:10px; }
+
+    /* Formulario */
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .form-grid .full { grid-column:1/-1; }
+    .form-group { display:flex; flex-direction:column; gap:5px; }
+    .form-group label { font-size:0.82rem; font-weight:600; color:#555; text-transform:uppercase; letter-spacing:0.03em; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding:9px 12px; border:1.5px solid #ddd; border-radius:7px;
+      font-size:0.92rem; font-family:inherit; transition:border-color 0.2s; background:#fafafa; }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { outline:none; border-color:#b71c1c; background:#fff; }
+    .form-group textarea { resize:vertical; min-height:80px; }
+
+    /* Botones */
+    .btn { padding:10px 22px; border:none; border-radius:7px; cursor:pointer;
+      font-weight:600; font-size:0.9rem; font-family:inherit; transition:all 0.2s; }
+    .btn-primary { background:#b71c1c; color:#fff; }
+    .btn-primary:hover { background:#f57c00; }
+    .btn-secondary { background:#f5f5f5; color:#555; border:1.5px solid #ddd; }
+    .btn-secondary:hover { background:#ffe0b2; border-color:#f57c00; color:#b71c1c; }
+    .btn-sm { padding:5px 12px; font-size:0.8rem; border-radius:5px; }
+    .form-actions { display:flex; gap:10px; margin-top:18px; }
+
+    /* Mensaje de estado */
+    .msg { padding:11px 16px; border-radius:7px; font-size:0.88rem; font-weight:500; display:none; margin-bottom:16px; }
+    .msg.success { background:#e8f5e9; color:#2e7d32; border:1px solid #a5d6a7; display:block; }
+    .msg.error   { background:#ffebee; color:#c62828; border:1px solid #ef9a9a; display:block; }
+
+    /* Tabla de reportes */
+    .tabla-wrapper { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; font-size:0.88rem; }
+    thead tr { background:linear-gradient(135deg,#b71c1c,#f57c00); color:#fff; }
+    th { padding:11px 14px; text-align:left; font-weight:600; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.04em; }
+    td { padding:11px 14px; border-bottom:1px solid #f0f0f0; color:#444; vertical-align:middle; }
+    tr:hover td { background:#fff8f0; }
+
+    /* Badges de estado */
+    .badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:600; }
+    .badge-reportado    { background:#fff3cd; color:#856404; }
+    .badge-revision     { background:#cce5ff; color:#004085; }
+    .badge-seguimiento  { background:#d4edda; color:#155724; }
+    .badge-remitido     { background:#f8d7da; color:#721c24; }
+    .badge-cerrado      { background:#e2e3e5; color:#383d41; }
+
+    /* Buscador */
+    .search-bar { display:flex; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
+    .search-bar input,
+    .search-bar select { padding:8px 12px; border:1.5px solid #ddd; border-radius:7px;
+      font-size:0.88rem; font-family:inherit; background:#fafafa; flex:1; min-width:140px; }
+    .search-bar input:focus,
+    .search-bar select:focus { outline:none; border-color:#b71c1c; }
+
+    /* Modal de edición */
+    .modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:100;
+      align-items:center; justify-content:center; }
+    .modal-bg.open { display:flex; }
+    .modal { background:#fff; border-radius:14px; padding:28px; width:100%; max-width:520px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.18); max-height:90vh; overflow-y:auto; }
+    .modal h3 { margin:0 0 18px; color:#b71c1c; font-size:1rem; }
+    .modal-actions { display:flex; gap:10px; margin-top:18px; justify-content:flex-end; }
+
+    /* Stats rápidas */
+    .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:20px; }
+    .stat-card { background:#fff; border-radius:10px; padding:16px; text-align:center;
+      box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+    .stat-num { font-size:1.8rem; font-weight:600; color:#b71c1c; }
+    .stat-label { font-size:0.78rem; color:#888; margin-top:2px; }
+
+    @media(max-width:600px) {
+      .form-grid { grid-template-columns:1fr; }
+      .tabs { overflow-x:auto; }
+    }
+  </style>
 </head>
 <body>
-  <div class="header">
-    <h2>Panel Docente</h2>
+
+<!-- Header -->
+<div class="header">
+  <img src="escudo-unilibre.png" alt="Universidad Libre">
+  <div class="header-info">
+    <h1>Panel Docente</h1>
+    <p id="nombreHeader">Sistema de Alertas Académicas</p>
+  </div>
+  <div class="header-right">
+    <a href="index.html" class="btn-logout" onclick="cerrarSesion()">Cerrar sesión</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-num" id="statTotal">—</div>
+      <div class="stat-label">Total reportes</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statPendientes">—</div>
+      <div class="stat-label">Pendientes</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statSeguimiento">—</div>
+      <div class="stat-label">En seguimiento</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statCerrados">—</div>
+      <div class="stat-label">Cerrados</div>
+    </div>
   </div>
 
-  <div class="login-container" style="width:600px;">
-    <h3>Registrar Reporte de Riesgo Académico</h3>
-    <form onsubmit="registrarReporte(
-      document.getElementById('estudiante').value,
-      document.getElementById('materia').value,
-      document.getElementById('motivo').value,
-      document.getElementById('observaciones').value,
-      localStorage.getItem('nombreUsuario')
-    ); mostrarReportesDocente('tablaReportes'); return false;">
-      <label>Estudiante:</label>
-      <input type="text" id="estudiante" required>
-      <label>Materia:</label>
-      <input type="text" id="materia" required>
-      <label>Motivo:</label>
-      <select id="motivo">
-        <option value="Bajo rendimiento">Bajo rendimiento</option>
-        <option value="Inasistencia">Inasistencia</option>
-        <option value="Seguimiento">Seguimiento</option>
-      </select>
-      <label>Observaciones:</label>
-      <textarea id="observaciones"></textarea>
-      <button type="submit">Registrar Reporte</button>
-    </form>
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="cambiarTab('nuevo', this)">➕ Nuevo reporte</button>
+    <button class="tab" onclick="cambiarTab('lista', this)">📋 Mis reportes</button>
   </div>
 
-  <div class="login-container" style="width:600px;">
-    <h3>Mis Reportes</h3>
-    <table id="tablaReportes" border="1" width="100%"></table>
+  <!-- TAB: Nuevo reporte -->
+  <div id="tab-nuevo" class="tab-panel active">
+    <div class="card">
+      <h2>Registrar reporte de riesgo académico</h2>
+      <div id="msgNuevo" class="msg"></div>
+      <form id="formNuevo" onsubmit="registrarReporte(event)">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nombre del estudiante</label>
+            <input type="text" id="estudiante" placeholder="Ej: Ana García" required>
+          </div>
+          <div class="form-group">
+            <label>Documento del estudiante</label>
+            <input type="text" id="documento" placeholder="Número de documento">
+          </div>
+          <div class="form-group">
+            <label>Materia</label>
+            <input type="text" id="materia" placeholder="Ej: Cálculo I" required>
+          </div>
+          <div class="form-group">
+            <label>Motivo del reporte</label>
+            <select id="motivo">
+              <option value="Bajo rendimiento">Bajo rendimiento</option>
+              <option value="Inasistencia">Inasistencia</option>
+              <option value="Seguimiento">Seguimiento preventivo</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>Observaciones</label>
+            <textarea id="observaciones" placeholder="Describa la situación del estudiante con detalle..."></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Registrar reporte</button>
+          <button type="button" class="btn btn-secondary" onclick="limpiarFormulario()">Limpiar</button>
+        </div>
+      </form>
+    </div>
   </div>
 
-  <a href="index.html">Cerrar sesión</a>
+  <!-- TAB: Lista de reportes -->
+  <div id="tab-lista" class="tab-panel">
+    <div class="card">
+      <h2>Mis reportes registrados</h2>
+      <div class="search-bar">
+        <input type="text" id="buscarEstudiante" placeholder="🔍 Buscar por estudiante..." oninput="filtrarTabla()">
+        <input type="text" id="buscarMateria" placeholder="🔍 Buscar por materia..." oninput="filtrarTabla()">
+        <select id="filtroEstado" onchange="filtrarTabla()">
+          <option value="">Todos los estados</option>
+          <option value="Reportado">Reportado</option>
+          <option value="En revisión">En revisión</option>
+          <option value="En seguimiento">En seguimiento</option>
+          <option value="Remitido">Remitido</option>
+          <option value="Cerrado">Cerrado</option>
+        </select>
+      </div>
+      <div class="tabla-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Estudiante</th>
+              <th>Materia</th>
+              <th>Motivo</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyReportes"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
-  <script src="docente.js"></script>
-  <script>
-    mostrarReportesDocente("tablaReportes");
-  </script>
+</div><!-- /main -->
+
+<!-- Modal edición -->
+<div class="modal-bg" id="modalEdicion">
+  <div class="modal">
+    <h3>✏️ Editar reporte</h3>
+    <div id="msgEdicion" class="msg"></div>
+    <div class="form-grid">
+      <input type="hidden" id="editId">
+      <div class="form-group">
+        <label>Estudiante</label>
+        <input type="text" id="editEstudiante" required>
+      </div>
+      <div class="form-group">
+        <label>Materia</label>
+        <input type="text" id="editMateria" required>
+      </div>
+      <div class="form-group">
+        <label>Motivo</label>
+        <select id="editMotivo">
+          <option value="Bajo rendimiento">Bajo rendimiento</option>
+          <option value="Inasistencia">Inasistencia</option>
+          <option value="Seguimiento">Seguimiento preventivo</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Observaciones</label>
+        <textarea id="editObservaciones"></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarEdicion()">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<script src="docente.js"></script>
+<script>
+  // Mostrar nombre del usuario logueado
+  const nombreUsuario = localStorage.getItem("nombreUsuario") || "Docente";
+  document.getElementById("nombreHeader").textContent = "Bienvenido/a: " + nombreUsuario;
+
+  function cerrarSesion() {
+    localStorage.removeItem("nombreUsuario");
+    localStorage.removeItem("rolUsuario");
+  }
+
+  function cambiarTab(nombre, el) {
+    document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    document.getElementById("tab-" + nombre).classList.add("active");
+    el.classList.add("active");
+    if (nombre === "lista") { cargarTabla(); }
+  }
+
+  function mostrarMsg(id, tipo, texto) {
+    const el = document.getElementById(id);
+    el.className = "msg " + tipo;
+    el.textContent = texto;
+    setTimeout(() => el.className = "msg", 4000);
+  }
+
+  function limpiarFormulario() {
+    document.getElementById("formNuevo").reset();
+  }
+
+  // ---------- CRUD con localStorage (reemplazar por fetch a PHP) ----------
+
+  function obtenerReportes() {
+    return JSON.parse(localStorage.getItem("reportes")) || [];
+  }
+  function guardarReportes(r) {
+    localStorage.setItem("reportes", JSON.stringify(r));
+  }
+
+  function registrarReporte(e) {
+    e.preventDefault();
+    const docente = localStorage.getItem("nombreUsuario") || "Sin nombre";
+    const nuevo = {
+      estudiante:   document.getElementById("estudiante").value.trim(),
+      documento:    document.getElementById("documento").value.trim(),
+      materia:      document.getElementById("materia").value.trim(),
+      motivo:       document.getElementById("motivo").value,
+      observaciones:document.getElementById("observaciones").value.trim(),
+      docente,
+      fecha: new Date().toLocaleString("es-CO"),
+      estado: "Reportado"
+    };
+    const reportes = obtenerReportes();
+    reportes.push(nuevo);
+    guardarReportes(reportes);
+    mostrarMsg("msgNuevo", "success", "✅ Reporte registrado correctamente.");
+    limpiarFormulario();
+    actualizarStats();
+
+    /* ── Cuando tengas PHP activo, reemplaza las líneas de arriba por: ──
+    fetch("api/reportes.php", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify(nuevo)
+    }).then(r => r.json()).then(res => {
+      if(res.ok) mostrarMsg("msgNuevo","success","✅ Reporte registrado.");
+      else        mostrarMsg("msgNuevo","error","❌ Error: " + res.error);
+    });
+    */
+  }
+
+  let reportesData = [];
+
+  function cargarTabla() {
+    reportesData = obtenerReportes();
+    renderTabla(reportesData);
+    actualizarStats();
+  }
+
+  function renderTabla(datos) {
+    const tbody = document.getElementById("tbodyReportes");
+    tbody.innerHTML = "";
+    if (datos.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">
+        Sin reportes registrados aún.</td></tr>`;
+      return;
+    }
+    datos.forEach((r, i) => {
+      const badgeClass = {
+        "Reportado":      "badge-reportado",
+        "En revisión":    "badge-revision",
+        "En seguimiento": "badge-seguimiento",
+        "Remitido":       "badge-remitido",
+        "Cerrado":        "badge-cerrado"
+      }[r.estado] || "badge-reportado";
+
+      const idx = obtenerReportes().indexOf(r); // índice real
+      tbody.innerHTML += `
+        <tr>
+          <td>${i+1}</td>
+          <td><strong>${r.estudiante}</strong><br>
+            <span style="font-size:0.78rem;color:#999">${r.documento||""}</span></td>
+          <td>${r.materia}</td>
+          <td>${r.motivo}</td>
+          <td><span class="badge ${badgeClass}">${r.estado}</span></td>
+          <td style="font-size:0.8rem;color:#888">${r.fecha}</td>
+          <td>
+            <button class="btn btn-secondary btn-sm" onclick='abrirModal(${JSON.stringify(r)}, ${idx})'>Editar</button>
+          </td>
+        </tr>`;
+    });
+  }
+
+  function filtrarTabla() {
+    const est = document.getElementById("buscarEstudiante").value.toLowerCase();
+    const mat = document.getElementById("buscarMateria").value.toLowerCase();
+    const est2 = document.getElementById("filtroEstado").value;
+    const filtrados = reportesData.filter(r =>
+      (!est  || r.estudiante.toLowerCase().includes(est)) &&
+      (!mat  || r.materia.toLowerCase().includes(mat)) &&
+      (!est2 || r.estado === est2)
+    );
+    renderTabla(filtrados);
+  }
+
+  function actualizarStats() {
+    const r = obtenerReportes();
+    document.getElementById("statTotal").textContent      = r.length;
+    document.getElementById("statPendientes").textContent = r.filter(x => x.estado === "Reportado").length;
+    document.getElementById("statSeguimiento").textContent= r.filter(x => x.estado === "En seguimiento").length;
+    document.getElementById("statCerrados").textContent   = r.filter(x => x.estado === "Cerrado").length;
+  }
+
+  function abrirModal(r, idx) {
+    document.getElementById("editId").value            = idx;
+    document.getElementById("editEstudiante").value    = r.estudiante;
+    document.getElementById("editMateria").value       = r.materia;
+    document.getElementById("editMotivo").value        = r.motivo;
+    document.getElementById("editObservaciones").value = r.observaciones;
+    document.getElementById("modalEdicion").classList.add("open");
+  }
+
+  function cerrarModal() {
+    document.getElementById("modalEdicion").classList.remove("open");
+  }
+
+  function guardarEdicion() {
+    const idx = parseInt(document.getElementById("editId").value);
+    const reportes = obtenerReportes();
+    if (reportes[idx]) {
+      reportes[idx].estudiante    = document.getElementById("editEstudiante").value;
+      reportes[idx].materia       = document.getElementById("editMateria").value;
+      reportes[idx].motivo        = document.getElementById("editMotivo").value;
+      reportes[idx].observaciones = document.getElementById("editObservaciones").value;
+      guardarReportes(reportes);
+      cerrarModal();
+      cargarTabla();
+      mostrarMsg("msgNuevo", "success", "✅ Reporte actualizado correctamente.");
+    }
+  }
+
+  // Cerrar modal al hacer clic fuera
+  document.getElementById("modalEdicion").addEventListener("click", function(e) {
+    if (e.target === this) cerrarModal();
+  });
+
+  // Inicializar
+  actualizarStats();
+</script>
 </body>
 </html>
