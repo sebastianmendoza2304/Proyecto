@@ -299,7 +299,6 @@
     document.getElementById("formNuevo").reset();
   }
 
-  // ---------- CRUD con localStorage (reemplazar por fetch a PHP) ----------
 
   function obtenerReportes() {
     return JSON.parse(localStorage.getItem("reportes")) || [];
@@ -327,17 +326,6 @@
     mostrarMsg("msgNuevo", "success", "✅ Reporte registrado correctamente.");
     limpiarFormulario();
     actualizarStats();
-
-    /* ── Cuando tengas PHP activo, reemplaza las líneas de arriba por: ──
-    fetch("api/reportes.php", {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify(nuevo)
-    }).then(r => r.json()).then(res => {
-      if(res.ok) mostrarMsg("msgNuevo","success","✅ Reporte registrado.");
-      else        mostrarMsg("msgNuevo","error","❌ Error: " + res.error);
-    });
-    */
   }
 
   let reportesData = [];

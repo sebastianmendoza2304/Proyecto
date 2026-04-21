@@ -4,7 +4,8 @@ const usuarios = [
   { nombre: "docente1", password: "1234", rol: "docentes.html" },
   { nombre: "bienestar1", password: "xyz", rol: "bienestar.html" },
   { nombre: "bienestar_director", password: "12345", rol: "director_bienestar.html" },
-  { nombre: "decano1", password: "abcd", rol: "decanatura.html" }
+  { nombre: "decano1", password: "abcd", rol: "decanatura.html" },
+  { nombre: "director1", password: "321", rol: "director_programa.html" }
 ];
 
 // Validar usuario y redirigir

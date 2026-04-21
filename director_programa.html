@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Director de Programa - Sistema de Alertas</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; }
+ 
+    .header { display:flex; align-items:center; gap:16px; justify-content:center;
+      background: linear-gradient(135deg,#ab1313,#f57c00); color:#fff; padding:16px 24px; }
+    .header img { width:54px; height:54px; border-radius:50%; border:2px solid rgba(255,255,255,0.5); }
+    .header-info h1 { margin:0; font-size:1.2rem; font-weight:600; }
+    .header-info p  { margin:0; font-size:0.82rem; opacity:0.85; }
+    .header-right { margin-left:auto; }
+    .btn-logout { background:rgba(255,255,255,0.18); color:#fff; border:1px solid rgba(255,255,255,0.4);
+      padding:7px 16px; border-radius:6px; cursor:pointer; font-size:0.85rem; text-decoration:none; }
+ 
+    .main { max-width:1200px; margin:28px auto; padding:0 16px; }
+ 
+    /* Stats */
+    .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:24px; }
+    .stat-card { background:#fff; border-radius:10px; padding:16px 12px; text-align:center; box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+    .stat-num { font-size:2rem; font-weight:700; color:#b71c1c; }
+    .stat-label { font-size:0.78rem; color:#888; margin-top:2px; }
+ 
+    /* Tabs */
+    .tabs { display:flex; gap:4px; margin-bottom:24px; border-bottom:2px solid #e0e0e0; overflow-x:auto; }
+    .tab { padding:10px 22px; cursor:pointer; border-radius:8px 8px 0 0; font-size:0.9rem;
+      font-weight:600; color:#777; background:none; border:none; border-bottom:2px solid transparent;
+      margin-bottom:-2px; transition:all 0.2s; white-space:nowrap; }
+    .tab.active { color:#b71c1c; border-bottom-color:#b71c1c; background:#fff3e0; }
+    .tab:hover:not(.active) { color:#b71c1c; background:#fafafa; }
+    .tab-panel { display:none; }
+    .tab-panel.active { display:block; }
+ 
+    /* Card */
+    .card { background:#fff; border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,0.09); padding:24px; margin-bottom:20px; }
+    .card h2 { margin:0 0 18px; font-size:1.05rem; color:#b71c1c; border-left:4px solid #f57c00; padding-left:10px; }
+ 
+    /* Filtros */
+    .search-bar { display:flex; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
+    .search-bar input,
+    .search-bar select { padding:8px 12px; border:1.5px solid #ddd; border-radius:7px;
+      font-size:0.88rem; font-family:inherit; background:#fafafa; flex:1; min-width:140px; }
+    .search-bar input:focus,
+    .search-bar select:focus { outline:none; border-color:#b71c1c; }
+    .search-actions { display:flex; gap:8px; align-items:center; }
+ 
+    /* Botones */
+    .btn { padding:9px 18px; border:none; border-radius:7px; cursor:pointer;
+      font-weight:600; font-size:0.88rem; font-family:inherit; transition:all 0.2s; }
+    .btn-primary { background:#b71c1c; color:#fff; }
+    .btn-primary:hover { background:#f57c00; }
+    .btn-secondary { background:#f5f5f5; color:#555; border:1.5px solid #ddd; }
+    .btn-secondary:hover { background:#ffe0b2; }
+    .btn-export { background:#1b5e20; color:#fff; }
+    .btn-export:hover { background:#2e7d32; }
+    .btn-sm { padding:4px 12px; font-size:0.8rem; border-radius:5px; }
+ 
+    /* Tabla */
+    .tabla-wrapper { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; font-size:0.88rem; }
+    thead tr { background:linear-gradient(135deg,#b71c1c,#f57c00); color:#fff; }
+    th { padding:11px 14px; text-align:left; font-weight:600; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.04em; }
+    td { padding:11px 14px; border-bottom:1px solid #f0f0f0; color:#444; vertical-align:middle; }
+    tr:hover td { background:#fff8f0; }
+ 
+    /* Badges */
+    .badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:600; }
+    .badge-reportado    { background:#fff3cd; color:#856404; }
+    .badge-revision     { background:#cce5ff; color:#004085; }
+    .badge-seguimiento  { background:#d4edda; color:#155724; }
+    .badge-remitido     { background:#f8d7da; color:#721c24; }
+    .badge-cerrado      { background:#e2e3e5; color:#383d41; }
+ 
+    /* Gráfico de barras */
+    .chart-wrap { margin-top: 4px; }
+    .bar-row {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 10px; font-size: 0.83rem;
+    }
+    .bar-label { min-width: 170px; color: #555; font-weight: 600; }
+    .bar-track {
+      flex: 1; height: 10px; background: #f5f5f5;
+      border-radius: 5px; overflow: hidden;
+      border: 1px solid #eee;
+    }
+    .bar-fill { height: 100%; border-radius: 5px; transition: width 0.6s ease; }
+    .bar-val { min-width: 28px; text-align: right; font-weight: 700; color: #b71c1c; }
+    .chart-empty { color:#aaa; font-size:0.88rem; font-style:italic; padding:8px 0; }
+ 
+    .fill-bajo      { background: #f59e0b; }
+    .fill-inasis    { background: #ef4444; }
+    .fill-seg       { background: #22c55e; }
+    .fill-reportado { background: #f59e0b; }
+    .fill-revision  { background: #3b82f6; }
+    .fill-seguim    { background: #22c55e; }
+    .fill-remitido  { background: #ef4444; }
+    .fill-cerrado   { background: #9ca3af; }
+ 
+    /* Grid de análisis */
+    .analisis-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .analisis-grid .full { grid-column:1/-1; }
+    @media(max-width:780px){ .analisis-grid { grid-template-columns:1fr; } }
+ 
+    /* Alertas */
+    .alerta-item {
+      border-radius: 8px;
+      padding: 13px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .alerta-item.critica { background:#ffebee; border:1px solid #ef9a9a; }
+    .alerta-item.warning { background:#fff8e1; border:1px solid #ffe082; }
+    .alerta-item .icono  { font-size: 1.3rem; }
+    .alerta-item .info   { flex: 1; font-size: 0.88rem; }
+    .alerta-item .info small { display:block; color:#777; font-size:0.78rem; margin-top:3px; }
+    .alerta-item .info strong { font-size:0.95rem; }
+    .vacio-ok { color:#2e7d32; font-weight:600; font-size:0.9rem; padding:12px 0; }
+ 
+    /* Modal detalle */
+    .modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:100;
+      align-items:center; justify-content:center; }
+    .modal-bg.open { display:flex; }
+    .modal { background:#fff; border-radius:14px; padding:28px; width:100%; max-width:600px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.18); max-height:92vh; overflow-y:auto; }
+    .modal h3 { margin:0 0 16px; color:#b71c1c; font-size:1rem; }
+    .detalle-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .detalle-item { background:#f9f9f9; border-radius:8px; padding:12px; }
+    .detalle-item.full { grid-column:1/-1; }
+    .detalle-label { font-size:0.75rem; color:#999; text-transform:uppercase; font-weight:600; margin-bottom:4px; }
+    .detalle-val { font-size:0.92rem; color:#333; }
+    .modal-actions { margin-top:18px; display:flex; justify-content:flex-end; gap:10px; }
+ 
+    @media(max-width:600px){ .detalle-grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+ 
+<div class="header">
+  <img src="escudo-unilibre.png" alt="Universidad Libre">
+  <div class="header-info">
+    <h1>Panel Director de Programa</h1>
+    <p id="nombreHeader">Sistema de Alertas Académicas</p>
+  </div>
+  <div class="header-right">
+    <a href="Index.html" class="btn-logout" onclick="cerrarSesion()">Cerrar sesión</a>
+  </div>
+</div>
+ 
+<div class="main">
+ 
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-card"><div class="stat-num" id="statTotal">—</div><div class="stat-label">Casos totales</div></div>
+    <div class="stat-card"><div class="stat-num" id="statPendientes">—</div><div class="stat-label">Pendientes</div></div>
+    <div class="stat-card"><div class="stat-num" id="statEnProceso">—</div><div class="stat-label">En proceso</div></div>
+    <div class="stat-card"><div class="stat-num" id="statCerrados">—</div><div class="stat-label">Cerrados</div></div>
+    <div class="stat-card"><div class="stat-num" id="statEstudiantes">—</div><div class="stat-label">Estudiantes en riesgo</div></div>
+  </div>
+ 
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="cambiarTab('casos', this)">📋 Casos de la carrera</button>
+    <button class="tab" onclick="cambiarTab('analisis', this)">📊 Análisis</button>
+    <button class="tab" onclick="cambiarTab('alertas', this)">🔔 Alertas críticas</button>
+  </div>
+ 
+  <!-- TAB: Casos -->
+  <div id="tab-casos" class="tab-panel active">
+    <div class="card">
+      <h2>Reportes activos de la carrera</h2>
+ 
+      <div class="search-bar">
+        <input  type="text" id="fEstudiante" placeholder="🔍 Estudiante..." oninput="aplicarFiltros()">
+        <input  type="text" id="fMateria"    placeholder="🔍 Materia..."    oninput="aplicarFiltros()">
+        <select id="fEstado" onchange="aplicarFiltros()">
+          <option value="">Todos los estados</option>
+          <option value="Reportado">Reportado</option>
+          <option value="En revisión">En revisión</option>
+          <option value="En seguimiento">En seguimiento</option>
+          <option value="Remitido">Remitido</option>
+          <option value="Cerrado">Cerrado</option>
+        </select>
+        <select id="fMotivo" onchange="aplicarFiltros()">
+          <option value="">Todos los motivos</option>
+          <option value="Bajo rendimiento">Bajo rendimiento</option>
+          <option value="Inasistencia">Inasistencia</option>
+          <option value="Seguimiento preventivo">Seguimiento preventivo</option>
+        </select>
+        <div class="search-actions">
+          <button class="btn btn-secondary btn-sm" onclick="limpiarFiltros()">Limpiar</button>
+          <button class="btn btn-export btn-sm" onclick="exportarCSV()">⬇ CSV</button>
+        </div>
+      </div>
+ 
+      <div class="tabla-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Estudiante</th>
+              <th>Materia</th>
+              <th>Docente</th>
+              <th>Motivo</th>
+              <th>Estado</th>
+              <th>Seguimiento</th>
+              <th>Fecha</th>
+              <th>Detalle</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyCasos"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- TAB: Análisis -->
+  <div id="tab-analisis" class="tab-panel">
+    <div class="analisis-grid">
+      <div class="card">
+        <h2>📊 Casos por motivo</h2>
+        <div class="chart-wrap" id="chartMotivo"></div>
+      </div>
+      <div class="card">
+        <h2>📈 Casos por estado</h2>
+        <div class="chart-wrap" id="chartEstado"></div>
+      </div>
+      <div class="card full">
+        <h2>🏫 Top 5 materias con más casos</h2>
+        <div class="chart-wrap" id="chartMaterias"></div>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- TAB: Alertas -->
+  <div id="tab-alertas" class="tab-panel">
+    <div class="card">
+      <h2>🚨 Casos sin intervención</h2>
+      <p style="font-size:0.88rem;color:#777;margin:-8px 0 16px">
+        Casos en estado "Reportado" que aún no tienen seguimiento registrado por Bienestar.
+      </p>
+      <div id="alertasCriticas"></div>
+    </div>
+ 
+    <div class="card">
+      <h2>⚠️ Casos remitidos externamente</h2>
+      <p style="font-size:0.88rem;color:#777;margin:-8px 0 16px">
+        Casos derivados a servicios externos que requieren seguimiento continuo.
+      </p>
+      <div id="alertasRemitidos"></div>
+    </div>
+  </div>
+ 
+</div>
+ 
+<!-- Modal detalle -->
+<div class="modal-bg" id="modalDetalle">
+  <div class="modal">
+    <h3>📄 Detalle del caso</h3>
+    <div class="detalle-grid" id="detalleContenido"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="cerrarModal()">Cerrar</button>
+    </div>
+  </div>
+</div>
+ 
+<script src="director_programa.js"></script>
+</body>
+</html
