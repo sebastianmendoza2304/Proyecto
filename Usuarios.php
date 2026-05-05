@@ -1,15 +1,13 @@
 <?php
 // ============================================================
-// usuarios.php — CRUD de usuarios del sistema
-// Sistema de Alertas por Riesgo Académico - Universidad Libre
+// usuarios.php — CRUD tabla "usuario" (BD sistema)
 //
-// Métodos soportados:
-//   GET    /usuarios.php              → listar todos
-//   GET    /usuarios.php?id=5         → obtener uno por ID
-//   GET    /usuarios.php?rol=docente  → filtrar por rol
-//   POST   /usuarios.php              → crear usuario
-//   PUT    /usuarios.php?id=5         → actualizar usuario
-//   DELETE /usuarios.php?id=5         → eliminar (desactivar) usuario
+// GET    /usuarios.php            → listar todos
+// GET    /usuarios.php?id=2       → obtener uno
+// GET    /usuarios.php?rol=docente→ filtrar por rol
+// POST   /usuarios.php            → crear usuario
+// PUT    /usuarios.php?id=2       → actualizar
+// DELETE /usuarios.php?id=2       → desactivar
 // ============================================================
 
 require_once 'config.php';
@@ -20,154 +18,131 @@ $id     = isset($_GET['id']) ? (int)$_GET['id'] : null;
 try {
     $pdo = conectar();
 
-    // ──────────────────────────────────────────────────────────
-    // GET — Listar / Obtener
-    // ──────────────────────────────────────────────────────────
+    // ── GET ──────────────────────────────────────────────
     if ($metodo === 'GET') {
 
-        // Obtener uno por ID
         if ($id) {
             $stmt = $pdo->prepare(
-                'SELECT id, nombre, correo, rol, activo, creado_en
-                 FROM usuarios WHERE id = ?'
+                'SELECT id_usuario AS id, nombre_usuario AS nombre,
+                        documento_identidad AS documento, nombres, apellidos,
+                        telefono, correo_institucional AS correo, rol, estado
+                 FROM usuario WHERE id_usuario = ?'
             );
             $stmt->execute([$id]);
-            $usuario = $stmt->fetch();
-
-            if (!$usuario) {
-                responder('Usuario no encontrado.', false, 404);
-            }
-            responder($usuario);
+            $u = $stmt->fetch();
+            if (!$u) responder('Usuario no encontrado.', false, 404);
+            responder($u);
         }
 
-        // Filtrar por rol
-        $rol    = $_GET['rol']    ?? null;
-        $activo = $_GET['activo'] ?? null;   // "1" o "0"
-
-        $sql    = 'SELECT id, nombre, correo, rol, activo, creado_en FROM usuarios WHERE 1=1';
+        $sql    = 'SELECT id_usuario AS id, nombre_usuario AS nombre,
+                          documento_identidad AS documento, nombres, apellidos,
+                          telefono, correo_institucional AS correo, rol, estado
+                   FROM usuario WHERE 1=1';
         $params = [];
 
-        if ($rol) {
+        if (!empty($_GET['rol'])) {
             $sql .= ' AND rol = ?';
-            $params[] = $rol;
+            $params[] = $_GET['rol'];
         }
-        if ($activo !== null) {
-            $sql .= ' AND activo = ?';
-            $params[] = (int)$activo;
+        if (isset($_GET['activo'])) {
+            $sql .= ' AND estado = ?';
+            $params[] = (int)$_GET['activo'];
+        }
+        if (!empty($_GET['buscar'])) {
+            $like = '%' . $_GET['buscar'] . '%';
+            $sql .= ' AND (nombres LIKE ? OR apellidos LIKE ? OR nombre_usuario LIKE ?)';
+            $params[] = $like; $params[] = $like; $params[] = $like;
         }
 
-        $sql .= ' ORDER BY creado_en DESC';
+        $sql .= ' ORDER BY apellidos, nombres';
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
         responder($stmt->fetchAll());
     }
 
-    // ──────────────────────────────────────────────────────────
-    // POST — Crear usuario
-    // ──────────────────────────────────────────────────────────
+    // ── POST — Crear usuario ────────────────────────────
     if ($metodo === 'POST') {
-        $datos = leerJSON();
+        $d = leerJSON();
+        requerir($d, 'nombre', 'password', 'rol', 'documento', 'nombres', 'apellidos');
 
-        requerir($datos, 'nombre', 'password', 'rol');
+        // Nombre de usuario único
+        $chk = $pdo->prepare('SELECT id_usuario FROM usuario WHERE nombre_usuario = ?');
+        $chk->execute([$d['nombre']]);
+        if ($chk->fetch()) responder('Ya existe un usuario con ese nombre.', false, 409);
 
-        // Verificar nombre único
-        $chk = $pdo->prepare('SELECT id FROM usuarios WHERE nombre = ?');
-        $chk->execute([$datos['nombre']]);
-        if ($chk->fetch()) {
-            responder('Ya existe un usuario con ese nombre.', false, 409);
-        }
-
-        // Roles válidos
-        $rolesValidos = ['administrador', 'docente', 'bienestar', 'director_bienestar', 'decanatura'];
-        if (!in_array($datos['rol'], $rolesValidos, true)) {
-            responder('Rol no válido.', false, 422);
-        }
-
-        // Hash de contraseña con bcrypt
-        $hash = password_hash(trim($datos['password']), PASSWORD_BCRYPT);
+        // Contraseña con bcrypt
+        $hash = password_hash(trim($d['password']), PASSWORD_BCRYPT);
 
         $stmt = $pdo->prepare(
-            'INSERT INTO usuarios (nombre, password, correo, rol, activo)
-             VALUES (?, ?, ?, ?, 1)'
+            'INSERT INTO usuario
+               (nombre_usuario, contrasena, documento_identidad, nombres, apellidos,
+                telefono, correo_institucional, rol, estado)
+             VALUES (?,?,?,?,?,?,?,?,1)'
         );
         $stmt->execute([
-            trim($datos['nombre']),
+            trim($d['nombre']),
             $hash,
-            trim($datos['correo'] ?? ''),
-            $datos['rol'],
+            trim($d['documento']),
+            trim($d['nombres']),
+            trim($d['apellidos']),
+            trim($d['telefono'] ?? ''),
+            trim($d['correo']   ?? ''),
+            $d['rol'],
         ]);
 
-        responder([
-            'id'      => (int)$pdo->lastInsertId(),
-            'mensaje' => 'Usuario registrado correctamente.',
-        ], true, 201);
+        responder(['id' => (int)$pdo->lastInsertId(), 'mensaje' => 'Usuario registrado correctamente.'], true, 201);
     }
 
-    // ──────────────────────────────────────────────────────────
-    // PUT — Actualizar usuario
-    // ──────────────────────────────────────────────────────────
+    // ── PUT — Actualizar ────────────────────────────────
     if ($metodo === 'PUT') {
         if (!$id) responder('Falta el parámetro id.', false, 400);
+        $d = leerJSON();
 
-        $datos = leerJSON();
-
-        // Verificar que existe
-        $chk = $pdo->prepare('SELECT id FROM usuarios WHERE id = ?');
+        $chk = $pdo->prepare('SELECT id_usuario FROM usuario WHERE id_usuario = ?');
         $chk->execute([$id]);
-        if (!$chk->fetch()) {
-            responder('Usuario no encontrado.', false, 404);
+        if (!$chk->fetch()) responder('Usuario no encontrado.', false, 404);
+
+        $mapa = [
+            'nombre'    => 'nombre_usuario = ?',
+            'documento' => 'documento_identidad = ?',
+            'nombres'   => 'nombres = ?',
+            'apellidos' => 'apellidos = ?',
+            'telefono'  => 'telefono = ?',
+            'correo'    => 'correo_institucional = ?',
+            'rol'       => 'rol = ?',
+        ];
+
+        $campos = []; $valores = [];
+        foreach ($mapa as $key => $sql) {
+            if (array_key_exists($key, $d)) {
+                $campos[]  = $sql;
+                $valores[] = trim((string)$d[$key]);
+            }
+        }
+        if (!empty($d['password'])) {
+            $campos[]  = 'contrasena = ?';
+            $valores[] = password_hash(trim($d['password']), PASSWORD_BCRYPT);
+        }
+        if (isset($d['activo'])) {
+            $campos[]  = 'estado = ?';
+            $valores[] = (int)(bool)$d['activo'];
         }
 
-        // Construir UPDATE dinámico (solo campos enviados)
-        $campos  = [];
-        $valores = [];
-
-        if (!empty($datos['nombre'])) {
-            $campos[]  = 'nombre = ?';
-            $valores[] = trim($datos['nombre']);
-        }
-        if (!empty($datos['password'])) {
-            $campos[]  = 'password = ?';
-            $valores[] = password_hash(trim($datos['password']), PASSWORD_BCRYPT);
-        }
-        if (isset($datos['correo'])) {
-            $campos[]  = 'correo = ?';
-            $valores[] = trim($datos['correo']);
-        }
-        if (!empty($datos['rol'])) {
-            $campos[]  = 'rol = ?';
-            $valores[] = $datos['rol'];
-        }
-        if (isset($datos['activo'])) {
-            $campos[]  = 'activo = ?';
-            $valores[] = (int)(bool)$datos['activo'];
-        }
-
-        if (empty($campos)) {
-            responder('No se enviaron campos para actualizar.', false, 422);
-        }
+        if (empty($campos)) responder('No se enviaron campos para actualizar.', false, 422);
 
         $valores[] = $id;
-        $stmt = $pdo->prepare(
-            'UPDATE usuarios SET ' . implode(', ', $campos) . ' WHERE id = ?'
-        );
-        $stmt->execute($valores);
+        $pdo->prepare('UPDATE usuario SET ' . implode(', ', $campos) . ' WHERE id_usuario = ?')
+            ->execute($valores);
 
         responder(['mensaje' => 'Usuario actualizado correctamente.']);
     }
 
-    // ──────────────────────────────────────────────────────────
-    // DELETE — Desactivar usuario (baja lógica)
-    // ──────────────────────────────────────────────────────────
+    // ── DELETE — Desactivar (baja lógica) ───────────────
     if ($metodo === 'DELETE') {
         if (!$id) responder('Falta el parámetro id.', false, 400);
-
-        $stmt = $pdo->prepare('UPDATE usuarios SET activo = 0 WHERE id = ?');
+        $stmt = $pdo->prepare('UPDATE usuario SET estado = 0 WHERE id_usuario = ?');
         $stmt->execute([$id]);
-
-        if ($stmt->rowCount() === 0) {
-            responder('Usuario no encontrado.', false, 404);
-        }
+        if ($stmt->rowCount() === 0) responder('Usuario no encontrado.', false, 404);
         responder(['mensaje' => 'Usuario desactivado correctamente.']);
     }
 

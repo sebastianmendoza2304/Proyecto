@@ -1,22 +1,16 @@
 <?php
 // ============================================================
-// reportes.php — CRUD de reportes de riesgo académico
-// Sistema de Alertas por Riesgo Académico - Universidad Libre
+// reportes.php — CRUD tabla "reporte_riesgo" (BD sistema)
 //
-// Métodos soportados:
-//   GET    /reportes.php                      → listar todos (vista completa)
-//   GET    /reportes.php?id=2                 → obtener uno por ID
-//   GET    /reportes.php?estudiante_id=1      → por estudiante
-//   GET    /reportes.php?docente_id=2         → por docente
-//   GET    /reportes.php?estado=Reportado     → por estado
-//   GET    /reportes.php?motivo=Inasistencia  → por motivo
-//   GET    /reportes.php?carrera=Sistemas     → por carrera del estudiante
-//   GET    /reportes.php?periodo=2025-1       → por periodo académico
-//   GET    /reportes.php?fecha_ini=2025-01-01&fecha_fin=2025-06-30
-//   GET    /reportes.php?buscar=ana           → búsqueda libre
-//   POST   /reportes.php                      → crear reporte
-//   PUT    /reportes.php?id=2                 → actualizar estado / remisión
-//   DELETE /reportes.php?id=2                 → eliminar reporte (solo admin)
+// GET    /reportes.php                    → listar todos (con JOINs)
+// GET    /reportes.php?id=1               → obtener uno con seguimientos
+// GET    /reportes.php?estado=Reportado   → filtrar por estado
+// GET    /reportes.php?docente_id=2       → por docente (vía usuario)
+// GET    /reportes.php?buscar=ana         → búsqueda libre
+// GET    /reportes.php?fecha_ini=...&fecha_fin=...
+// POST   /reportes.php                    → crear reporte
+// PUT    /reportes.php?id=1               → actualizar estado
+// DELETE /reportes.php?id=1               → eliminar
 // ============================================================
 
 require_once 'config.php';
@@ -24,136 +18,131 @@ require_once 'config.php';
 $metodo = $_SERVER['REQUEST_METHOD'];
 $id     = isset($_GET['id']) ? (int)$_GET['id'] : null;
 
+// SELECT base con todos los JOINs para traer nombres en lugar de IDs
+const SQL_BASE = "
+    SELECT
+        r.id_reporte            AS id,
+        CONCAT(e.nombres, ' ', e.apellidos) AS estudiante,
+        e.documento_identidad   AS documento,
+        e.carrera_cursada       AS carrera,
+        m.nombre_materia        AS materia,
+        mo.nombre_motivo        AS motivo,
+        r.observaciones,
+        r.estado,
+        r.remitido_a,
+        r.motivo_remision,
+        CONCAT(r.fecha_registro, ' ', TIME_FORMAT(r.hora_registro,'%H:%i')) AS fecha,
+        r.id_estudiante,
+        r.id_materia,
+        r.id_motivo,
+        r.id_semestre_académico AS id_semestre
+    FROM reporte_riesgo r
+    JOIN estudiante    e  ON r.id_estudiante   = e.id_estudiante
+    JOIN materia       m  ON r.id_materia       = m.id_materia
+    JOIN motivo        mo ON r.id_motivo        = mo.id_motivo
+";
+
 try {
     $pdo = conectar();
 
-    // ──────────────────────────────────────────────────────────
-    // GET — Listar / Filtrar / Obtener
-    // ──────────────────────────────────────────────────────────
+    // ── GET ──────────────────────────────────────────────
     if ($metodo === 'GET') {
 
-        // Obtener uno por ID (con datos completos de vista)
+        // Obtener uno con sus seguimientos
         if ($id) {
-            $stmt = $pdo->prepare('SELECT * FROM v_reportes WHERE id = ?');
+            $stmt = $pdo->prepare(SQL_BASE . ' WHERE r.id_reporte = ?');
             $stmt->execute([$id]);
             $rep = $stmt->fetch();
             if (!$rep) responder('Reporte no encontrado.', false, 404);
 
-            // Adjuntar seguimientos de este reporte
-            $seg = $pdo->prepare('SELECT * FROM v_seguimientos WHERE reporte_id = ? ORDER BY fecha');
+            $seg = $pdo->prepare(
+                'SELECT s.id_seguimiento AS id, s.id_reporte AS reporte_id,
+                        CONCAT(u.nombres," ",u.apellidos) AS profesional,
+                        s.tipo_intervención AS intervencion,
+                        s.observaciones, s.recomendaciones,
+                        CONCAT(s.fecha_intervención," ",TIME_FORMAT(s.hora_intervención,"%H:%i")) AS fecha
+                 FROM seguimiento s
+                 JOIN usuario u ON s.id_profesional = u.id_usuario
+                 WHERE s.id_reporte = ?
+                 ORDER BY s.fecha_intervención, s.hora_intervención'
+            );
             $seg->execute([$id]);
             $rep['seguimientos'] = $seg->fetchAll();
 
             responder($rep);
         }
 
-        // Construir consulta con filtros
-        $sql    = 'SELECT * FROM v_reportes WHERE 1=1';
+        // Listado con filtros
+        $sql    = SQL_BASE . ' WHERE 1=1';
         $params = [];
 
-        if (!empty($_GET['estudiante_id'])) {
-            // Buscar por ID de estudiante en la tabla base
-            $sql    = 'SELECT r.*, CONCAT(e.nombres," ",e.apellidos) AS estudiante,
-                              e.documento, e.carrera, u.nombre AS docente
-                       FROM reportes r
-                       JOIN estudiantes e ON r.estudiante_id = e.id
-                       JOIN usuarios u ON r.docente_id = u.id
-                       WHERE r.estudiante_id = ?';
-            $params[] = (int)$_GET['estudiante_id'];
-        } else {
-            // Filtros sobre la vista
-            if (!empty($_GET['docente_id'])) {
-                // La vista no tiene docente_id; usamos subquery
-                $sql .= ' AND id IN (SELECT id FROM reportes WHERE docente_id = ?)';
-                $params[] = (int)$_GET['docente_id'];
-            }
-            if (!empty($_GET['estado'])) {
-                $sql .= ' AND estado = ?';
-                $params[] = $_GET['estado'];
-            }
-            if (!empty($_GET['motivo'])) {
-                $sql .= ' AND motivo = ?';
-                $params[] = $_GET['motivo'];
-            }
-            if (!empty($_GET['carrera'])) {
-                $sql .= ' AND carrera LIKE ?';
-                $params[] = '%' . $_GET['carrera'] . '%';
-            }
-            if (!empty($_GET['periodo'])) {
-                $sql .= ' AND id IN (
-                    SELECT r2.id FROM reportes r2
-                    JOIN estudiantes e2 ON r2.estudiante_id = e2.id
-                    WHERE e2.periodo = ?
-                )';
-                $params[] = $_GET['periodo'];
-            }
-            // Rango de fechas
-            if (!empty($_GET['fecha_ini'])) {
-                $sql .= ' AND fecha >= ?';
-                $params[] = $_GET['fecha_ini'] . ' 00:00:00';
-            }
-            if (!empty($_GET['fecha_fin'])) {
-                $sql .= ' AND fecha <= ?';
-                $params[] = $_GET['fecha_fin'] . ' 23:59:59';
-            }
-            // Búsqueda libre
-            if (!empty($_GET['buscar'])) {
-                $like = '%' . $_GET['buscar'] . '%';
-                $sql .= ' AND (estudiante LIKE ? OR materia LIKE ? OR docente LIKE ?)';
-                $params[] = $like;
-                $params[] = $like;
-                $params[] = $like;
-            }
+        if (!empty($_GET['estado'])) {
+            $sql .= ' AND r.estado = ?';
+            $params[] = $_GET['estado'];
+        }
+        if (!empty($_GET['motivo'])) {
+            $sql .= ' AND mo.nombre_motivo = ?';
+            $params[] = $_GET['motivo'];
+        }
+        if (!empty($_GET['carrera'])) {
+            $sql .= ' AND e.carrera_cursada LIKE ?';
+            $params[] = '%' . $_GET['carrera'] . '%';
+        }
+        if (!empty($_GET['fecha_ini'])) {
+            $sql .= ' AND r.fecha_registro >= ?';
+            $params[] = $_GET['fecha_ini'];
+        }
+        if (!empty($_GET['fecha_fin'])) {
+            $sql .= ' AND r.fecha_registro <= ?';
+            $params[] = $_GET['fecha_fin'];
+        }
+        if (!empty($_GET['buscar'])) {
+            $like = '%' . $_GET['buscar'] . '%';
+            $sql .= ' AND (e.nombres LIKE ? OR e.apellidos LIKE ? OR m.nombre_materia LIKE ?)';
+            $params[] = $like; $params[] = $like; $params[] = $like;
         }
 
-        $sql .= ' ORDER BY fecha DESC';
+        $sql .= ' ORDER BY r.fecha_registro DESC, r.hora_registro DESC';
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
         responder($stmt->fetchAll());
     }
 
-    // ──────────────────────────────────────────────────────────
-    // POST — Crear reporte
-    // ──────────────────────────────────────────────────────────
+    // ── POST — Crear reporte ────────────────────────────
     if ($metodo === 'POST') {
         $d = leerJSON();
+        requerir($d, 'estudiante_id', 'materia_id', 'motivo_id', 'observaciones');
 
-        requerir($d, 'estudiante_id', 'docente_id', 'materia', 'motivo');
+        // Obtener semestre activo (el más reciente)
+        $semestre = $pdo->query(
+            'SELECT id_semestre FROM `semestre_acacémico`
+             ORDER BY año DESC, periodo DESC LIMIT 1'
+        )->fetch();
+        $semestreId = $semestre ? $semestre['id_semestre'] : 1;
 
-        // Verificar que el estudiante existe
-        $chkEst = $pdo->prepare('SELECT id FROM estudiantes WHERE id = ?');
-        $chkEst->execute([(int)$d['estudiante_id']]);
-        if (!$chkEst->fetch()) responder('Estudiante no encontrado.', false, 404);
-
-        // Verificar que el docente existe
-        $chkDoc = $pdo->prepare("SELECT id FROM usuarios WHERE id = ? AND rol = 'docente'");
-        $chkDoc->execute([(int)$d['docente_id']]);
-        if (!$chkDoc->fetch()) responder('Docente no encontrado.', false, 404);
-
-        // Motivos válidos
-        $motivosValidos = ['Bajo rendimiento', 'Inasistencia', 'Seguimiento'];
-        if (!in_array($d['motivo'], $motivosValidos, true)) {
-            responder('Motivo no válido. Use: ' . implode(', ', $motivosValidos), false, 422);
-        }
+        // Crear caso
+        $pdo->prepare('INSERT INTO caso (descripcion) VALUES (?)')->execute(['Reporte automático']);
+        $casoId = (int)$pdo->lastInsertId();
 
         $stmt = $pdo->prepare(
-            'INSERT INTO reportes
-               (estudiante_id, docente_id, materia, motivo, observaciones, estado)
-             VALUES (?, ?, ?, ?, ?, ?)'
+            'INSERT INTO reporte_riesgo
+               (observaciones, fecha_registro, hora_registro, estado, caso,
+                id_motivo, id_materia, id_semestre_académico, id_estudiante)
+             VALUES (?, CURDATE(), CURTIME(), ?, ?, ?, ?, ?, ?)'
         );
         $stmt->execute([
-            (int)$d['estudiante_id'],
-            (int)$d['docente_id'],
-            trim($d['materia']),
-            $d['motivo'],
-            trim($d['observaciones'] ?? ''),
+            trim($d['observaciones']),
             $d['estado'] ?? 'Reportado',
+            $casoId,
+            (int)$d['motivo_id'],
+            (int)$d['materia_id'],
+            $semestreId,
+            (int)$d['estudiante_id'],
         ]);
 
         $nuevoId = (int)$pdo->lastInsertId();
 
-        // Devolver el reporte recién creado con datos completos
-        $stmt2 = $pdo->prepare('SELECT * FROM v_reportes WHERE id = ?');
+        $stmt2 = $pdo->prepare(SQL_BASE . ' WHERE r.id_reporte = ?');
         $stmt2->execute([$nuevoId]);
 
         responder([
@@ -163,28 +152,21 @@ try {
         ], true, 201);
     }
 
-    // ──────────────────────────────────────────────────────────
-    // PUT — Actualizar estado / remisión del reporte
-    // ──────────────────────────────────────────────────────────
+    // ── PUT — Actualizar estado / remisión ──────────────
     if ($metodo === 'PUT') {
         if (!$id) responder('Falta el parámetro id.', false, 400);
-
         $d = leerJSON();
 
-        // Verificar que existe
-        $chk = $pdo->prepare('SELECT id, estado FROM reportes WHERE id = ?');
+        $chk = $pdo->prepare('SELECT id_reporte FROM reporte_riesgo WHERE id_reporte = ?');
         $chk->execute([$id]);
-        $actual = $chk->fetch();
-        if (!$actual) responder('Reporte no encontrado.', false, 404);
+        if (!$chk->fetch()) responder('Reporte no encontrado.', false, 404);
 
-        $estadosValidos = ['Reportado', 'En revisión', 'En seguimiento', 'Remitido', 'Cerrado'];
-
-        $campos  = [];
-        $valores = [];
+        $estadosValidos = ['Reportado','En revisión','En seguimiento','Remitido','Cerrado'];
+        $campos = []; $valores = [];
 
         if (!empty($d['estado'])) {
             if (!in_array($d['estado'], $estadosValidos, true)) {
-                responder('Estado no válido. Use: ' . implode(', ', $estadosValidos), false, 422);
+                responder('Estado no válido.', false, 422);
             }
             $campos[]  = 'estado = ?';
             $valores[] = $d['estado'];
@@ -205,33 +187,20 @@ try {
         if (empty($campos)) responder('No se enviaron campos para actualizar.', false, 422);
 
         $valores[] = $id;
-        $stmt = $pdo->prepare(
-            'UPDATE reportes SET ' . implode(', ', $campos) . ' WHERE id = ?'
-        );
-        $stmt->execute($valores);
+        $pdo->prepare('UPDATE reporte_riesgo SET ' . implode(', ', $campos) . ' WHERE id_reporte = ?')
+            ->execute($valores);
 
-        // Retornar el reporte actualizado
-        $stmt2 = $pdo->prepare('SELECT * FROM v_reportes WHERE id = ?');
+        $stmt2 = $pdo->prepare(SQL_BASE . ' WHERE r.id_reporte = ?');
         $stmt2->execute([$id]);
-
-        responder([
-            'reporte' => $stmt2->fetch(),
-            'mensaje' => 'Reporte actualizado correctamente.',
-        ]);
+        responder(['reporte' => $stmt2->fetch(), 'mensaje' => 'Reporte actualizado correctamente.']);
     }
 
-    // ──────────────────────────────────────────────────────────
-    // DELETE — Eliminar reporte
-    // ──────────────────────────────────────────────────────────
+    // ── DELETE ──────────────────────────────────────────
     if ($metodo === 'DELETE') {
         if (!$id) responder('Falta el parámetro id.', false, 400);
-
-        // Eliminar seguimientos asociados primero (FK)
-        $pdo->prepare('DELETE FROM seguimientos WHERE reporte_id = ?')->execute([$id]);
-
-        $stmt = $pdo->prepare('DELETE FROM reportes WHERE id = ?');
+        $pdo->prepare('DELETE FROM seguimiento WHERE id_reporte = ?')->execute([$id]);
+        $stmt = $pdo->prepare('DELETE FROM reporte_riesgo WHERE id_reporte = ?');
         $stmt->execute([$id]);
-
         if ($stmt->rowCount() === 0) responder('Reporte no encontrado.', false, 404);
         responder(['mensaje' => 'Reporte eliminado correctamente.']);
     }

@@ -194,7 +194,7 @@
 
       <!-- RU-13: Filtros por fecha, programa académico, periodo -->
       <div class="filtros-panel">
-        <h4>🔎 Filtros avanzados</h4>
+        <h4>🔎 Filtros avanzados — RU-13</h4>
         <div class="filtros-grid">
           <input type="text" id="fEstudiante"  placeholder="Estudiante..."           oninput="filtrarCasos()">
           <input type="text" id="fPrograma"    placeholder="Programa académico..."   oninput="filtrarCasos()">
@@ -302,7 +302,7 @@
   <!-- ════ TAB: Consulta por estudiante (RU-14) ════ -->
   <div id="tab-historial" class="tab-panel">
     <div class="card">
-      <h2>🔍 Consulta por estudiante</h2>
+      <h2>🔍 Consulta por estudiante — RU-14</h2>
       <p style="font-size:0.87rem;color:#777;margin:-8px 0 18px">
         Visualiza qué docentes han reportado a cada estudiante y en qué materias.
         Los casos se agrupan por nombre del estudiante.
@@ -380,6 +380,7 @@
   </div>
 </div>
 
+<script src="api.js"></script>
 <script>
   const nombreUsuario = localStorage.getItem("nombreUsuario") || "Director/a Bienestar";
   document.getElementById("nombreHeader").textContent = "Bienvenido/a: " + nombreUsuario;
@@ -402,8 +403,8 @@
   let todosLos = [];
 
   /* ── INIT ── */
-  function init(){
-    todosLos = obtenerReportes();
+  async function init(){
+    todosLos = await obtenerReportesAsync();
     renderCasos(todosLos);
     actualizarStats(todosLos);
   }
@@ -518,9 +519,23 @@
       reportes[idx].remitido_a=document.getElementById("modalRemitidoA").value;
       reportes[idx].motivo_remision=document.getElementById("modalMotivo").value;
     }
-    guardarReportes(reportes); todosLos=reportes;
-    cerrarModal(); filtrarCasos(); actualizarStats(todosLos);
-    mostrarMsg("msgCasos","success","✅ Caso actualizado correctamente.");
+    try {
+      await API.reportes.actualizar(idx+1, { estado: reportes[idx].estado });
+      if(reportes[idx].seguimiento) {
+        await API.seguimientos.crear({
+          reporte_id: idx+1,
+          profesional_id: API.sesion.id,
+          intervencion: document.getElementById("modalIntervencion").value,
+          observaciones: document.getElementById("modalObservaciones").value,
+          nuevo_estado: reportes[idx].estado,
+          remitido_a: reportes[idx].remitido_a||'',
+          motivo_remision: reportes[idx].motivo_remision||''
+        });
+      }
+      todosLos = await obtenerReportesAsync();
+      cerrarModal(); filtrarCasos(); actualizarStats(todosLos);
+      mostrarMsg("msgCasos","success","✅ Caso actualizado correctamente.");
+    } catch(err) { mostrarMsg("msgCasos","error","❌ "+err.message); }
   }
 
   function cerrarModal(){ document.getElementById("modalGestion").classList.remove("open"); }

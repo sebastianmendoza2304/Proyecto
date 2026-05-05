@@ -1,66 +1,49 @@
 <?php
 // ============================================================
-// login.php — Autenticación de usuarios
-// Sistema de Alertas por Riesgo Académico - Universidad Libre
-//
-// POST /login.php
-//   Body JSON: { "nombre": "...", "password": "..." }
-//   Responde:  { ok: true, data: { id, nombre, rol, token } }
+// login.php — Autenticación usando tabla "usuario" de BD sistema
+// POST /login.php  →  { nombre_usuario, password }
 // ============================================================
 
 require_once 'config.php';
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    responder('Solo se admite POST.', false, 405);
-}
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') responder('Solo se admite POST.', false, 405);
 
 $d = leerJSON();
 requerir($d, 'nombre', 'password');
 
+$paneles = [
+    'administrador'      => 'administrador.html',
+    'docente'            => 'Docentes.html',
+    'bienestar'          => 'Bienestar.html',
+    'director_bienestar' => 'director_bienestar.html',
+    'decanatura'         => 'Decanatura.html',
+    'director_programa'  => 'director_programa.html',
+];
+
 try {
     $pdo = conectar();
 
-    // Buscar usuario activo por nombre
+    // Buscar usuario activo por nombre_usuario
     $stmt = $pdo->prepare(
-        'SELECT id, nombre, password, correo, rol
-         FROM usuarios
-         WHERE nombre = ? AND activo = 1'
+        'SELECT id_usuario, nombre_usuario, contrasena, nombres, apellidos, correo_institucional, rol
+         FROM usuario
+         WHERE nombre_usuario = ? AND estado = 1'
     );
     $stmt->execute([trim($d['nombre'])]);
     $usuario = $stmt->fetch();
 
-    if (!$usuario) {
-        responder('Usuario o contraseña incorrectos.', false, 401);
-    }
+    if (!$usuario) responder('Usuario o contraseña incorrectos.', false, 401);
 
-    // Verificar contraseña
-    // Soporta tanto bcrypt (producción) como texto plano (datos de prueba)
-    $passwordOk = password_verify($d['password'], $usuario['password'])
-               || $d['password'] === $usuario['password']; // compatibilidad datos prueba
+    // Verificar contraseña (soporta bcrypt Y texto plano para datos de prueba)
+    $ok = password_verify($d['password'], $usuario['contrasena'])
+       || $d['password'] === $usuario['contrasena'];
 
-    if (!$passwordOk) {
-        responder('Usuario o contraseña incorrectos.', false, 401);
-    }
-
-    // Mapeo de rol → archivo HTML de destino
-    $paneles = [
-        'administrador'      => 'administrador.html',
-        'docente'            => 'Docentes.html',
-        'bienestar'          => 'Bienestar.html',
-        'director_bienestar' => 'director_bienestar.html',
-        'decanatura'         => 'Decanatura.html',
-    ];
-
-    // Generar token de sesión simple (para uso con sesión PHP)
-    session_start();
-    $_SESSION['usuario_id']  = $usuario['id'];
-    $_SESSION['usuario_rol'] = $usuario['rol'];
-    $_SESSION['usuario_nom'] = $usuario['nombre'];
+    if (!$ok) responder('Usuario o contraseña incorrectos.', false, 401);
 
     responder([
-        'id'     => $usuario['id'],
-        'nombre' => $usuario['nombre'],
-        'correo' => $usuario['correo'],
+        'id'     => $usuario['id_usuario'],
+        'nombre' => $usuario['nombre_usuario'],
+        'correo' => $usuario['correo_institucional'],
         'rol'    => $usuario['rol'],
         'panel'  => $paneles[$usuario['rol']] ?? 'Index.html',
     ]);

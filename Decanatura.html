@@ -292,62 +292,30 @@
     actualizarStats(filtrados);
   }
 
-  function limpiarFiltros() {
-    ["fEstudiante","fMateria","fDocente","fEstado","fMotivo"].forEach(id => {
-      document.getElementById(id).value = "";
-    });
+<script src="api.js"></script>
+<script>
+// ── Datos de sesión ──
+const _sesion = API.sesion.obtener();
+document.getElementById("nombreHeader").textContent =
+  "Bienvenido/a: " + (_sesion?.nombre || "Decano/a");
+
+function cerrarSesion() { API.sesion.cerrar(); }
+
+// ── Cargar reportes desde la BD ──
+let todos = [];
+
+async function init() {
+  try {
+    todos = await API.reportes.listar();
+    renderNotificaciones();
     renderTabla(todos);
     actualizarStats(todos);
+  } catch(e) {
+    console.error("Error cargando reportes:", e);
   }
+}
 
-  function verDetalle(r) {
-    const seg = r.seguimiento;
-    document.getElementById("detalleContenido").innerHTML = `
-      <div class="detalle-item"><div class="detalle-label">Estudiante</div><div class="detalle-val">${r.estudiante}</div></div>
-      <div class="detalle-item"><div class="detalle-label">Documento</div><div class="detalle-val">${r.documento||"N/D"}</div></div>
-      <div class="detalle-item"><div class="detalle-label">Materia</div><div class="detalle-val">${r.materia}</div></div>
-      <div class="detalle-item"><div class="detalle-label">Docente</div><div class="detalle-val">${r.docente||"N/D"}</div></div>
-      <div class="detalle-item"><div class="detalle-label">Motivo</div><div class="detalle-val">${r.motivo}</div></div>
-      <div class="detalle-item"><div class="detalle-label">Estado</div><div class="detalle-val">${r.estado}</div></div>
-      <div class="detalle-item"><div class="detalle-label">Fecha</div><div class="detalle-val">${r.fecha||"N/D"}</div></div>
-      <div class="detalle-item"><div class="detalle-label">Remitido a</div><div class="detalle-val">${r.remitido_a||"—"}</div></div>
-      <div class="detalle-item full"><div class="detalle-label">Observaciones docente</div><div class="detalle-val">${r.observaciones||"—"}</div></div>
-      ${seg ? `
-      <div class="detalle-item full" style="background:#e8f5e9">
-        <div class="detalle-label">Seguimiento bienestar (${seg.fecha})</div>
-        <div class="detalle-val">
-          <strong>Intervención:</strong> ${seg.intervencion}<br>
-          <strong>Observaciones:</strong> ${seg.observaciones||"—"}<br>
-          <strong>Recomendaciones:</strong> ${seg.recomendaciones||"—"}<br>
-          <strong>Profesional:</strong> ${seg.profesional||"—"}
-        </div>
-      </div>` : ""}
-    `;
-    document.getElementById("modalDetalle").classList.add("open");
-  }
-
-  function cerrarModal() {
-    document.getElementById("modalDetalle").classList.remove("open");
-  }
-
-  document.getElementById("modalDetalle").addEventListener("click", function(e) {
-    if (e.target === this) cerrarModal();
-  });
-
-  function exportarCSV() {
-    const datos = todos;
-    if (datos.length === 0) { alert("No hay datos para exportar."); return; }
-    const cabecera = ["ID","Estudiante","Materia","Docente","Motivo","Estado","Fecha"];
-    const filas = datos.map((r,i) => [i+1, r.estudiante, r.materia, r.docente||"N/A", r.motivo, r.estado, r.fecha||""].join(","));
-    const csv = [cabecera.join(","), ...filas].join("\n");
-    const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "reportes_academicos.csv";
-    a.click();
-  }
-
-  init();
+init();
 </script>
 </body>
 </html>
