@@ -3,8 +3,6 @@
 $sever = "localhost";
 $user = "root";
 $pass = "";
-<<<<<<< HEAD
-$db = "ejemplo";
 =======
 $db = "sistema";
 >>>>>>> 6437cdfe83b7100765bb5d6a82355bc79986ee40
