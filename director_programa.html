@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel Director de Programa - Sistema de Alertas</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="Style.css">
   <style>
     * { box-sizing: border-box; }
     body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; }
- 
+
     .header { display:flex; align-items:center; gap:16px; justify-content:center;
       background: linear-gradient(135deg,#ab1313,#f57c00); color:#fff; padding:16px 24px; }
     .header img { width:54px; height:54px; border-radius:50%; border:2px solid rgba(255,255,255,0.5); }
@@ -17,30 +17,26 @@
     .header-right { margin-left:auto; }
     .btn-logout { background:rgba(255,255,255,0.18); color:#fff; border:1px solid rgba(255,255,255,0.4);
       padding:7px 16px; border-radius:6px; cursor:pointer; font-size:0.85rem; text-decoration:none; }
- 
+
     .main { max-width:1200px; margin:28px auto; padding:0 16px; }
- 
-    /* Stats */
+
     .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:24px; }
     .stat-card { background:#fff; border-radius:10px; padding:16px 12px; text-align:center; box-shadow:0 1px 4px rgba(0,0,0,0.08); }
     .stat-num { font-size:2rem; font-weight:700; color:#b71c1c; }
     .stat-label { font-size:0.78rem; color:#888; margin-top:2px; }
- 
-    /* Tabs */
+
     .tabs { display:flex; gap:4px; margin-bottom:24px; border-bottom:2px solid #e0e0e0; overflow-x:auto; }
-    .tab { padding:10px 22px; cursor:pointer; border-radius:8px 8px 0 0; font-size:0.9rem;
+    .tab { padding:10px 20px; cursor:pointer; border-radius:8px 8px 0 0; font-size:0.88rem;
       font-weight:600; color:#777; background:none; border:none; border-bottom:2px solid transparent;
       margin-bottom:-2px; transition:all 0.2s; white-space:nowrap; }
     .tab.active { color:#b71c1c; border-bottom-color:#b71c1c; background:#fff3e0; }
     .tab:hover:not(.active) { color:#b71c1c; background:#fafafa; }
     .tab-panel { display:none; }
     .tab-panel.active { display:block; }
- 
-    /* Card */
+
     .card { background:#fff; border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,0.09); padding:24px; margin-bottom:20px; }
     .card h2 { margin:0 0 18px; font-size:1.05rem; color:#b71c1c; border-left:4px solid #f57c00; padding-left:10px; }
- 
-    /* Filtros */
+
     .search-bar { display:flex; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
     .search-bar input,
     .search-bar select { padding:8px 12px; border:1.5px solid #ddd; border-radius:7px;
@@ -48,8 +44,7 @@
     .search-bar input:focus,
     .search-bar select:focus { outline:none; border-color:#b71c1c; }
     .search-actions { display:flex; gap:8px; align-items:center; }
- 
-    /* Botones */
+
     .btn { padding:9px 18px; border:none; border-radius:7px; cursor:pointer;
       font-weight:600; font-size:0.88rem; font-family:inherit; transition:all 0.2s; }
     .btn-primary { background:#b71c1c; color:#fff; }
@@ -59,76 +54,50 @@
     .btn-export { background:#1b5e20; color:#fff; }
     .btn-export:hover { background:#2e7d32; }
     .btn-sm { padding:4px 12px; font-size:0.8rem; border-radius:5px; }
- 
-    /* Tabla */
+
     .tabla-wrapper { overflow-x:auto; }
     table { width:100%; border-collapse:collapse; font-size:0.88rem; }
     thead tr { background:linear-gradient(135deg,#b71c1c,#f57c00); color:#fff; }
     th { padding:11px 14px; text-align:left; font-weight:600; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.04em; }
     td { padding:11px 14px; border-bottom:1px solid #f0f0f0; color:#444; vertical-align:middle; }
     tr:hover td { background:#fff8f0; }
- 
-    /* Badges */
+
     .badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:600; }
     .badge-reportado    { background:#fff3cd; color:#856404; }
     .badge-revision     { background:#cce5ff; color:#004085; }
     .badge-seguimiento  { background:#d4edda; color:#155724; }
     .badge-remitido     { background:#f8d7da; color:#721c24; }
     .badge-cerrado      { background:#e2e3e5; color:#383d41; }
- 
-    /* Gráfico de barras */
-    .chart-wrap { margin-top: 4px; }
-    .bar-row {
-      display: flex; align-items: center; gap: 10px;
-      margin-bottom: 10px; font-size: 0.83rem;
-    }
-    .bar-label { min-width: 170px; color: #555; font-weight: 600; }
-    .bar-track {
-      flex: 1; height: 10px; background: #f5f5f5;
-      border-radius: 5px; overflow: hidden;
-      border: 1px solid #eee;
-    }
-    .bar-fill { height: 100%; border-radius: 5px; transition: width 0.6s ease; }
-    .bar-val { min-width: 28px; text-align: right; font-weight: 700; color: #b71c1c; }
+
+    /* Gráfico barras */
+    .chart-wrap { margin-top:4px; }
+    .bar-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; font-size:0.83rem; }
+    .bar-label { min-width:170px; color:#555; font-weight:600; }
+    .bar-track { flex:1; height:10px; background:#f5f5f5; border-radius:5px; overflow:hidden; border:1px solid #eee; }
+    .bar-fill { height:100%; border-radius:5px; transition:width 0.6s ease; }
+    .bar-val { min-width:28px; text-align:right; font-weight:700; color:#b71c1c; }
     .chart-empty { color:#aaa; font-size:0.88rem; font-style:italic; padding:8px 0; }
- 
-    .fill-bajo      { background: #f59e0b; }
-    .fill-inasis    { background: #ef4444; }
-    .fill-seg       { background: #22c55e; }
-    .fill-reportado { background: #f59e0b; }
-    .fill-revision  { background: #3b82f6; }
-    .fill-seguim    { background: #22c55e; }
-    .fill-remitido  { background: #ef4444; }
-    .fill-cerrado   { background: #9ca3af; }
- 
-    /* Grid de análisis */
+    .fill-bajo{background:#f59e0b;} .fill-inasis{background:#ef4444;} .fill-seg{background:#22c55e;}
+    .fill-reportado{background:#f59e0b;} .fill-revision{background:#3b82f6;}
+    .fill-seguim{background:#22c55e;} .fill-remitido{background:#ef4444;} .fill-cerrado{background:#9ca3af;}
+
     .analisis-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
     .analisis-grid .full { grid-column:1/-1; }
     @media(max-width:780px){ .analisis-grid { grid-template-columns:1fr; } }
- 
+
     /* Alertas */
-    .alerta-item {
-      border-radius: 8px;
-      padding: 13px 16px;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    .alerta-item { border-radius:8px; padding:13px 16px; margin-bottom:10px; display:flex; align-items:center; gap:12px; }
     .alerta-item.critica { background:#ffebee; border:1px solid #ef9a9a; }
     .alerta-item.warning { background:#fff8e1; border:1px solid #ffe082; }
-    .alerta-item .icono  { font-size: 1.3rem; }
-    .alerta-item .info   { flex: 1; font-size: 0.88rem; }
+    .alerta-item .icono  { font-size:1.3rem; }
+    .alerta-item .info   { flex:1; font-size:0.88rem; }
     .alerta-item .info small { display:block; color:#777; font-size:0.78rem; margin-top:3px; }
-    .alerta-item .info strong { font-size:0.95rem; }
     .vacio-ok { color:#2e7d32; font-weight:600; font-size:0.9rem; padding:12px 0; }
- 
+
     /* Modal detalle */
-    .modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:100;
-      align-items:center; justify-content:center; }
+    .modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:100; align-items:center; justify-content:center; }
     .modal-bg.open { display:flex; }
-    .modal { background:#fff; border-radius:14px; padding:28px; width:100%; max-width:600px;
-      box-shadow:0 8px 32px rgba(0,0,0,0.18); max-height:92vh; overflow-y:auto; }
+    .modal { background:#fff; border-radius:14px; padding:28px; width:100%; max-width:600px; box-shadow:0 8px 32px rgba(0,0,0,0.18); max-height:92vh; overflow-y:auto; }
     .modal h3 { margin:0 0 16px; color:#b71c1c; font-size:1rem; }
     .detalle-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
     .detalle-item { background:#f9f9f9; border-radius:8px; padding:12px; }
@@ -136,12 +105,100 @@
     .detalle-label { font-size:0.75rem; color:#999; text-transform:uppercase; font-weight:600; margin-bottom:4px; }
     .detalle-val { font-size:0.92rem; color:#333; }
     .modal-actions { margin-top:18px; display:flex; justify-content:flex-end; gap:10px; }
- 
-    @media(max-width:600px){ .detalle-grid { grid-template-columns:1fr; } }
+
+    /* ══════════════════════════════════════
+       RU-25: Prontitud del seguimiento
+    ══════════════════════════════════════ */
+    .pront-filtros { display:flex; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
+    .pront-filtros select,
+    .pront-filtros input {
+      padding:8px 12px; border:1.5px solid #ddd; border-radius:7px;
+      font-size:0.87rem; font-family:inherit; background:#fafafa; flex:1; min-width:150px;
+    }
+    .pront-filtros select:focus,
+    .pront-filtros input:focus { outline:none; border-color:#b71c1c; }
+
+    /* Tarjeta de caso con línea de tiempo */
+    .caso-timeline {
+      border:1px solid #eee; border-radius:12px; margin-bottom:14px;
+      overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.05);
+    }
+    .ct-header {
+      background:#fafafa; border-bottom:1px solid #eee;
+      padding:12px 18px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    }
+    .ct-estudiante { font-weight:700; font-size:0.95rem; color:#333; flex:1; }
+    .ct-materia { font-size:0.83rem; color:#666; }
+    .ct-tiempo-chip {
+      padding:4px 12px; border-radius:20px; font-size:0.78rem; font-weight:700;
+    }
+    .chip-rapido  { background:#d4edda; color:#155724; }
+    .chip-normal  { background:#cce5ff; color:#004085; }
+    .chip-lento   { background:#fff3cd; color:#856404; }
+    .chip-critico { background:#f8d7da; color:#721c24; }
+    .chip-pendiente { background:#e2e3e5; color:#383d41; }
+
+    .ct-body { padding:16px 18px; }
+
+    /* Línea de tiempo visual */
+    .timeline {
+      display:flex; align-items:flex-start; gap:0; position:relative;
+      padding-bottom:4px; overflow-x:auto;
+    }
+    .tl-step {
+      display:flex; flex-direction:column; align-items:center;
+      min-width:140px; position:relative; flex:1;
+    }
+    .tl-step:not(:last-child)::after {
+      content:""; position:absolute; top:14px; left:50%;
+      width:100%; height:2px;
+      background:linear-gradient(90deg,#ddd 0%,#ddd 100%);
+      z-index:0;
+    }
+    .tl-step.done:not(:last-child)::after { background:linear-gradient(90deg,#4caf50,#4caf50); }
+    .tl-step.pending:not(:last-child)::after { background:repeating-linear-gradient(90deg,#ccc 0,#ccc 5px,transparent 5px,transparent 10px); }
+
+    .tl-dot {
+      width:28px; height:28px; border-radius:50%; display:flex;
+      align-items:center; justify-content:center; font-size:0.9rem;
+      z-index:1; position:relative; border:2px solid #fff;
+      box-shadow:0 1px 4px rgba(0,0,0,0.15);
+    }
+    .dot-done    { background:#4caf50; }
+    .dot-pending { background:#e0e0e0; }
+    .dot-alert   { background:#f44336; }
+
+    .tl-label {
+      font-size:0.72rem; font-weight:700; text-transform:uppercase;
+      color:#777; margin-top:6px; text-align:center; letter-spacing:0.04em;
+    }
+    .tl-fecha {
+      font-size:0.74rem; color:#aaa; margin-top:3px; text-align:center;
+      max-width:130px; line-height:1.3;
+    }
+    .tl-delta {
+      font-size:0.73rem; color:#888; margin-top:4px; text-align:center;
+      font-style:italic;
+    }
+
+    /* Resumen estadístico de prontitud */
+    .pront-resumen {
+      display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+      gap:12px; margin-bottom:20px;
+    }
+    .pr-card {
+      background:#fff; border-radius:10px; padding:14px 16px;
+      box-shadow:0 1px 4px rgba(0,0,0,0.07); text-align:center;
+    }
+    .pr-num { font-size:1.7rem; font-weight:700; color:#b71c1c; }
+    .pr-label { font-size:0.76rem; color:#888; margin-top:3px; }
+    .pr-sub { font-size:0.7rem; color:#aaa; margin-top:2px; }
+
+    @media(max-width:600px){ .detalle-grid { grid-template-columns:1fr; } .tl-step{ min-width:110px; } }
   </style>
 </head>
 <body>
- 
+
 <div class="header">
   <img src="escudo-unilibre.png" alt="Universidad Libre">
   <div class="header-info">
@@ -152,10 +209,9 @@
     <a href="Index.html" class="btn-logout" onclick="cerrarSesion()">Cerrar sesión</a>
   </div>
 </div>
- 
+
 <div class="main">
- 
-  <!-- Stats -->
+
   <div class="stats">
     <div class="stat-card"><div class="stat-num" id="statTotal">—</div><div class="stat-label">Casos totales</div></div>
     <div class="stat-card"><div class="stat-num" id="statPendientes">—</div><div class="stat-label">Pendientes</div></div>
@@ -163,19 +219,18 @@
     <div class="stat-card"><div class="stat-num" id="statCerrados">—</div><div class="stat-label">Cerrados</div></div>
     <div class="stat-card"><div class="stat-num" id="statEstudiantes">—</div><div class="stat-label">Estudiantes en riesgo</div></div>
   </div>
- 
-  <!-- Tabs -->
+
   <div class="tabs">
-    <button class="tab active" onclick="cambiarTab('casos', this)">📋 Casos de la carrera</button>
-    <button class="tab" onclick="cambiarTab('analisis', this)">📊 Análisis</button>
-    <button class="tab" onclick="cambiarTab('alertas', this)">🔔 Alertas críticas</button>
+    <button class="tab active" onclick="cambiarTab('casos',this)">📋 Casos de la carrera</button>
+    <button class="tab" onclick="cambiarTab('analisis',this)">📊 Análisis</button>
+    <button class="tab" onclick="cambiarTab('alertas',this)">🔔 Alertas críticas</button>
+    <button class="tab" onclick="cambiarTab('prontitud',this)">⏱️ Prontitud del seguimiento</button>
   </div>
- 
-  <!-- TAB: Casos -->
+
+  <!-- ════ TAB: Casos ════ -->
   <div id="tab-casos" class="tab-panel active">
     <div class="card">
       <h2>Reportes activos de la carrera</h2>
- 
       <div class="search-bar">
         <input  type="text" id="fEstudiante" placeholder="🔍 Estudiante..." oninput="aplicarFiltros()">
         <input  type="text" id="fMateria"    placeholder="🔍 Materia..."    oninput="aplicarFiltros()">
@@ -198,29 +253,19 @@
           <button class="btn btn-export btn-sm" onclick="exportarCSV()">⬇ CSV</button>
         </div>
       </div>
- 
       <div class="tabla-wrapper">
         <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Estudiante</th>
-              <th>Materia</th>
-              <th>Docente</th>
-              <th>Motivo</th>
-              <th>Estado</th>
-              <th>Seguimiento</th>
-              <th>Fecha</th>
-              <th>Detalle</th>
-            </tr>
-          </thead>
+          <thead><tr>
+            <th>#</th><th>Estudiante</th><th>Materia</th><th>Docente</th>
+            <th>Motivo</th><th>Estado</th><th>Seguimiento</th><th>Fecha</th><th>Detalle</th>
+          </tr></thead>
           <tbody id="tbodyCasos"></tbody>
         </table>
       </div>
     </div>
   </div>
- 
-  <!-- TAB: Análisis -->
+
+  <!-- ════ TAB: Análisis ════ -->
   <div id="tab-analisis" class="tab-panel">
     <div class="analisis-grid">
       <div class="card">
@@ -237,17 +282,16 @@
       </div>
     </div>
   </div>
- 
-  <!-- TAB: Alertas -->
+
+  <!-- ════ TAB: Alertas ════ -->
   <div id="tab-alertas" class="tab-panel">
     <div class="card">
       <h2>🚨 Casos sin intervención</h2>
       <p style="font-size:0.88rem;color:#777;margin:-8px 0 16px">
-        Casos en estado "Reportado" que aún no tienen seguimiento registrado por Bienestar.
+        Casos en estado "Reportado" sin seguimiento registrado por Bienestar.
       </p>
       <div id="alertasCriticas"></div>
     </div>
- 
     <div class="card">
       <h2>⚠️ Casos remitidos externamente</h2>
       <p style="font-size:0.88rem;color:#777;margin:-8px 0 16px">
@@ -256,9 +300,54 @@
       <div id="alertasRemitidos"></div>
     </div>
   </div>
- 
-</div>
- 
+
+  <!-- ════ TAB: Prontitud del seguimiento (RU-25) ════ -->
+  <div id="tab-prontitud" class="tab-panel">
+
+    <!-- Resumen estadístico -->
+    <div class="pront-resumen" id="prontResumen"></div>
+
+    <div class="card">
+      <h2>⏱️ Prontitud del seguimiento por caso — RU-25</h2>
+      <p style="font-size:0.87rem;color:#777;margin:-8px 0 16px">
+        Visualiza con qué rapidez se atiende cada caso: fecha de reporte, fecha de seguimiento por Bienestar
+        y estado actual. Permite identificar casos con mayor demora en la atención.
+      </p>
+
+      <!-- Filtros prontitud -->
+      <div class="pront-filtros">
+        <input type="text" id="pBusq" placeholder="🔍 Buscar estudiante o materia..." oninput="renderProntitud()">
+        <select id="pEstado" onchange="renderProntitud()">
+          <option value="">Todos los estados</option>
+          <option value="Reportado">Reportado</option>
+          <option value="En revisión">En revisión</option>
+          <option value="En seguimiento">En seguimiento</option>
+          <option value="Remitido">Remitido</option>
+          <option value="Cerrado">Cerrado</option>
+        </select>
+        <select id="pOrden" onchange="renderProntitud()">
+          <option value="mayor">Mayor demora primero</option>
+          <option value="menor">Menor demora primero</option>
+          <option value="fecha">Fecha de reporte (más reciente)</option>
+          <option value="pendiente">Sin seguimiento primero</option>
+        </select>
+      </div>
+
+      <!-- Leyenda -->
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;font-size:0.8rem">
+        <span><span style="display:inline-block;width:10px;height:10px;background:#4caf50;border-radius:50%;margin-right:4px"></span>≤ 2 días (Rápido)</span>
+        <span><span style="display:inline-block;width:10px;height:10px;background:#2196f3;border-radius:50%;margin-right:4px"></span>3–5 días (Normal)</span>
+        <span><span style="display:inline-block;width:10px;height:10px;background:#ff9800;border-radius:50%;margin-right:4px"></span>6–10 días (Lento)</span>
+        <span><span style="display:inline-block;width:10px;height:10px;background:#f44336;border-radius:50%;margin-right:4px"></span>> 10 días (Crítico)</span>
+        <span><span style="display:inline-block;width:10px;height:10px;background:#9e9e9e;border-radius:50%;margin-right:4px"></span>Sin seguimiento aún</span>
+      </div>
+
+      <div id="prontContenedor"></div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
 <!-- Modal detalle -->
 <div class="modal-bg" id="modalDetalle">
   <div class="modal">
@@ -269,7 +358,337 @@
     </div>
   </div>
 </div>
- 
-<script src="director_programa.js"></script>
+
+<script>
+  const nombreUsuario = localStorage.getItem("nombreUsuario") || "Director/a";
+  document.getElementById("nombreHeader").textContent = "Bienvenido/a: " + nombreUsuario;
+
+  function cerrarSesion(){ localStorage.removeItem("nombreUsuario"); localStorage.removeItem("rolUsuario"); }
+
+  const X = s => { if(s===null||s===undefined)return""; return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
+  function obtenerReportes(){ return JSON.parse(localStorage.getItem("reportes"))||[]; }
+
+  const BADGE = {
+    "Reportado":"badge-reportado","En revisión":"badge-revision",
+    "En seguimiento":"badge-seguimiento","Remitido":"badge-remitido","Cerrado":"badge-cerrado"
+  };
+
+  let todos = [];
+
+  function init(){
+    todos = obtenerReportes();
+    renderTabla(todos);
+    actualizarStats(todos);
+  }
+
+  function actualizarStats(r){
+    document.getElementById("statTotal").textContent      = r.length;
+    document.getElementById("statPendientes").textContent = r.filter(x=>x.estado==="Reportado").length;
+    document.getElementById("statEnProceso").textContent  = r.filter(x=>["En revisión","En seguimiento"].includes(x.estado)).length;
+    document.getElementById("statCerrados").textContent   = r.filter(x=>x.estado==="Cerrado").length;
+    const uniq=[...new Set(r.filter(x=>x.estado!=="Cerrado").map(x=>x.estudiante))];
+    document.getElementById("statEstudiantes").textContent = uniq.length;
+  }
+
+  /* ── Tabs ── */
+  function cambiarTab(nombre,btn){
+    document.querySelectorAll(".tab-panel").forEach(p=>p.classList.remove("active"));
+    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+    document.getElementById("tab-"+nombre).classList.add("active");
+    btn.classList.add("active");
+    if(nombre==="analisis")  renderAnalisis();
+    if(nombre==="alertas")   renderAlertas();
+    if(nombre==="prontitud") renderProntitud();
+  }
+
+  /* ── Tabla casos ── */
+  function badgeClass(e){
+    return BADGE[e]||"badge-reportado";
+  }
+
+  function renderTabla(datos){
+    const tbody=document.getElementById("tbodyCasos");
+    if(!datos.length){
+      tbody.innerHTML=`<tr><td colspan="9" style="text-align:center;color:#aaa;padding:24px">Sin casos registrados.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML=datos.map((r,i)=>{
+      const seg=r.seguimiento;
+      return `<tr>
+        <td>${i+1}</td>
+        <td><strong>${X(r.estudiante)}</strong></td>
+        <td>${X(r.materia)}</td>
+        <td>${X(r.docente||"N/A")}</td>
+        <td style="font-size:0.82rem">${X(r.motivo)}</td>
+        <td><span class="badge ${badgeClass(r.estado)}">${X(r.estado)}</span></td>
+        <td>${seg?`<span style="font-size:0.78rem;color:#2e7d32;font-weight:700">✓ ${X(seg.intervencion||"Reg.")}</span>`:`<span style="font-size:0.78rem;color:#aaa">—</span>`}</td>
+        <td style="font-size:0.78rem;color:#888;white-space:nowrap">${X(r.fecha||"")}</td>
+        <td><button class="btn btn-secondary btn-sm" onclick='verDetalle(${JSON.stringify(r)})'>Ver</button></td>
+      </tr>`;
+    }).join("");
+  }
+
+  function aplicarFiltros(){
+    const est=document.getElementById("fEstudiante").value.toLowerCase();
+    const mat=document.getElementById("fMateria").value.toLowerCase();
+    const estado=document.getElementById("fEstado").value;
+    const motivo=document.getElementById("fMotivo").value;
+    renderTabla(todos.filter(r=>
+      (!est   ||(r.estudiante||"").toLowerCase().includes(est))&&
+      (!mat   ||(r.materia   ||"").toLowerCase().includes(mat))&&
+      (!estado||r.estado===estado)&&
+      (!motivo||r.motivo===motivo)
+    ));
+  }
+
+  function limpiarFiltros(){
+    ["fEstudiante","fMateria","fEstado","fMotivo"].forEach(id=>document.getElementById(id).value="");
+    renderTabla(todos);
+  }
+
+  /* ── Modal detalle ── */
+  function verDetalle(r){
+    const seg=r.seguimiento;
+    document.getElementById("detalleContenido").innerHTML=`
+      <div class="detalle-item"><div class="detalle-label">Estudiante</div><div class="detalle-val">${X(r.estudiante)}</div></div>
+      <div class="detalle-item"><div class="detalle-label">Documento</div><div class="detalle-val">${X(r.documento||"—")}</div></div>
+      <div class="detalle-item"><div class="detalle-label">Materia</div><div class="detalle-val">${X(r.materia)}</div></div>
+      <div class="detalle-item"><div class="detalle-label">Docente</div><div class="detalle-val">${X(r.docente||"—")}</div></div>
+      <div class="detalle-item"><div class="detalle-label">Motivo</div><div class="detalle-val">${X(r.motivo)}</div></div>
+      <div class="detalle-item"><div class="detalle-label">Estado</div>
+        <div class="detalle-val"><span class="badge ${badgeClass(r.estado)}">${X(r.estado)}</span></div></div>
+      <div class="detalle-item"><div class="detalle-label">Fecha reporte</div><div class="detalle-val">${X(r.fecha||"—")}</div></div>
+      <div class="detalle-item"><div class="detalle-label">Remitido a</div><div class="detalle-val">${X(r.remitido_a||"—")}</div></div>
+      <div class="detalle-item full"><div class="detalle-label">Observaciones docente</div><div class="detalle-val">${X(r.observaciones||"—")}</div></div>
+      ${seg?`<div class="detalle-item full" style="background:#e8f5e9">
+        <div class="detalle-label">Seguimiento bienestar (${X(seg.fecha||"")})</div>
+        <div class="detalle-val" style="line-height:1.8">
+          <strong>Intervención:</strong> ${X(seg.intervencion||"—")}<br>
+          <strong>Observaciones:</strong> ${X(seg.observaciones||"—")}<br>
+          <strong>Recomendaciones:</strong> ${X(seg.recomendaciones||"—")}<br>
+          <strong>Profesional:</strong> ${X(seg.profesional||"—")}
+        </div>
+      </div>`:`<div class="detalle-item full" style="color:#aaa;font-size:0.88rem">Sin seguimiento registrado.</div>`}
+    `;
+    document.getElementById("modalDetalle").classList.add("open");
+  }
+
+  function cerrarModal(){ document.getElementById("modalDetalle").classList.remove("open"); }
+  document.getElementById("modalDetalle").addEventListener("click",function(e){ if(e.target===this)cerrarModal(); });
+
+  /* ── Análisis ── */
+  function barChart(cid,datos,colorMap){
+    const el=document.getElementById(cid);
+    const entries=Object.entries(datos);
+    if(!entries.length){ el.innerHTML=`<p class="chart-empty">Sin datos.</p>`; return; }
+    const max=Math.max(...Object.values(datos),1);
+    el.innerHTML=entries.map(([l,v])=>`
+      <div class="bar-row">
+        <span class="bar-label">${X(l)}</span>
+        <div class="bar-track"><div class="bar-fill ${colorMap[l]||'fill-bajo'}" style="width:${Math.round(v/max*100)}%"></div></div>
+        <span class="bar-val">${v}</span>
+      </div>`).join("");
+  }
+
+  function renderAnalisis(){
+    const r=obtenerReportes();
+    const motivos={};r.forEach(x=>{motivos[x.motivo]=(motivos[x.motivo]||0)+1;});
+    barChart("chartMotivo",motivos,{"Bajo rendimiento":"fill-bajo","Inasistencia":"fill-inasis","Seguimiento preventivo":"fill-seg"});
+    const estados={};r.forEach(x=>{estados[x.estado]=(estados[x.estado]||0)+1;});
+    barChart("chartEstado",estados,{"Reportado":"fill-reportado","En revisión":"fill-revision","En seguimiento":"fill-seguim","Remitido":"fill-remitido","Cerrado":"fill-cerrado"});
+    const mats={};r.forEach(x=>{mats[x.materia]=(mats[x.materia]||0)+1;});
+    const top5=Object.fromEntries(Object.entries(mats).sort((a,b)=>b[1]-a[1]).slice(0,5));
+    const pal=["fill-bajo","fill-inasis","fill-revision","fill-seguim","fill-remitido"];
+    const mc={};Object.keys(top5).forEach((k,i)=>mc[k]=pal[i%pal.length]);
+    barChart("chartMaterias",top5,mc);
+  }
+
+  /* ── Alertas ── */
+  function renderAlertas(){
+    const r=obtenerReportes();
+    const sinSeg=r.filter(x=>x.estado==="Reportado"&&!x.seguimiento);
+    const elCrit=document.getElementById("alertasCriticas");
+    if(!sinSeg.length){ elCrit.innerHTML=`<p class="vacio-ok">✅ Sin casos críticos pendientes.</p>`; }
+    else { elCrit.innerHTML=sinSeg.map(r=>`
+      <div class="alerta-item critica">
+        <span class="icono">🚨</span>
+        <div class="info"><strong style="color:#c62828">${X(r.estudiante)}</strong> — ${X(r.materia)}
+          <small>Motivo: ${X(r.motivo)} | Fecha: ${X(r.fecha||"N/D")}</small></div>
+        <span class="badge badge-reportado">Sin intervención</span>
+      </div>`).join(""); }
+    const remitidos=r.filter(x=>x.estado==="Remitido");
+    const elRem=document.getElementById("alertasRemitidos");
+    if(!remitidos.length){ elRem.innerHTML=`<p class="vacio-ok">✅ Sin casos remitidos actualmente.</p>`; }
+    else { elRem.innerHTML=remitidos.map(r=>`
+      <div class="alerta-item warning">
+        <span class="icono">⚠️</span>
+        <div class="info"><strong style="color:#7a5500">${X(r.estudiante)}</strong> — ${X(r.materia)}
+          <small>Remitido a: ${X(r.remitido_a||"N/D")} ${r.motivo_remision?" | "+X(r.motivo_remision):""}</small></div>
+        <span class="badge badge-remitido">Remitido</span>
+      </div>`).join(""); }
+  }
+
+  /* ══════════════════════════════════════════════════
+     RU-25: PRONTITUD DEL SEGUIMIENTO
+     — Visualiza fecha y hora de cada avance/cambio
+       para evaluar qué tan rápido se atiende cada caso
+  ══════════════════════════════════════════════════ */
+
+  function parseFecha(str){
+    if(!str) return null;
+    try{
+      const p=str.split(",")[0].trim().split("/");
+      if(p.length===3) return new Date(`${p[2]}-${p[1].padStart(2,"0")}-${p[0].padStart(2,"0")}T00:00:00`);
+    }catch(e){}
+    // Intentar parseo directo
+    try{ const d=new Date(str); if(!isNaN(d)) return d; }catch(e){}
+    return null;
+  }
+
+  function diasEntre(d1, d2){
+    if(!d1||!d2) return null;
+    return Math.round((d2-d1)/(1000*60*60*24));
+  }
+
+  function clasificarDemora(dias){
+    if(dias===null) return { cls:"chip-pendiente", texto:"Sin seguimiento" };
+    if(dias<=2)     return { cls:"chip-rapido",    texto:`⚡ Rápido (${dias}d)` };
+    if(dias<=5)     return { cls:"chip-normal",    texto:`✓ Normal (${dias}d)` };
+    if(dias<=10)    return { cls:"chip-lento",     texto:`⚠ Lento (${dias}d)` };
+    return            { cls:"chip-critico",  texto:`🔴 Crítico (${dias}d)` };
+  }
+
+  function renderProntitud(){
+    const busq   = (document.getElementById("pBusq").value||"").toLowerCase();
+    const estado = document.getElementById("pEstado").value;
+    const orden  = document.getElementById("pOrden").value;
+
+    const reps   = obtenerReportes();
+    const cont   = document.getElementById("prontContenedor");
+
+    // Calcular demoras
+    let datos = reps.map((r,idx)=>{
+      const dReporte    = parseFecha(r.fecha);
+      const dSeguimiento= r.seguimiento ? parseFecha(r.seguimiento.fecha) : null;
+      const diasHastaSeg= diasEntre(dReporte, dSeguimiento);
+      const ahora       = new Date();
+      const diasSinAtencion = !dSeguimiento && dReporte ? diasEntre(dReporte, ahora) : null;
+      return { ...r, _idx:idx, dReporte, dSeguimiento, diasHastaSeg, diasSinAtencion };
+    });
+
+    // Filtros
+    if(estado) datos = datos.filter(r=>r.estado===estado);
+    if(busq)   datos = datos.filter(r=>
+      (r.estudiante||"").toLowerCase().includes(busq)||
+      (r.materia   ||"").toLowerCase().includes(busq)
+    );
+
+    // Ordenar
+    if(orden==="mayor"){
+      datos.sort((a,b)=>{
+        const da = a.diasHastaSeg ?? (a.diasSinAtencion ?? -1);
+        const db = b.diasHastaSeg ?? (b.diasSinAtencion ?? -1);
+        return db - da;
+      });
+    } else if(orden==="menor"){
+      datos.sort((a,b)=>{
+        const da = a.diasHastaSeg ?? 999;
+        const db = b.diasHastaSeg ?? 999;
+        return da - db;
+      });
+    } else if(orden==="fecha"){
+      datos.sort((a,b)=>(b.dReporte||0)-(a.dReporte||0));
+    } else if(orden==="pendiente"){
+      datos.sort((a,b)=> (!a.seguimiento?0:1)-(!b.seguimiento?0:1) || (b.diasSinAtencion||0)-(a.diasSinAtencion||0));
+    }
+
+    // Resumen estadístico
+    const conSeg    = datos.filter(d=>d.diasHastaSeg!==null);
+    const sinSeg    = datos.filter(d=>d.diasHastaSeg===null&&d.estado!=="Cerrado");
+    const promedioD = conSeg.length ? Math.round(conSeg.reduce((s,d)=>s+d.diasHastaSeg,0)/conSeg.length) : null;
+    const rapidos   = conSeg.filter(d=>d.diasHastaSeg<=2).length;
+    const criticos  = datos.filter(d=>d.diasHastaSeg>10||(d.diasSinAtencion!==null&&d.diasSinAtencion>10)).length;
+
+    document.getElementById("prontResumen").innerHTML=`
+      <div class="pr-card"><div class="pr-num">${datos.length}</div><div class="pr-label">Casos analizados</div></div>
+      <div class="pr-card"><div class="pr-num">${conSeg.length}</div><div class="pr-label">Con seguimiento</div><div class="pr-sub">de ${datos.length} total</div></div>
+      <div class="pr-card"><div class="pr-num">${sinSeg.length}</div><div class="pr-label">Sin atender aún</div><div class="pr-sub">activos sin seguimiento</div></div>
+      <div class="pr-card"><div class="pr-num">${promedioD!==null?promedioD+"d":"—"}</div><div class="pr-label">Promedio respuesta</div><div class="pr-sub">días hasta seguimiento</div></div>
+      <div class="pr-card"><div class="pr-num" style="color:#4caf50">${rapidos}</div><div class="pr-label">Atendidos ≤ 2 días</div></div>
+      <div class="pr-card"><div class="pr-num" style="color:#f44336">${criticos}</div><div class="pr-label">Casos críticos</div><div class="pr-sub">> 10 días sin atención</div></div>
+    `;
+
+    if(!datos.length){
+      cont.innerHTML=`<p style="text-align:center;color:#aaa;padding:32px;font-style:italic">Sin casos para mostrar.</p>`;
+      return;
+    }
+
+    cont.innerHTML = datos.map(r=>{
+      const demora = clasificarDemora(r.diasHastaSeg);
+
+      // Pasos de la línea de tiempo
+      const pasos = [
+        {
+          label:"Reporte",
+          fecha: r.fecha||"—",
+          done: true,
+          dot:"dot-done",
+          emoji:"📝"
+        },
+        {
+          label:"Seguimiento Bienestar",
+          fecha: r.seguimiento ? r.seguimiento.fecha : "Pendiente",
+          done: !!r.seguimiento,
+          dot: r.seguimiento ? "dot-done" : (r.diasSinAtencion>10?"dot-alert":"dot-pending"),
+          emoji: r.seguimiento ? "✅" : (r.diasSinAtencion>10?"🚨":"⏳"),
+          delta: r.diasHastaSeg!==null ? `+${r.diasHastaSeg}d desde reporte` : (r.diasSinAtencion!==null?`${r.diasSinAtencion}d sin atención`:null)
+        },
+        {
+          label:"Cierre / Estado",
+          fecha: r.estado==="Cerrado" ? (r.seguimiento?.fecha||"—") : r.estado,
+          done: r.estado==="Cerrado",
+          dot: r.estado==="Cerrado" ? "dot-done" : "dot-pending",
+          emoji: r.estado==="Cerrado"?"🏁":(r.estado==="Remitido"?"📨":"⏳")
+        }
+      ];
+
+      const tlHtml = pasos.map((p,i)=>`
+        <div class="tl-step ${p.done?'done':'pending'}">
+          <div class="tl-dot ${p.dot}" title="${p.label}">${p.emoji}</div>
+          <div class="tl-label">${p.label}</div>
+          <div class="tl-fecha">${X(p.fecha)}</div>
+          ${p.delta?`<div class="tl-delta">${p.delta}</div>`:""}
+        </div>`).join("");
+
+      return `
+        <div class="caso-timeline">
+          <div class="ct-header">
+            <div>
+              <div class="ct-estudiante">👤 ${X(r.estudiante)}</div>
+              <div class="ct-materia">📚 ${X(r.materia)} &nbsp;|&nbsp; 👨‍🏫 ${X(r.docente||"N/A")}</div>
+            </div>
+            <span class="badge ${badgeClass(r.estado)}">${X(r.estado)}</span>
+            <span class="ct-tiempo-chip ${demora.cls}">${demora.texto}</span>
+          </div>
+          <div class="ct-body">
+            <div class="timeline">${tlHtml}</div>
+          </div>
+        </div>`;
+    }).join("");
+  }
+
+  /* ── Exportar CSV ── */
+  function exportarCSV(){
+    if(!todos.length){ alert("No hay datos."); return; }
+    const hdr=["#","Estudiante","Documento","Materia","Docente","Motivo","Estado","Fecha"];
+    const rows=todos.map((r,i)=>[i+1,r.estudiante,r.documento||"",r.materia,r.docente||"N/A",r.motivo,r.estado,r.fecha||""].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(","));
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(new Blob(["\uFEFF"+[hdr.join(","),...rows].join("\n")],{type:"text/csv;charset=utf-8;"}));
+    a.download="casos_programa_"+new Date().toLocaleDateString("es-CO").replace(/\//g,"-")+".csv";
+    a.click();
+  }
+
+  init();
+</script>
 </body>
-</html
+</html>

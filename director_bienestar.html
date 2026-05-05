@@ -25,11 +25,10 @@
     .stat-num { font-size:2rem; font-weight:700; color:#b71c1c; }
     .stat-label { font-size:0.78rem; color:#888; margin-top:2px; }
 
-    /* Tabs */
-    .tabs { display:flex; gap:4px; margin-bottom:24px; border-bottom:2px solid #e0e0e0; }
-    .tab { padding:10px 22px; cursor:pointer; border-radius:8px 8px 0 0; font-size:0.9rem;
+    .tabs { display:flex; gap:4px; margin-bottom:24px; border-bottom:2px solid #e0e0e0; overflow-x:auto; }
+    .tab { padding:10px 20px; cursor:pointer; border-radius:8px 8px 0 0; font-size:0.88rem;
       font-weight:600; color:#777; background:none; border:none; border-bottom:2px solid transparent;
-      margin-bottom:-2px; transition:all 0.2s; }
+      margin-bottom:-2px; transition:all 0.2s; white-space:nowrap; }
     .tab.active { color:#b71c1c; border-bottom-color:#b71c1c; background:#fff3e0; }
     .tab:hover:not(.active) { color:#b71c1c; background:#fafafa; }
     .tab-panel { display:none; }
@@ -38,7 +37,6 @@
     .card { background:#fff; border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,0.09); padding:24px; margin-bottom:20px; }
     .card h2 { margin:0 0 18px; font-size:1.05rem; color:#b71c1c; border-left:4px solid #f57c00; padding-left:10px; }
 
-    /* Form */
     .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
     .form-grid .full { grid-column:1/-1; }
     .form-group { display:flex; flex-direction:column; gap:5px; }
@@ -65,14 +63,29 @@
     .msg.success { background:#e8f5e9; color:#2e7d32; border:1px solid #a5d6a7; display:block; }
     .msg.error   { background:#ffebee; color:#c62828; border:1px solid #ef9a9a; display:block; }
 
-    /* Lista casos */
-    .search-bar { display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
-    .search-bar input,
-    .search-bar select { padding:8px 12px; border:1.5px solid #ddd; border-radius:7px;
-      font-size:0.88rem; font-family:inherit; background:#fafafa; flex:1; min-width:140px; }
-    .search-bar input:focus,
-    .search-bar select:focus { outline:none; border-color:#b71c1c; }
+    /* RU-13: Filtros avanzados */
+    .filtros-panel {
+      background:#fff8f0; border:1px solid #ffe0b2; border-radius:10px;
+      padding:16px 20px; margin-bottom:18px;
+    }
+    .filtros-panel h4 {
+      margin:0 0 12px; font-size:0.82rem; color:#e65100; font-weight:700;
+      text-transform:uppercase; letter-spacing:0.05em;
+    }
+    .filtros-grid {
+      display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); gap:10px; margin-bottom:10px;
+    }
+    .filtros-grid input,
+    .filtros-grid select {
+      padding:8px 11px; border:1.5px solid #ddd; border-radius:7px;
+      font-size:0.86rem; font-family:inherit; background:#fff;
+    }
+    .filtros-grid input:focus,
+    .filtros-grid select:focus { outline:none; border-color:#b71c1c; }
+    .filtros-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .contador-filtro { font-size:0.82rem; color:#888; }
 
+    /* Tabla */
     .tabla-wrapper { overflow-x:auto; }
     table { width:100%; border-collapse:collapse; font-size:0.88rem; }
     thead tr { background:linear-gradient(135deg,#b71c1c,#f57c00); color:#fff; }
@@ -86,7 +99,11 @@
     .badge-remitido     { background:#f8d7da; color:#721c24; }
     .badge-cerrado      { background:#e2e3e5; color:#383d41; }
 
-    /* Modal gestion */
+    .caso-info { background:#fff8f0; border:1px solid #ffe0b2; border-radius:8px; padding:14px; margin-bottom:18px; }
+    .caso-info p { margin:4px 0; font-size:0.88rem; color:#555; }
+    .caso-info strong { color:#b71c1c; }
+
+    /* Modal */
     .modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:100;
       align-items:center; justify-content:center; }
     .modal-bg.open { display:flex; }
@@ -96,15 +113,49 @@
     .modal-sub { font-size:0.82rem; color:#888; margin-bottom:18px; }
     .modal-actions { margin-top:18px; display:flex; justify-content:flex-end; gap:10px; }
 
-    /* Info del caso */
-    .caso-info { background:#fff8f0; border:1px solid #ffe0b2; border-radius:8px; padding:14px; margin-bottom:18px; }
-    .caso-info p { margin:4px 0; font-size:0.88rem; color:#555; }
-    .caso-info strong { color:#b71c1c; }
+    /* RU-14: Historial por estudiante */
+    .hist-busqueda { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
+    .hist-busqueda input,
+    .hist-busqueda select {
+      flex:1; min-width:180px; padding:9px 12px;
+      border:1.5px solid #ddd; border-radius:7px; font-size:0.9rem;
+      font-family:inherit; background:#fafafa;
+    }
+    .hist-busqueda input:focus,
+    .hist-busqueda select:focus { outline:none; border-color:#b71c1c; }
 
-    /* Estado remisión condicional */
-    #bloqueRemision { display:none; }
+    .est-card {
+      border:1px solid #eee; border-radius:12px; margin-bottom:16px;
+      overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.06);
+    }
+    .est-card-header {
+      background:linear-gradient(135deg,#b71c1c,#f57c00); color:#fff;
+      padding:13px 18px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+    }
+    .est-nombre { font-weight:700; font-size:1rem; }
+    .est-doc { font-size:0.79rem; opacity:0.87; margin-top:2px; }
+    .est-chips { margin-left:auto; display:flex; gap:6px; flex-wrap:wrap; }
+    .chip {
+      background:rgba(255,255,255,0.22); border:1px solid rgba(255,255,255,0.35);
+      padding:3px 10px; border-radius:12px; font-size:0.76rem; font-weight:600;
+    }
+    .est-body { padding:16px 18px; }
+    .est-body .sub-label {
+      font-size:0.76rem; color:#888; text-transform:uppercase; font-weight:700;
+      letter-spacing:0.05em; margin-bottom:10px;
+    }
+    .reporte-fila {
+      display:flex; align-items:center; gap:12px; padding:9px 0;
+      border-bottom:1px solid #f5f5f5; font-size:0.86rem; flex-wrap:wrap;
+    }
+    .reporte-fila:last-child { border-bottom:none; }
+    .rf-docente { font-weight:700; color:#333; min-width:130px; }
+    .rf-materia { color:#555; flex:1; }
+    .rf-fecha   { color:#aaa; font-size:0.78rem; white-space:nowrap; }
+    .rf-seg     { font-size:0.76rem; }
+    .sin-datos  { text-align:center; color:#aaa; padding:32px; font-style:italic; font-size:0.9rem; }
 
-    @media(max-width:600px) { .form-grid { grid-template-columns:1fr; } .tabs { overflow-x:auto; } }
+    @media(max-width:600px){ .form-grid { grid-template-columns:1fr; } .tabs { overflow-x:auto; } }
   </style>
 </head>
 <body>
@@ -130,32 +181,47 @@
   </div>
 
   <div class="tabs">
-    <button class="tab active" onclick="cambiarTab('casos', this)">📋 Gestión de casos</button>
-    <button class="tab" onclick="cambiarTab('seguimiento', this)">📝 Registrar seguimiento</button>
+    <button class="tab active" onclick="cambiarTab('casos',this)">📋 Gestión de casos</button>
+    <button class="tab" onclick="cambiarTab('seguimiento',this)">📝 Registrar seguimiento</button>
+    <button class="tab" onclick="cambiarTab('historial',this)">🔍 Consulta por estudiante</button>
   </div>
 
-  <!-- TAB: Gestión de casos -->
+  <!-- ════ TAB: Gestión de casos ════ -->
   <div id="tab-casos" class="tab-panel active">
     <div class="card">
       <h2>Casos activos — actualizar estado</h2>
       <div id="msgCasos" class="msg"></div>
-      <div class="search-bar">
-        <input type="text" id="buscarEst" placeholder="🔍 Estudiante..." oninput="filtrarCasos()">
-        <input type="text" id="buscarMat" placeholder="🔍 Materia..."   oninput="filtrarCasos()">
-        <select id="filtroEst" onchange="filtrarCasos()">
-          <option value="">Todos los estados</option>
-          <option value="Reportado">Reportado</option>
-          <option value="En revisión">En revisión</option>
-          <option value="En seguimiento">En seguimiento</option>
-          <option value="Remitido">Remitido</option>
-          <option value="Cerrado">Cerrado</option>
-        </select>
+
+      <!-- RU-13: Filtros por fecha, programa académico, periodo -->
+      <div class="filtros-panel">
+        <h4>🔎 Filtros avanzados — RU-13</h4>
+        <div class="filtros-grid">
+          <input type="text" id="fEstudiante"  placeholder="Estudiante..."           oninput="filtrarCasos()">
+          <input type="text" id="fPrograma"    placeholder="Programa académico..."   oninput="filtrarCasos()">
+          <input type="text" id="fPeriodo"     placeholder="Periodo (ej: 2025-1)"   oninput="filtrarCasos()">
+          <input type="text" id="fDocente"     placeholder="Docente..."             oninput="filtrarCasos()">
+          <select id="fEstado" onchange="filtrarCasos()">
+            <option value="">Todos los estados</option>
+            <option value="Reportado">Reportado</option>
+            <option value="En revisión">En revisión</option>
+            <option value="En seguimiento">En seguimiento</option>
+            <option value="Remitido">Remitido</option>
+            <option value="Cerrado">Cerrado</option>
+          </select>
+          <input type="date" id="fFechaInicio" title="Fecha inicio" onchange="filtrarCasos()">
+          <input type="date" id="fFechaFin"    title="Fecha fin"    onchange="filtrarCasos()">
+        </div>
+        <div class="filtros-actions">
+          <button class="btn btn-secondary btn-sm" onclick="limpiarFiltros()">Limpiar filtros</button>
+          <span class="contador-filtro" id="contadorFiltro"></span>
+        </div>
       </div>
+
       <div class="tabla-wrapper">
         <table>
           <thead><tr>
             <th>#</th><th>Estudiante</th><th>Materia</th>
-            <th>Docente</th><th>Motivo</th><th>Estado</th><th>Fecha</th><th>Acciones</th>
+            <th>Docente</th><th>Motivo</th><th>Estado</th><th>Fecha</th><th>Acción</th>
           </tr></thead>
           <tbody id="tbodyCasos"></tbody>
         </table>
@@ -163,12 +229,12 @@
     </div>
   </div>
 
-  <!-- TAB: Registrar seguimiento -->
+  <!-- ════ TAB: Registrar seguimiento ════ -->
   <div id="tab-seguimiento" class="tab-panel">
     <div class="card">
       <h2>Registrar seguimiento a un caso</h2>
       <div id="msgSeg" class="msg"></div>
-      <form id="formSeguimiento" onsubmit="registrarSeguimiento(event)">
+      <form id="formSeg" onsubmit="registrarSeguimiento(event)">
         <div class="form-grid">
           <div class="form-group full">
             <label>ID del reporte</label>
@@ -178,9 +244,7 @@
             </div>
           </div>
         </div>
-        <!-- Info del caso encontrado -->
         <div id="infoCaso" class="caso-info" style="display:none"></div>
-
         <div class="form-grid">
           <div class="form-group">
             <label>Tipo de intervención</label>
@@ -195,7 +259,7 @@
           </div>
           <div class="form-group">
             <label>Nuevo estado del caso</label>
-            <select id="segEstado" onchange="mostrarRemision()">
+            <select id="segEstado" onchange="toggleRemision('bloqueRemision',this.value)">
               <option value="En revisión">En revisión</option>
               <option value="En seguimiento">En seguimiento</option>
               <option value="Remitido">Remitido</option>
@@ -210,15 +274,14 @@
             <label>Recomendaciones</label>
             <textarea id="segRecomendaciones" placeholder="Acciones a seguir, recursos sugeridos..."></textarea>
           </div>
-
-          <!-- Bloque condicional: Remisión -->
-          <div id="bloqueRemision" class="full">
-            <div style="background:#fff3e0;border:1px solid #ffe0b2;border-radius:8px;padding:14px;">
-              <p style="margin:0 0 10px;font-weight:600;color:#e65100;font-size:0.88rem;">📨 Datos de remisión</p>
+          <!-- RU-12: Bloque remisión -->
+          <div id="bloqueRemision" class="full" style="display:none">
+            <div style="background:#fff3e0;border:1px solid #ffe0b2;border-radius:8px;padding:14px">
+              <p style="margin:0 0 10px;font-weight:600;color:#e65100;font-size:0.88rem">📨 Datos de remisión (RU-12)</p>
               <div class="form-grid">
                 <div class="form-group">
                   <label>Remitido a</label>
-                  <input type="text" id="segRemitidoA" placeholder="Ej: Psicología externa, Hospital...">
+                  <input type="text" id="segRemitidoA" placeholder="Ej: Psicología, Hospital...">
                 </div>
                 <div class="form-group">
                   <label>Motivo de remisión</label>
@@ -228,7 +291,6 @@
             </div>
           </div>
         </div>
-
         <div class="form-actions">
           <button type="submit" class="btn btn-primary">Guardar seguimiento</button>
           <button type="button" class="btn btn-secondary" onclick="limpiarSeg()">Limpiar</button>
@@ -237,9 +299,35 @@
     </div>
   </div>
 
-</div>
+  <!-- ════ TAB: Consulta por estudiante (RU-14) ════ -->
+  <div id="tab-historial" class="tab-panel">
+    <div class="card">
+      <h2>🔍 Consulta por estudiante — RU-14</h2>
+      <p style="font-size:0.87rem;color:#777;margin:-8px 0 18px">
+        Visualiza qué docentes han reportado a cada estudiante y en qué materias.
+        Los casos se agrupan por nombre del estudiante.
+      </p>
 
-<!-- Modal gestión rápida -->
+      <div class="hist-busqueda">
+        <input type="text" id="histBusq" placeholder="🔍 Buscar por estudiante o docente..."
+          oninput="renderHistorial()">
+        <select id="histEstado" onchange="renderHistorial()">
+          <option value="">Todos los estados</option>
+          <option value="Reportado">Reportado</option>
+          <option value="En revisión">En revisión</option>
+          <option value="En seguimiento">En seguimiento</option>
+          <option value="Remitido">Remitido</option>
+          <option value="Cerrado">Cerrado</option>
+        </select>
+      </div>
+
+      <div id="histContenedor"></div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ════ Modal gestión rápida (RU-11 + RU-12) ════ -->
 <div class="modal-bg" id="modalGestion">
   <div class="modal">
     <h3>⚙️ Actualizar estado del caso</h3>
@@ -249,7 +337,7 @@
       <input type="hidden" id="modalIdx">
       <div class="form-group">
         <label>Nuevo estado</label>
-        <select id="modalEstado" onchange="mostrarRemisionModal()">
+        <select id="modalEstado" onchange="toggleRemision('bloqueRemisionModal',this.value)">
           <option value="En revisión">En revisión</option>
           <option value="En seguimiento">En seguimiento</option>
           <option value="Remitido">Remitido</option>
@@ -271,16 +359,16 @@
         <label>Observaciones</label>
         <textarea id="modalObservaciones" placeholder="Notas del caso..."></textarea>
       </div>
-      <div id="bloqueRemisionModal" style="display:none" class="full">
-        <div style="background:#fff3e0;border:1px solid #ffe0b2;border-radius:8px;padding:12px;">
-          <p style="margin:0 0 8px;font-weight:600;color:#e65100;font-size:0.85rem;">📨 Datos de remisión</p>
+      <div id="bloqueRemisionModal" class="full" style="display:none">
+        <div style="background:#fff3e0;border:1px solid #ffe0b2;border-radius:8px;padding:12px">
+          <p style="margin:0 0 8px;font-weight:600;color:#e65100;font-size:0.85rem">📨 Datos de remisión (RU-12)</p>
           <div class="form-group">
             <label>Remitido a</label>
             <input type="text" id="modalRemitidoA" placeholder="Institución o especialista...">
           </div>
           <div class="form-group" style="margin-top:8px">
-            <label>Motivo</label>
-            <textarea id="modalMotivo" style="min-height:56px"></textarea>
+            <label>Motivo de remisión</label>
+            <textarea id="modalMotivo" style="min-height:56px" placeholder="Justificación..."></textarea>
           </div>
         </div>
       </div>
@@ -293,7 +381,7 @@
 </div>
 
 <script>
-  const nombreUsuario = localStorage.getItem("nombreUsuario") || "Director/a";
+  const nombreUsuario = localStorage.getItem("nombreUsuario") || "Director/a Bienestar";
   document.getElementById("nombreHeader").textContent = "Bienvenido/a: " + nombreUsuario;
 
   function cerrarSesion() {
@@ -301,179 +389,275 @@
     localStorage.removeItem("rolUsuario");
   }
 
-  function obtenerReportes() { return JSON.parse(localStorage.getItem("reportes")) || []; }
-  function guardarReportes(r) { localStorage.setItem("reportes", JSON.stringify(r)); }
+  const X = s => { if(s===null||s===undefined)return""; return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
+  function obtenerReportes() { return JSON.parse(localStorage.getItem("reportes"))||[]; }
+  function guardarReportes(r){ localStorage.setItem("reportes",JSON.stringify(r)); }
+
+  const BADGE = {
+    "Reportado":"badge-reportado","En revisión":"badge-revision",
+    "En seguimiento":"badge-seguimiento","Remitido":"badge-remitido","Cerrado":"badge-cerrado"
+  };
+  const ICON = { "Reportado":"🟡","En revisión":"🔵","En seguimiento":"🟢","Remitido":"🔴","Cerrado":"⚫" };
 
   let todosLos = [];
 
-  function init() {
+  /* ── INIT ── */
+  function init(){
     todosLos = obtenerReportes();
     renderCasos(todosLos);
     actualizarStats(todosLos);
   }
 
-  function actualizarStats(r) {
-    document.getElementById("statTotal").textContent    = r.length;
-    document.getElementById("statPendientes").textContent = r.filter(x => x.estado==="Reportado").length;
-    document.getElementById("statEnProceso").textContent= r.filter(x=>["En revisión","En seguimiento"].includes(x.estado)).length;
-    document.getElementById("statCerrados").textContent = r.filter(x=>x.estado==="Cerrado").length;
+  function actualizarStats(r){
+    document.getElementById("statTotal").textContent      = r.length;
+    document.getElementById("statPendientes").textContent = r.filter(x=>x.estado==="Reportado").length;
+    document.getElementById("statEnProceso").textContent  = r.filter(x=>["En revisión","En seguimiento"].includes(x.estado)).length;
+    document.getElementById("statCerrados").textContent   = r.filter(x=>x.estado==="Cerrado").length;
   }
 
-  function renderCasos(datos) {
-    const tbody = document.getElementById("tbodyCasos");
-    if (datos.length===0) {
-      tbody.innerHTML=`<tr><td colspan="8" style="text-align:center;color:#aaa;padding:24px">Sin casos registrados.</td></tr>`;
+  /* ══════════════════════════════════════
+     RU-13: Filtros por fecha, programa, periodo
+  ══════════════════════════════════════ */
+  function filtrarCasos(){
+    const est    = document.getElementById("fEstudiante").value.toLowerCase();
+    const prog   = document.getElementById("fPrograma").value.toLowerCase();
+    const per    = document.getElementById("fPeriodo").value.toLowerCase();
+    const doc    = document.getElementById("fDocente").value.toLowerCase();
+    const estado = document.getElementById("fEstado").value;
+    const fIni   = document.getElementById("fFechaInicio").value;
+    const fFin   = document.getElementById("fFechaFin").value;
+
+    const fil = todosLos.filter(r=>{
+      if(est   && !(r.estudiante||"").toLowerCase().includes(est))  return false;
+      if(prog  && !(r.carrera   ||"").toLowerCase().includes(prog)) return false;
+      if(per   && !(r.periodo   ||"").toLowerCase().includes(per))  return false;
+      if(doc   && !(r.docente   ||"").toLowerCase().includes(doc))  return false;
+      if(estado && r.estado!==estado)                                return false;
+      if(fIni||fFin){
+        const d = parseFecha(r.fecha);
+        if(!d) return true;
+        if(fIni && d < new Date(fIni+"T00:00:00")) return false;
+        if(fFin && d > new Date(fFin+"T23:59:59")) return false;
+      }
+      return true;
+    });
+
+    document.getElementById("contadorFiltro").textContent =
+      fil.length < todosLos.length ? `Mostrando ${fil.length} de ${todosLos.length} casos` : "";
+
+    renderCasos(fil);
+    actualizarStats(fil);
+  }
+
+  function parseFecha(str){
+    if(!str) return null;
+    try{
+      const p=str.split(",")[0].trim().split("/");
+      if(p.length===3) return new Date(`${p[2]}-${p[1].padStart(2,"0")}-${p[0].padStart(2,"0")}T00:00:00`);
+    }catch(e){}
+    return null;
+  }
+
+  function limpiarFiltros(){
+    ["fEstudiante","fPrograma","fPeriodo","fDocente","fEstado","fFechaInicio","fFechaFin"]
+      .forEach(id=>document.getElementById(id).value="");
+    document.getElementById("contadorFiltro").textContent="";
+    renderCasos(todosLos); actualizarStats(todosLos);
+  }
+
+  /* ── Tabla casos ── */
+  function renderCasos(datos){
+    const tbody=document.getElementById("tbodyCasos");
+    if(!datos.length){
+      tbody.innerHTML=`<tr><td colspan="8" style="text-align:center;color:#aaa;padding:24px">Sin casos para mostrar.</td></tr>`;
       return;
     }
-    const bCls = {"Reportado":"badge-reportado","En revisión":"badge-revision","En seguimiento":"badge-seguimiento","Remitido":"badge-remitido","Cerrado":"badge-cerrado"};
-    tbody.innerHTML = datos.map((r,i) => {
-      const idx = obtenerReportes().findIndex(x => x.estudiante===r.estudiante && x.materia===r.materia && x.fecha===r.fecha);
+    tbody.innerHTML=datos.map(r=>{
+      const idx=obtenerReportes().findIndex(x=>x.estudiante===r.estudiante&&x.materia===r.materia&&x.fecha===r.fecha);
       return `<tr>
-        <td>${i+1}</td>
-        <td><strong>${r.estudiante}</strong></td>
-        <td>${r.materia}</td>
-        <td>${r.docente||"N/A"}</td>
-        <td>${r.motivo}</td>
-        <td><span class="badge ${bCls[r.estado]||'badge-reportado'}">${r.estado}</span></td>
-        <td style="font-size:0.8rem;color:#888">${r.fecha||""}</td>
-        <td>
-          <button class="btn btn-secondary btn-sm" onclick='abrirModal(${idx})'>Gestionar</button>
-        </td>
+        <td>${idx+1}</td>
+        <td><strong>${X(r.estudiante)}</strong></td>
+        <td>${X(r.materia)}</td>
+        <td>${X(r.docente||"N/A")}</td>
+        <td>${X(r.motivo)}</td>
+        <td><span class="badge ${BADGE[r.estado]||'badge-reportado'}">${X(r.estado)}</span></td>
+        <td style="font-size:0.8rem;color:#888">${X(r.fecha||"")}</td>
+        <td><button class="btn btn-secondary btn-sm" onclick="abrirModal(${idx})">Gestionar</button></td>
       </tr>`;
     }).join("");
   }
 
-  function filtrarCasos() {
-    const est = document.getElementById("buscarEst").value.toLowerCase();
-    const mat = document.getElementById("buscarMat").value.toLowerCase();
-    const estado = document.getElementById("filtroEst").value;
-    const f = todosLos.filter(r =>
-      (!est   || r.estudiante?.toLowerCase().includes(est)) &&
-      (!mat   || r.materia?.toLowerCase().includes(mat)) &&
-      (!estado|| r.estado===estado)
-    );
-    renderCasos(f);
-  }
-
-  function abrirModal(idx) {
-    const r = obtenerReportes()[idx];
-    if (!r) return;
-    document.getElementById("modalIdx").value = idx;
-    document.getElementById("modalSubtitle").textContent = `#${idx+1} — ${r.estudiante} | ${r.materia}`;
-    document.getElementById("infoCasoModal").innerHTML = `
-      <p><strong>Motivo:</strong> ${r.motivo}</p>
-      <p><strong>Estado actual:</strong> ${r.estado}</p>
-      <p><strong>Observaciones docente:</strong> ${r.observaciones||"—"}</p>
-    `;
-    document.getElementById("modalEstado").value = r.estado;
-    document.getElementById("modalObservaciones").value = r.seguimiento?.observaciones || "";
-    document.getElementById("bloqueRemisionModal").style.display = "none";
+  /* ── Modal gestión (RU-11 + RU-12) ── */
+  function abrirModal(idx){
+    const r=obtenerReportes()[idx]; if(!r)return;
+    document.getElementById("modalIdx").value=idx;
+    document.getElementById("modalSubtitle").textContent=`#${idx+1} — ${r.estudiante} | ${r.materia}`;
+    document.getElementById("infoCasoModal").innerHTML=`
+      <p><strong>Motivo:</strong> ${X(r.motivo)}</p>
+      <p><strong>Estado actual:</strong> ${X(r.estado)}</p>
+      <p><strong>Observaciones docente:</strong> ${X(r.observaciones||"—")}</p>`;
+    document.getElementById("modalEstado").value=r.estado;
+    document.getElementById("modalObservaciones").value=r.seguimiento?.observaciones||"";
+    document.getElementById("modalRemitidoA").value=r.remitido_a||"";
+    document.getElementById("modalMotivo").value=r.motivo_remision||"";
+    toggleRemision("bloqueRemisionModal",r.estado);
     document.getElementById("modalGestion").classList.add("open");
   }
 
-  function mostrarRemisionModal() {
-    const v = document.getElementById("modalEstado").value;
-    document.getElementById("bloqueRemisionModal").style.display = v==="Remitido" ? "block" : "none";
-  }
-
-  function guardarGestion() {
-    const idx = parseInt(document.getElementById("modalIdx").value);
-    const reportes = obtenerReportes();
-    if (!reportes[idx]) return;
-    reportes[idx].estado = document.getElementById("modalEstado").value;
-    reportes[idx].seguimiento = {
-      fecha: new Date().toLocaleString("es-CO"),
-      intervencion: document.getElementById("modalIntervencion").value,
-      observaciones: document.getElementById("modalObservaciones").value,
-      profesional: nombreUsuario
+  function guardarGestion(){
+    const idx=parseInt(document.getElementById("modalIdx").value);
+    const reportes=obtenerReportes(); if(!reportes[idx])return;
+    reportes[idx].estado=document.getElementById("modalEstado").value;
+    reportes[idx].seguimiento={
+      fecha:new Date().toLocaleString("es-CO"),
+      intervencion:document.getElementById("modalIntervencion").value,
+      observaciones:document.getElementById("modalObservaciones").value,
+      profesional:nombreUsuario
     };
-    if (reportes[idx].estado === "Remitido") {
-      reportes[idx].remitido_a = document.getElementById("modalRemitidoA").value;
-      reportes[idx].motivo_remision = document.getElementById("modalMotivo").value;
+    if(reportes[idx].estado==="Remitido"){
+      reportes[idx].remitido_a=document.getElementById("modalRemitidoA").value;
+      reportes[idx].motivo_remision=document.getElementById("modalMotivo").value;
     }
-    guardarReportes(reportes);
-    todosLos = reportes;
-    cerrarModal();
-    renderCasos(todosLos);
-    actualizarStats(todosLos);
+    guardarReportes(reportes); todosLos=reportes;
+    cerrarModal(); filtrarCasos(); actualizarStats(todosLos);
     mostrarMsg("msgCasos","success","✅ Caso actualizado correctamente.");
   }
 
-  function cerrarModal() {
-    document.getElementById("modalGestion").classList.remove("open");
-  }
-  document.getElementById("modalGestion").addEventListener("click",function(e){ if(e.target===this) cerrarModal(); });
+  function cerrarModal(){ document.getElementById("modalGestion").classList.remove("open"); }
+  document.getElementById("modalGestion").addEventListener("click",function(e){ if(e.target===this)cerrarModal(); });
 
-  // ---- Seguimiento ----
-  function buscarCaso() {
-    const id = parseInt(document.getElementById("segId").value);
-    const reportes = obtenerReportes();
-    const r = reportes[id-1];
-    const el = document.getElementById("infoCaso");
-    if (!r) {
-      el.innerHTML = `<p style="color:#c62828">❌ No se encontró un reporte con ID ${id}.</p>`;
-      el.style.display = "block";
-      return;
+  function toggleRemision(bloqueId,val){
+    document.getElementById(bloqueId).style.display=val==="Remitido"?"block":"none";
+  }
+
+  /* ── Seguimiento por ID ── */
+  function buscarCaso(){
+    const id=parseInt(document.getElementById("segId").value);
+    const r=obtenerReportes()[id-1];
+    const el=document.getElementById("infoCaso");
+    if(!r){
+      el.innerHTML=`<p style="color:#c62828">❌ No se encontró un reporte con ID ${id}.</p>`;
+      el.style.display="block"; return;
     }
-    el.innerHTML = `
-      <p><strong>Estudiante:</strong> ${r.estudiante} &nbsp;|&nbsp; <strong>Materia:</strong> ${r.materia}</p>
-      <p><strong>Docente:</strong> ${r.docente||"N/A"} &nbsp;|&nbsp; <strong>Motivo:</strong> ${r.motivo}</p>
-      <p><strong>Estado actual:</strong> ${r.estado} &nbsp;|&nbsp; <strong>Fecha reporte:</strong> ${r.fecha||"N/D"}</p>
-    `;
-    el.style.display = "block";
+    el.innerHTML=`
+      <p><strong>Estudiante:</strong> ${X(r.estudiante)} &nbsp;|&nbsp; <strong>Materia:</strong> ${X(r.materia)}</p>
+      <p><strong>Docente:</strong> ${X(r.docente||"N/A")} &nbsp;|&nbsp; <strong>Motivo:</strong> ${X(r.motivo)}</p>
+      <p><strong>Estado:</strong> ${X(r.estado)} &nbsp;|&nbsp; <strong>Fecha:</strong> ${X(r.fecha||"N/D")}</p>`;
+    el.style.display="block";
   }
 
-  function mostrarRemision() {
-    const v = document.getElementById("segEstado").value;
-    document.getElementById("bloqueRemision").style.display = v==="Remitido" ? "block" : "none";
-  }
-
-  function registrarSeguimiento(e) {
+  function registrarSeguimiento(e){
     e.preventDefault();
-    const id = parseInt(document.getElementById("segId").value);
-    const reportes = obtenerReportes();
-    if (!reportes[id-1]) {
-      mostrarMsg("msgSeg","error","❌ Reporte no encontrado. Verifica el ID.");
-      return;
-    }
-    const nuevoEstado = document.getElementById("segEstado").value;
-    reportes[id-1].estado = nuevoEstado;
-    reportes[id-1].seguimiento = {
-      fecha: new Date().toLocaleString("es-CO"),
-      intervencion:   document.getElementById("segIntervencion").value,
-      observaciones:  document.getElementById("segObservaciones").value,
+    const id=parseInt(document.getElementById("segId").value);
+    const reportes=obtenerReportes();
+    if(!reportes[id-1]){ mostrarMsg("msgSeg","error","❌ Reporte no encontrado."); return; }
+    const nuevoEstado=document.getElementById("segEstado").value;
+    reportes[id-1].estado=nuevoEstado;
+    reportes[id-1].seguimiento={
+      fecha:new Date().toLocaleString("es-CO"),
+      intervencion:document.getElementById("segIntervencion").value,
+      observaciones:document.getElementById("segObservaciones").value,
       recomendaciones:document.getElementById("segRecomendaciones").value,
-      profesional:    nombreUsuario
+      profesional:nombreUsuario
     };
-    if (nuevoEstado === "Remitido") {
-      reportes[id-1].remitido_a      = document.getElementById("segRemitidoA").value;
-      reportes[id-1].motivo_remision = document.getElementById("segMotivoRemision").value;
+    if(nuevoEstado==="Remitido"){
+      reportes[id-1].remitido_a=document.getElementById("segRemitidoA").value;
+      reportes[id-1].motivo_remision=document.getElementById("segMotivoRemision").value;
     }
-    guardarReportes(reportes);
-    todosLos = reportes;
+    guardarReportes(reportes); todosLos=reportes;
     actualizarStats(todosLos);
     mostrarMsg("msgSeg","success","✅ Seguimiento registrado correctamente.");
     limpiarSeg();
   }
 
-  function limpiarSeg() {
-    document.getElementById("formSeguimiento").reset();
-    document.getElementById("infoCaso").style.display = "none";
-    document.getElementById("bloqueRemision").style.display = "none";
+  function limpiarSeg(){
+    document.getElementById("formSeg").reset();
+    document.getElementById("infoCaso").style.display="none";
+    document.getElementById("bloqueRemision").style.display="none";
   }
 
-  function cambiarTab(nombre, el) {
-    document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
-    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-    document.getElementById("tab-" + nombre).classList.add("active");
+  /* ══════════════════════════════════════
+     RU-14: Consulta por estudiante
+     — Qué docentes reportaron y en qué materias
+  ══════════════════════════════════════ */
+  function renderHistorial(){
+    const busq   = (document.getElementById("histBusq").value||"").toLowerCase();
+    const estado = document.getElementById("histEstado").value;
+    const reps   = obtenerReportes();
+    const cont   = document.getElementById("histContenedor");
+
+    // Agrupar por nombre de estudiante
+    const mapa = {};
+    reps.forEach((r,idx)=>{
+      if(estado && r.estado!==estado) return;
+      const key = (r.estudiante||"Sin nombre").trim();
+      if(!mapa[key]) mapa[key]={documento:r.documento||"—",reportes:[]};
+      mapa[key].reportes.push({...r,_idx:idx});
+    });
+
+    // Filtrar por búsqueda (estudiante o docente)
+    const entradas = Object.entries(mapa).filter(([nom,dat])=>{
+      if(!busq) return true;
+      if(nom.toLowerCase().includes(busq)) return true;
+      return dat.reportes.some(r=>(r.docente||"").toLowerCase().includes(busq));
+    });
+
+    if(!entradas.length){
+      cont.innerHTML=`<p class="sin-datos">Sin estudiantes encontrados.</p>`;
+      return;
+    }
+
+    cont.innerHTML = entradas.map(([nom,dat])=>{
+      const total   = dat.reportes.length;
+      const docUniq = [...new Set(dat.reportes.map(r=>r.docente).filter(Boolean))].length;
+      const matUniq = [...new Set(dat.reportes.map(r=>r.materia).filter(Boolean))].length;
+
+      const filas = dat.reportes.map(r=>`
+        <div class="reporte-fila">
+          <span style="font-size:1.1rem">${ICON[r.estado]||"⚪"}</span>
+          <span class="rf-docente">👨‍🏫 ${X(r.docente||"N/A")}</span>
+          <span class="rf-materia">📚 ${X(r.materia)}</span>
+          <span><span class="badge ${BADGE[r.estado]||'badge-reportado'}">${X(r.estado)}</span></span>
+          <span class="rf-fecha">🗓 ${X(r.fecha||"")}</span>
+          <span class="rf-seg" style="color:${r.seguimiento?'#2e7d32':'#bbb'}">
+            ${r.seguimiento?'✓ Con seguimiento':'Sin seguimiento'}
+          </span>
+        </div>`).join("");
+
+      return `
+        <div class="est-card">
+          <div class="est-card-header">
+            <div>
+              <div class="est-nombre">👤 ${X(nom)}</div>
+              <div class="est-doc">Doc: ${X(dat.documento)}</div>
+            </div>
+            <div class="est-chips">
+              <span class="chip">${total} reporte${total!==1?'s':''}</span>
+              <span class="chip">${docUniq} docente${docUniq!==1?'s':''}</span>
+              <span class="chip">${matUniq} materia${matUniq!==1?'s':''}</span>
+            </div>
+          </div>
+          <div class="est-body">
+            <p class="sub-label">Docentes y materias que han generado reportes para este estudiante:</p>
+            ${filas}
+          </div>
+        </div>`;
+    }).join("");
+  }
+
+  /* ── Tabs ── */
+  function cambiarTab(nombre,el){
+    document.querySelectorAll(".tab-panel").forEach(p=>p.classList.remove("active"));
+    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+    document.getElementById("tab-"+nombre).classList.add("active");
     el.classList.add("active");
+    if(nombre==="historial") renderHistorial();
   }
 
-  function mostrarMsg(id, tipo, texto) {
-    const el = document.getElementById(id);
-    el.className = "msg " + tipo;
-    el.textContent = texto;
-    setTimeout(() => el.className = "msg", 4000);
+  function mostrarMsg(id,tipo,texto){
+    const el=document.getElementById(id);
+    el.className="msg "+tipo; el.textContent=texto;
+    setTimeout(()=>el.className="msg",4000);
   }
 
   init();
