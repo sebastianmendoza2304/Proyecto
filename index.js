@@ -1,6 +1,5 @@
 // ============================================================
 // index.js — Login conectado a login.php (base de datos)
-// Sistema de Alertas por Riesgo Académico - Universidad Libre
 // ============================================================
 
 async function validarUsuario(event) {
@@ -15,37 +14,40 @@ async function validarUsuario(event) {
     return;
   }
 
-  // Indicador de carga
+  // Verificar que se usa http:// y no file://
+  if (window.location.protocol === 'file:') {
+    mostrarError('⚠️ Abre la página desde XAMPP: http://localhost/Proyecto-main/Index.html');
+    return;
+  }
+
   btnSubmit.textContent = 'Verificando...';
   btnSubmit.disabled    = true;
 
   try {
-    // Llama a login.php que verifica contra la base de datos
     const datos = await API.login(usuario, password);
-
-    // Guardar sesión en sessionStorage (no localStorage, para que cada
-    // pestaña/usuario tenga su propia sesión)
     API.sesion.guardar(datos);
-
-    // Redirigir al panel correspondiente al rol
     window.location.href = datos.panel;
 
   } catch (err) {
-    mostrarError('Usuario o contraseña incorrectos.');
+    if (!err.message || err.message.includes('fetch') || err.message.includes('Network')) {
+      mostrarError('❌ Sin conexión al servidor. ¿Está corriendo XAMPP (Apache + MySQL)?');
+    } else {
+      mostrarError('❌ Usuario o contraseña incorrectos.');
+    }
     btnSubmit.textContent = 'Ingresar';
     btnSubmit.disabled    = false;
   }
 }
 
 function mostrarError(msg) {
-  // Reusar el contenedor de error si existe, si no crearlo
   let el = document.getElementById('loginError');
   if (!el) {
     el = document.createElement('p');
     el.id = 'loginError';
-    el.style.cssText = 'color:#b71c1c;font-weight:600;text-align:center;margin-top:10px;font-size:0.9rem';
+    el.style.cssText = 'color:#b71c1c;font-weight:600;text-align:center;margin-top:10px;font-size:0.88rem;padding:8px;background:#ffebee;border-radius:6px;border:1px solid #ef9a9a';
     document.querySelector('.login-container form').appendChild(el);
   }
   el.textContent = msg;
-  setTimeout(() => { el.textContent = ''; }, 4000);
+  el.style.display = 'block';
+  setTimeout(() => { el.textContent = ''; el.style.display = 'none'; }, 7000);
 }
