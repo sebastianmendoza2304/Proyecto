@@ -3,274 +3,276 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel Director de Programa - Sistema de Alertas</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Panel Director de Programa — Sistema de Alertas</title>
+  <link rel="stylesheet" href="Style.css">
   <style>
-    * { box-sizing: border-box; }
-    body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; }
- 
-    .header { display:flex; align-items:center; gap:16px; justify-content:center;
-      background: linear-gradient(135deg,#ab1313,#f57c00); color:#fff; padding:16px 24px; }
-    .header img { width:54px; height:54px; border-radius:50%; border:2px solid rgba(255,255,255,0.5); }
-    .header-info h1 { margin:0; font-size:1.2rem; font-weight:600; }
-    .header-info p  { margin:0; font-size:0.82rem; opacity:0.85; }
-    .header-right { margin-left:auto; }
-    .btn-logout { background:rgba(255,255,255,0.18); color:#fff; border:1px solid rgba(255,255,255,0.4);
-      padding:7px 16px; border-radius:6px; cursor:pointer; font-size:0.85rem; text-decoration:none; }
- 
-    .main { max-width:1200px; margin:28px auto; padding:0 16px; }
- 
-    /* Stats */
-    .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:24px; }
-    .stat-card { background:#fff; border-radius:10px; padding:16px 12px; text-align:center; box-shadow:0 1px 4px rgba(0,0,0,0.08); }
-    .stat-num { font-size:2rem; font-weight:700; color:#b71c1c; }
-    .stat-label { font-size:0.78rem; color:#888; margin-top:2px; }
- 
-    /* Tabs */
-    .tabs { display:flex; gap:4px; margin-bottom:24px; border-bottom:2px solid #e0e0e0; overflow-x:auto; }
-    .tab { padding:10px 22px; cursor:pointer; border-radius:8px 8px 0 0; font-size:0.9rem;
-      font-weight:600; color:#777; background:none; border:none; border-bottom:2px solid transparent;
-      margin-bottom:-2px; transition:all 0.2s; white-space:nowrap; }
-    .tab.active { color:#b71c1c; border-bottom-color:#b71c1c; background:#fff3e0; }
-    .tab:hover:not(.active) { color:#b71c1c; background:#fafafa; }
-    .tab-panel { display:none; }
-    .tab-panel.active { display:block; }
- 
-    /* Card */
-    .card { background:#fff; border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,0.09); padding:24px; margin-bottom:20px; }
-    .card h2 { margin:0 0 18px; font-size:1.05rem; color:#b71c1c; border-left:4px solid #f57c00; padding-left:10px; }
- 
-    /* Filtros */
-    .search-bar { display:flex; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
-    .search-bar input,
-    .search-bar select { padding:8px 12px; border:1.5px solid #ddd; border-radius:7px;
-      font-size:0.88rem; font-family:inherit; background:#fafafa; flex:1; min-width:140px; }
-    .search-bar input:focus,
-    .search-bar select:focus { outline:none; border-color:#b71c1c; }
-    .search-actions { display:flex; gap:8px; align-items:center; }
- 
-    /* Botones */
-    .btn { padding:9px 18px; border:none; border-radius:7px; cursor:pointer;
-      font-weight:600; font-size:0.88rem; font-family:inherit; transition:all 0.2s; }
-    .btn-primary { background:#b71c1c; color:#fff; }
-    .btn-primary:hover { background:#f57c00; }
-    .btn-secondary { background:#f5f5f5; color:#555; border:1.5px solid #ddd; }
-    .btn-secondary:hover { background:#ffe0b2; }
-    .btn-export { background:#1b5e20; color:#fff; }
-    .btn-export:hover { background:#2e7d32; }
-    .btn-sm { padding:4px 12px; font-size:0.8rem; border-radius:5px; }
- 
-    /* Tabla */
-    .tabla-wrapper { overflow-x:auto; }
-    table { width:100%; border-collapse:collapse; font-size:0.88rem; }
-    thead tr { background:linear-gradient(135deg,#b71c1c,#f57c00); color:#fff; }
-    th { padding:11px 14px; text-align:left; font-weight:600; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.04em; }
-    td { padding:11px 14px; border-bottom:1px solid #f0f0f0; color:#444; vertical-align:middle; }
-    tr:hover td { background:#fff8f0; }
- 
-    /* Badges */
-    .badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:600; }
-    .badge-reportado    { background:#fff3cd; color:#856404; }
-    .badge-revision     { background:#cce5ff; color:#004085; }
-    .badge-seguimiento  { background:#d4edda; color:#155724; }
-    .badge-remitido     { background:#f8d7da; color:#721c24; }
-    .badge-cerrado      { background:#e2e3e5; color:#383d41; }
- 
-    /* Gráfico de barras */
-    .chart-wrap { margin-top: 4px; }
-    .bar-row {
-      display: flex; align-items: center; gap: 10px;
-      margin-bottom: 10px; font-size: 0.83rem;
-    }
-    .bar-label { min-width: 170px; color: #555; font-weight: 600; }
-    .bar-track {
-      flex: 1; height: 10px; background: #f5f5f5;
-      border-radius: 5px; overflow: hidden;
-      border: 1px solid #eee;
-    }
-    .bar-fill { height: 100%; border-radius: 5px; transition: width 0.6s ease; }
-    .bar-val { min-width: 28px; text-align: right; font-weight: 700; color: #b71c1c; }
-    .chart-empty { color:#aaa; font-size:0.88rem; font-style:italic; padding:8px 0; }
- 
-    .fill-bajo      { background: #f59e0b; }
-    .fill-inasis    { background: #ef4444; }
-    .fill-seg       { background: #22c55e; }
-    .fill-reportado { background: #f59e0b; }
-    .fill-revision  { background: #3b82f6; }
-    .fill-seguim    { background: #22c55e; }
-    .fill-remitido  { background: #ef4444; }
-    .fill-cerrado   { background: #9ca3af; }
- 
-    /* Grid de análisis */
-    .analisis-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-    .analisis-grid .full { grid-column:1/-1; }
-    @media(max-width:780px){ .analisis-grid { grid-template-columns:1fr; } }
- 
-    /* Alertas */
-    .alerta-item {
-      border-radius: 8px;
-      padding: 13px 16px;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .alerta-item.critica { background:#ffebee; border:1px solid #ef9a9a; }
-    .alerta-item.warning { background:#fff8e1; border:1px solid #ffe082; }
-    .alerta-item .icono  { font-size: 1.3rem; }
-    .alerta-item .info   { flex: 1; font-size: 0.88rem; }
-    .alerta-item .info small { display:block; color:#777; font-size:0.78rem; margin-top:3px; }
-    .alerta-item .info strong { font-size:0.95rem; }
-    .vacio-ok { color:#2e7d32; font-weight:600; font-size:0.9rem; padding:12px 0; }
- 
-    /* Modal detalle */
-    .modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:100;
-      align-items:center; justify-content:center; }
-    .modal-bg.open { display:flex; }
-    .modal { background:#fff; border-radius:14px; padding:28px; width:100%; max-width:600px;
-      box-shadow:0 8px 32px rgba(0,0,0,0.18); max-height:92vh; overflow-y:auto; }
-    .modal h3 { margin:0 0 16px; color:#b71c1c; font-size:1rem; }
-    .detalle-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    .detalle-item { background:#f9f9f9; border-radius:8px; padding:12px; }
-    .detalle-item.full { grid-column:1/-1; }
-    .detalle-label { font-size:0.75rem; color:#999; text-transform:uppercase; font-weight:600; margin-bottom:4px; }
-    .detalle-val { font-size:0.92rem; color:#333; }
-    .modal-actions { margin-top:18px; display:flex; justify-content:flex-end; gap:10px; }
- 
-    @media(max-width:600px){ .detalle-grid { grid-template-columns:1fr; } }
+    :root{--rojo:#b71c1c;--rojo2:#ab1313;--naranja:#f57c00;--verde:#2e7d32;--azul:#0d47a1;--bg:#f4f4f4;--card:#fff;--border:#e0e0e0;--muted:#777;--rojo-bg:#fff5f5;--rojo-borde:#ffcdd2;--warn-bg:#fff8e1;--warn-borde:#ffe082;--text-sec:#666;}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:Arial,sans-serif;background:var(--bg);color:#333;}
+    .panel-header{background:linear-gradient(135deg,var(--rojo2),var(--naranja));color:#fff;padding:0 28px;display:flex;align-items:center;gap:16px;min-height:68px;}
+    .panel-header img{width:48px;height:48px;border-radius:50%;border:2px solid rgba(255,255,255,.45);}
+    .panel-header h1{font-size:1.15rem;font-weight:700;}
+    .panel-header p{font-size:.8rem;opacity:.85;margin-top:2px;}
+    .spacer{flex:1;}
+    .btn-cerrar{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.4);padding:7px 18px;border-radius:6px;cursor:pointer;font-size:.85rem;text-decoration:none;}
+    .btn-cerrar:hover{background:rgba(255,255,255,.32);}
+    .wrap{max-width:1200px;margin:28px auto;padding:0 16px;}
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:26px;}
+    .stat{background:var(--card);border-radius:10px;padding:16px 12px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.08);}
+    .stat-n{font-size:2rem;font-weight:700;color:var(--rojo);line-height:1;}
+    .stat-l{font-size:.76rem;color:var(--muted);margin-top:5px;}
+    .tabs{display:flex;gap:4px;border-bottom:2px solid var(--border);margin-bottom:22px;overflow-x:auto;}
+    .tab-btn{padding:10px 22px;border:none;background:none;cursor:pointer;font-size:.9rem;font-weight:700;color:var(--muted);white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-2px;border-radius:8px 8px 0 0;transition:all .18s;}
+    .tab-btn.active{color:var(--rojo);border-bottom-color:var(--rojo);background:#fff3e0;}
+    .tab-btn:hover:not(.active){background:#fafafa;color:var(--rojo);}
+    .tab-panel{display:none;}
+    .tab-panel.active{display:block;}
+    .card{background:var(--card);border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.09);padding:24px;margin-bottom:20px;}
+    .card-title{font-size:1rem;font-weight:700;color:var(--rojo);border-left:4px solid var(--naranja);padding-left:10px;margin-bottom:18px;}
+    .busqueda{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
+    .busqueda input,.busqueda select{flex:1;min-width:140px;padding:9px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:.88rem;background:#fafafa;font-family:inherit;}
+    .busqueda input:focus,.busqueda select:focus{outline:none;border-color:var(--rojo);}
+    .btn{padding:9px 18px;border:none;border-radius:7px;cursor:pointer;font-weight:700;font-size:.88rem;font-family:inherit;transition:all .2s;}
+    .btn-secondary{background:#f5f5f5;color:#555;border:1.5px solid var(--border);}
+    .btn-secondary:hover{background:#ffe0b2;border-color:var(--naranja);}
+    .btn-export{background:#1b5e20;color:#fff;}
+    .btn-export:hover{background:#2e7d32;}
+    .btn-icon{padding:5px 12px;font-size:.8rem;border-radius:5px;}
+    .tabla-wrap{overflow-x:auto;}
+    table{width:100%;border-collapse:collapse;font-size:.88rem;}
+    thead tr{background:linear-gradient(135deg,var(--rojo2),var(--naranja));color:#fff;}
+    th{padding:11px 14px;text-align:left;font-weight:700;font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;}
+    td{padding:11px 14px;border-bottom:1px solid #f0f0f0;color:#444;vertical-align:middle;}
+    tr:hover td{background:#fff8f0;}
+    .sin-datos{text-align:center;color:var(--muted);padding:32px;}
+    .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:700;}
+    .b-reportado{background:#fff3cd;color:#856404;}
+    .b-revision{background:#cce5ff;color:#004085;}
+    .b-seguimiento{background:#d4edda;color:#155724;}
+    .b-remitido{background:#f8d7da;color:#721c24;}
+    .b-cerrado{background:#e2e3e5;color:#383d41;}
+    /* Gráficos de barras */
+    .chart-wrap{margin-top:8px;}
+    .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:.83rem;}
+    .bar-label{min-width:180px;color:var(--text-sec);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .bar-track{flex:1;height:12px;background:#f0f0f0;border-radius:6px;overflow:hidden;border:1px solid var(--border);}
+    .bar-fill{height:100%;border-radius:6px;transition:width .7s ease;}
+    .bar-val{min-width:32px;text-align:right;font-weight:700;color:var(--rojo);}
+    .fill-bajo{background:linear-gradient(90deg,#f59e0b,#fbbf24);}
+    .fill-inasis{background:linear-gradient(90deg,#ef4444,#f87171);}
+    .fill-seg{background:linear-gradient(90deg,#22c55e,#4ade80);}
+    .fill-reportado{background:linear-gradient(90deg,#f59e0b,#fbbf24);}
+    .fill-revision{background:linear-gradient(90deg,#3b82f6,#60a5fa);}
+    .fill-seguim{background:linear-gradient(90deg,#22c55e,#4ade80);}
+    .fill-remitido{background:linear-gradient(90deg,#ef4444,#f87171);}
+    .fill-cerrado{background:linear-gradient(90deg,#9ca3af,#d1d5db);}
+    /* Modal */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center;}
+    .modal-overlay.open{display:flex;}
+    .modal-box{background:#fff;border-radius:14px;padding:28px;width:100%;max-width:580px;box-shadow:0 8px 32px rgba(0,0,0,.18);max-height:90vh;overflow-y:auto;}
+    .modal-box h3{margin:0 0 16px;color:var(--rojo);font-size:1rem;}
+    .det-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .det-item{background:#f9f9f9;border-radius:8px;padding:12px;}
+    .det-item.span2{grid-column:1/-1;}
+    .det-lbl{font-size:.75rem;color:#999;text-transform:uppercase;font-weight:700;margin-bottom:4px;}
+    .det-val{font-size:.93rem;color:#333;}
+    .det-seg{grid-column:1/-1;background:#e8f5e9;border-radius:8px;padding:14px;}
+    .modal-actions{margin-top:18px;display:flex;justify-content:flex-end;gap:10px;}
+    /* Alertas críticas */
+    .alerta-item{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:8px;margin-bottom:10px;}
+    .alerta-crit{background:var(--rojo-bg);border:1px solid var(--rojo-borde);}
+    .alerta-warn{background:var(--warn-bg);border:1px solid var(--warn-borde);}
+    @media(max-width:640px){.det-grid{grid-template-columns:1fr;}.tabs{overflow-x:auto;}}
   </style>
 </head>
 <body>
- 
-<div class="header">
+<header class="panel-header">
   <img src="escudo-unilibre.png" alt="Universidad Libre">
-  <div class="header-info">
-    <h1>Panel Director de Programa</h1>
-    <p id="nombreHeader">Sistema de Alertas Académicas</p>
+  <div><h1>Panel Director de Programa</h1><p id="hdrNombre">Sistema de Alertas Académicas</p></div>
+  <div class="spacer"></div>
+  <a href="Index.html" class="btn-cerrar" onclick="logout()">Cerrar sesión</a>
+</header>
+<div class="wrap">
+  <div class="stats-grid">
+    <div class="stat"><div class="stat-n" id="stTotal">—</div><div class="stat-l">Casos en carrera</div></div>
+    <div class="stat"><div class="stat-n" id="stPend">—</div><div class="stat-l">Pendientes</div></div>
+    <div class="stat"><div class="stat-n" id="stProc">—</div><div class="stat-l">En proceso</div></div>
+    <div class="stat"><div class="stat-n" id="stCerr">—</div><div class="stat-l">Cerrados</div></div>
+    <div class="stat"><div class="stat-n" id="stEst">—</div><div class="stat-l">Estudiantes en riesgo</div></div>
   </div>
-  <div class="header-right">
-    <a href="Index.html" class="btn-logout" onclick="cerrarSesion()">Cerrar sesión</a>
-  </div>
-</div>
- 
-<div class="main">
- 
-  <!-- Stats -->
-  <div class="stats">
-    <div class="stat-card"><div class="stat-num" id="statTotal">—</div><div class="stat-label">Casos totales</div></div>
-    <div class="stat-card"><div class="stat-num" id="statPendientes">—</div><div class="stat-label">Pendientes</div></div>
-    <div class="stat-card"><div class="stat-num" id="statEnProceso">—</div><div class="stat-label">En proceso</div></div>
-    <div class="stat-card"><div class="stat-num" id="statCerrados">—</div><div class="stat-label">Cerrados</div></div>
-    <div class="stat-card"><div class="stat-num" id="statEstudiantes">—</div><div class="stat-label">Estudiantes en riesgo</div></div>
-  </div>
- 
-  <!-- Tabs -->
   <div class="tabs">
-    <button class="tab active" onclick="cambiarTab('casos', this)">📋 Casos de la carrera</button>
-    <button class="tab" onclick="cambiarTab('analisis', this)">📊 Análisis</button>
-    <button class="tab" onclick="cambiarTab('alertas', this)">🔔 Alertas críticas</button>
+    <button class="tab-btn active" onclick="tabDir('casos',this)">📋 Casos de la carrera</button>
+    <button class="tab-btn"        onclick="tabDir('analisis',this)">📊 Análisis</button>
+    <button class="tab-btn"        onclick="tabDir('alertas',this)">🔔 Alertas críticas</button>
   </div>
- 
+
   <!-- TAB: Casos -->
-  <div id="tab-casos" class="tab-panel active">
+  <div id="tp-casos" class="tab-panel active">
     <div class="card">
-      <h2>Reportes activos de la carrera</h2>
- 
-      <div class="search-bar">
-        <input  type="text" id="fEstudiante" placeholder="🔍 Estudiante..." oninput="aplicarFiltros()">
-        <input  type="text" id="fMateria"    placeholder="🔍 Materia..."    oninput="aplicarFiltros()">
-        <select id="fEstado" onchange="aplicarFiltros()">
-          <option value="">Todos los estados</option>
-          <option value="Reportado">Reportado</option>
-          <option value="En revisión">En revisión</option>
-          <option value="En seguimiento">En seguimiento</option>
-          <option value="Remitido">Remitido</option>
-          <option value="Cerrado">Cerrado</option>
-        </select>
-        <select id="fMotivo" onchange="aplicarFiltros()">
-          <option value="">Todos los motivos</option>
-          <option value="Bajo rendimiento">Bajo rendimiento</option>
-          <option value="Inasistencia">Inasistencia</option>
-          <option value="Seguimiento preventivo">Seguimiento preventivo</option>
-        </select>
-        <div class="search-actions">
-          <button class="btn btn-secondary btn-sm" onclick="limpiarFiltros()">Limpiar</button>
-          <button class="btn btn-export btn-sm" onclick="exportarCSV()">⬇ CSV</button>
-        </div>
+      <div class="card-title">Reportes activos — mi carrera</div>
+      <div class="busqueda">
+        <input id="bEst" type="text" placeholder="🔍 Estudiante…" oninput="filtrar()">
+        <input id="bMat" type="text" placeholder="🔍 Materia…"    oninput="filtrar()">
+        <select id="bEst2" onchange="filtrar()"><option value="">Todos los estados</option><option>Reportado</option><option>En revisión</option><option>En seguimiento</option><option>Remitido</option><option>Cerrado</option></select>
+        <select id="bMot" onchange="filtrar()"><option value="">Todos los motivos</option><option>Bajo rendimiento</option><option>Inasistencia</option><option>Seguimiento preventivo</option></select>
+        <button class="btn btn-secondary btn-icon" onclick="limpiarF()">Limpiar</button>
+        <button class="btn btn-export btn-icon" onclick="exportarCSV()">⬇ CSV</button>
       </div>
- 
-      <div class="tabla-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Estudiante</th>
-              <th>Materia</th>
-              <th>Docente</th>
-              <th>Motivo</th>
-              <th>Estado</th>
-              <th>Seguimiento</th>
-              <th>Fecha</th>
-              <th>Detalle</th>
-            </tr>
-          </thead>
-          <tbody id="tbodyCasos"></tbody>
-        </table>
-      </div>
+      <div class="tabla-wrap"><table>
+        <thead><tr><th>#</th><th>Estudiante</th><th>Materia</th><th>Docente</th><th>Motivo</th><th>Estado</th><th>Seguimiento</th><th>Fecha</th><th>Det.</th></tr></thead>
+        <tbody id="tbodyCasos"></tbody>
+      </table></div>
     </div>
   </div>
- 
+
   <!-- TAB: Análisis -->
-  <div id="tab-analisis" class="tab-panel">
-    <div class="analisis-grid">
-      <div class="card">
-        <h2>📊 Casos por motivo</h2>
-        <div class="chart-wrap" id="chartMotivo"></div>
-      </div>
-      <div class="card">
-        <h2>📈 Casos por estado</h2>
-        <div class="chart-wrap" id="chartEstado"></div>
-      </div>
-      <div class="card full">
-        <h2>🏫 Top 5 materias con más casos</h2>
-        <div class="chart-wrap" id="chartMaterias"></div>
-      </div>
+  <div id="tp-analisis" class="tab-panel">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="card"><div class="card-title">Casos por motivo</div><div class="chart-wrap" id="chartMotivo"></div></div>
+      <div class="card"><div class="card-title">Casos por estado</div><div class="chart-wrap" id="chartEstado"></div></div>
+      <div class="card" style="grid-column:1/-1"><div class="card-title">Top 5 materias con más casos</div><div class="chart-wrap" id="chartMaterias"></div></div>
     </div>
   </div>
- 
+
   <!-- TAB: Alertas -->
-  <div id="tab-alertas" class="tab-panel">
+  <div id="tp-alertas" class="tab-panel">
     <div class="card">
-      <h2>🚨 Casos sin intervención</h2>
-      <p style="font-size:0.88rem;color:#777;margin:-8px 0 16px">
-        Casos en estado "Reportado" que aún no tienen seguimiento registrado por Bienestar.
-      </p>
+      <div class="card-title">🚨 Alertas críticas — casos sin intervención</div>
+      <p style="font-size:.87rem;color:var(--text-sec);margin-bottom:18px">Casos en estado "Reportado" que aún no tienen seguimiento registrado por Bienestar.</p>
       <div id="alertasCriticas"></div>
     </div>
- 
     <div class="card">
-      <h2>⚠️ Casos remitidos externamente</h2>
-      <p style="font-size:0.88rem;color:#777;margin:-8px 0 16px">
-        Casos derivados a servicios externos que requieren seguimiento continuo.
-      </p>
+      <div class="card-title">⚠️ Casos remitidos — requieren seguimiento externo</div>
       <div id="alertasRemitidos"></div>
     </div>
   </div>
- 
 </div>
- 
+
 <!-- Modal detalle -->
-<div class="modal-bg" id="modalDetalle">
-  <div class="modal">
+<div class="modal-overlay" id="modalDet">
+  <div class="modal-box">
     <h3>📄 Detalle del caso</h3>
-    <div class="detalle-grid" id="detalleContenido"></div>
-    <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="cerrarModal()">Cerrar</button>
-    </div>
+    <div class="det-grid" id="detContenido"></div>
+    <div class="modal-actions"><button class="btn btn-secondary" onclick="cerrarModal()">Cerrar</button></div>
   </div>
 </div>
- 
+
 <script src="api.js"></script>
-<script src="director_programa.js"></script>
+<script>
+const sesion = API.sesion.obtener();
+if(!sesion){window.location.href='Index.html';}
+document.getElementById('hdrNombre').textContent='Bienvenido/a: '+sesion.nombre;
+function logout(){API.sesion.cerrar();}
+function cerrarModal(){document.getElementById('modalDet').classList.remove('open');}
+document.getElementById('modalDet').addEventListener('click',e=>{if(e.target.id==='modalDet')cerrarModal();});
+function badgeCls(e){return{'Reportado':'b-reportado','En revisión':'b-revision','En seguimiento':'b-seguimiento','Remitido':'b-remitido','Cerrado':'b-cerrado'}[e]||'b-reportado';}
+function tabDir(nombre,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tp-'+nombre).classList.add('active');
+  btn.classList.add('active');
+  if(nombre==='analisis')renderAnalisis();
+  if(nombre==='alertas')renderAlertas();
+}
+let todos=[];
+function actualizarStats(r){
+  document.getElementById('stTotal').textContent=r.length;
+  document.getElementById('stPend').textContent=r.filter(x=>x.estado==='Reportado').length;
+  document.getElementById('stProc').textContent=r.filter(x=>['En revisión','En seguimiento'].includes(x.estado)).length;
+  document.getElementById('stCerr').textContent=r.filter(x=>x.estado==='Cerrado').length;
+  const uniq=[...new Set(r.map(x=>x.estudiante))];
+  document.getElementById('stEst').textContent=uniq.length;
+}
+async function init(){
+  document.getElementById('tbodyCasos').innerHTML='<tr><td colspan="9" class="sin-datos">Cargando…</td></tr>';
+  try{
+    todos=await API.reportes.listar();
+    renderTabla(todos);
+    actualizarStats(todos);
+  }catch(e){document.getElementById('tbodyCasos').innerHTML='<tr><td colspan="9" class="sin-datos">❌ '+e.message+'</td></tr>';}
+}
+function filtrar(){
+  const est=document.getElementById('bEst').value.toLowerCase();
+  const mat=document.getElementById('bMat').value.toLowerCase();
+  const est2=document.getElementById('bEst2').value;
+  const mot=document.getElementById('bMot').value;
+  renderTabla(todos.filter(r=>
+    (!est||r.estudiante?.toLowerCase().includes(est))&&
+    (!mat||r.materia?.toLowerCase().includes(mat))&&
+    (!est2||r.estado===est2)&&
+    (!mot||r.motivo===mot)
+  ));
+}
+function limpiarF(){['bEst','bMat'].forEach(id=>document.getElementById(id).value='');['bEst2','bMot'].forEach(id=>document.getElementById(id).value='');renderTabla(todos);}
+function renderTabla(datos){
+  const tbody=document.getElementById('tbodyCasos');
+  if(!datos.length){tbody.innerHTML='<tr><td colspan="9" class="sin-datos">Sin casos registrados.</td></tr>';return;}
+  tbody.innerHTML=datos.map((r,i)=>{
+    const seg=r.seguimiento;
+    const fecha=r.fecha_registro?new Date(r.fecha_registro).toLocaleDateString('es-CO'):'—';
+    return`<tr>
+      <td>${i+1}</td>
+      <td><strong>${r.estudiante||'—'}</strong></td>
+      <td>${r.materia||'—'}</td>
+      <td>${r.docente||'N/A'}</td>
+      <td><span style="font-size:.8rem">${r.motivo||'—'}</span></td>
+      <td><span class="badge ${badgeCls(r.estado)}">${r.estado}</span></td>
+      <td>${seg?`<span style="font-size:.76rem;color:var(--verde);font-weight:700">✓ ${seg.intervencion||'Reg.'}</span>`:'<span style="font-size:.76rem;color:var(--muted)">—</span>'}</td>
+      <td style="font-size:.77rem;color:var(--muted);white-space:nowrap">${fecha}</td>
+      <td><button class="btn btn-secondary btn-icon" onclick='verDetalle(${JSON.stringify(r)})'>Ver</button></td>
+    </tr>`;
+  }).join('');
+}
+function verDetalle(r){
+  const seg=r.seguimiento;
+  document.getElementById('detContenido').innerHTML=`
+    <div class="det-item"><div class="det-lbl">Estudiante</div><div class="det-val">${r.estudiante||'—'}</div></div>
+    <div class="det-item"><div class="det-lbl">Documento</div><div class="det-val">${r.documento||'—'}</div></div>
+    <div class="det-item"><div class="det-lbl">Materia</div><div class="det-val">${r.materia||'—'}</div></div>
+    <div class="det-item"><div class="det-lbl">Docente</div><div class="det-val">${r.docente||'—'}</div></div>
+    <div class="det-item"><div class="det-lbl">Motivo</div><div class="det-val">${r.motivo||'—'}</div></div>
+    <div class="det-item"><div class="det-lbl">Estado</div><div class="det-val"><span class="badge ${badgeCls(r.estado)}">${r.estado}</span></div></div>
+    <div class="det-item"><div class="det-lbl">Fecha</div><div class="det-val">${r.fecha_registro?new Date(r.fecha_registro).toLocaleDateString('es-CO'):'—'}</div></div>
+    <div class="det-item"><div class="det-lbl">Remitido a</div><div class="det-val">${r.remitido_a||'—'}</div></div>
+    <div class="det-item span2"><div class="det-lbl">Observaciones docente</div><div class="det-val">${r.observaciones||'—'}</div></div>
+    ${seg?`<div class="det-seg span2"><div class="det-lbl">Seguimiento — ${seg.fecha||''}</div><div class="det-val" style="margin-top:6px;line-height:1.8"><strong>Intervención:</strong> ${seg.intervencion||'—'}<br><strong>Observaciones:</strong> ${seg.observaciones||'—'}<br><strong>Recomendaciones:</strong> ${seg.recomendaciones||'—'}<br><strong>Profesional:</strong> ${seg.profesional||'—'}</div></div>`:`<div class="det-item span2" style="color:var(--muted);font-size:.85rem">Sin seguimiento registrado.</div>`}`;
+  document.getElementById('modalDet').classList.add('open');
+}
+function barChart(containerId,datos,colorMap){
+  const el=document.getElementById(containerId);
+  const vals=Object.values(datos);
+  const max=Math.max(...vals,1);
+  el.innerHTML=Object.entries(datos).map(([label,val])=>`<div class="bar-row"><span class="bar-label" title="${label}">${label}</span><div class="bar-track"><div class="bar-fill ${colorMap[label]||'fill-bajo'}" style="width:${Math.round(val/max*100)}%"></div></div><span class="bar-val">${val}</span></div>`).join('');
+}
+function renderAnalisis(){
+  const r=todos;
+  if(!r.length){['chartMotivo','chartEstado','chartMaterias'].forEach(id=>document.getElementById(id).innerHTML='<p style="color:var(--muted);font-size:.88rem;padding:10px">Sin datos disponibles.</p>');return;}
+  const motivos={};r.forEach(x=>{motivos[x.motivo]=(motivos[x.motivo]||0)+1;});
+  barChart('chartMotivo',motivos,{'Bajo rendimiento':'fill-bajo','Inasistencia':'fill-inasis','Seguimiento preventivo':'fill-seg','Seguimiento':'fill-seg'});
+  const estados={};r.forEach(x=>{estados[x.estado]=(estados[x.estado]||0)+1;});
+  barChart('chartEstado',estados,{'Reportado':'fill-reportado','En revisión':'fill-revision','En seguimiento':'fill-seguim','Remitido':'fill-remitido','Cerrado':'fill-cerrado'});
+  const mats={};r.forEach(x=>{mats[x.materia]=(mats[x.materia]||0)+1;});
+  const top5=Object.fromEntries(Object.entries(mats).sort((a,b)=>b[1]-a[1]).slice(0,5));
+  const colors=['fill-bajo','fill-inasis','fill-revision','fill-seguim','fill-remitido'];
+  const matColors={};Object.keys(top5).forEach((k,i)=>{matColors[k]=colors[i%5];});
+  barChart('chartMaterias',top5,matColors);
+}
+function renderAlertas(){
+  const r=todos;
+  const sinSeg=r.filter(x=>x.estado==='Reportado'&&!x.seguimiento);
+  const elCrit=document.getElementById('alertasCriticas');
+  elCrit.innerHTML=sinSeg.length?sinSeg.map(r=>`<div class="alerta-item alerta-crit"><span style="font-size:1.3rem">🚨</span><div style="flex:1"><strong style="color:var(--rojo)">${r.estudiante}</strong><span style="font-size:.83rem;color:var(--text-sec)"> — ${r.materia||'—'}</span><br><span style="font-size:.8rem;color:var(--text-sec)">Motivo: ${r.motivo||'—'} | Fecha: ${r.fecha_registro?new Date(r.fecha_registro).toLocaleDateString('es-CO'):'N/D'}</span></div><span class="badge b-reportado">Sin intervención</span></div>`).join(''):'<p style="color:var(--verde);font-weight:700;font-size:.88rem">✅ Sin casos críticos pendientes.</p>';
+  const remitidos=r.filter(x=>x.estado==='Remitido');
+  const elRem=document.getElementById('alertasRemitidos');
+  elRem.innerHTML=remitidos.length?remitidos.map(r=>`<div class="alerta-item alerta-warn"><span style="font-size:1.3rem">⚠️</span><div style="flex:1"><strong style="color:#7a5500">${r.estudiante}</strong><span style="font-size:.83rem;color:var(--text-sec)"> — ${r.materia||'—'}</span><br><span style="font-size:.8rem;color:var(--text-sec)">Remitido a: ${r.remitido_a||'N/D'}</span></div><span class="badge b-remitido">Remitido</span></div>`).join(''):'<p style="color:var(--verde);font-weight:700;font-size:.88rem">✅ Sin casos remitidos actualmente.</p>';
+}
+function exportarCSV(){
+  if(!todos.length){alert('No hay datos.');return;}
+  const hdr=['#','Estudiante','Materia','Docente','Motivo','Estado','Fecha'];
+  const rows=todos.map((r,i)=>[i+1,r.estudiante,r.materia,r.docente||'N/A',r.motivo,r.estado,r.fecha_registro?new Date(r.fecha_registro).toLocaleDateString('es-CO'):''].map(v=>`"${v}"`).join(','));
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+[hdr.join(','),...rows].join('\n')],{type:'text/csv;charset=utf-8;'}));a.download='casos_programa_'+new Date().toLocaleDateString('es-CO').replace(/\//g,'-')+'.csv';a.click();
+}
+init();
+</script>
 </body>
 </html>

@@ -6,270 +6,128 @@
   <title>Panel Administrador — Sistema de Alertas</title>
   <link rel="stylesheet" href="Style.css">
   <style>
-    :root {
-      --rojo:#b71c1c; --rojo2:#ab1313; --naranja:#f57c00;
-      --bg:#f4f4f4; --card:#fff; --border:#e0e0e0; --muted:#777;
-    }
-    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
-    body { font-family:Arial,sans-serif; background:var(--bg); color:#333; }
- 
-    /* ── Header ── */
-    .panel-header {
-      background:linear-gradient(135deg,var(--rojo2),var(--naranja));
-      color:#fff; padding:0 28px;
-      display:flex; align-items:center; gap:16px; min-height:68px;
-    }
-    .panel-header img { width:48px; height:48px; border-radius:50%; border:2px solid rgba(255,255,255,.45); }
-    .panel-header h1  { font-size:1.15rem; font-weight:700; }
-    .panel-header p   { font-size:.8rem; opacity:.85; margin-top:2px; }
-    .spacer { flex:1; }
-    .btn-cerrar {
-      background:rgba(255,255,255,.18); color:#fff;
-      border:1px solid rgba(255,255,255,.4);
-      padding:7px 18px; border-radius:6px; cursor:pointer;
-      font-size:.85rem; text-decoration:none;
-    }
-    .btn-cerrar:hover { background:rgba(255,255,255,.32); }
- 
-    .wrap { max-width:1200px; margin:28px auto; padding:0 16px; }
- 
-    /* ── Stats ── */
-    .stats-grid {
-      display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-      gap:12px; margin-bottom:26px;
-    }
-    .stat { background:var(--card); border-radius:10px; padding:16px 12px;
-      text-align:center; box-shadow:0 1px 4px rgba(0,0,0,.08); }
-    .stat-n { font-size:2rem; font-weight:700; color:var(--rojo); line-height:1; }
-    .stat-l { font-size:.76rem; color:var(--muted); margin-top:5px; }
- 
-    /* ── Tabs ── */
-    .tabs { display:flex; gap:4px; border-bottom:2px solid var(--border); margin-bottom:22px; overflow-x:auto; }
-    .tab-btn {
-      padding:10px 20px; border:none; background:none; cursor:pointer;
-      font-size:.9rem; font-weight:700; color:var(--muted); white-space:nowrap;
-      border-bottom:2px solid transparent; margin-bottom:-2px;
-      border-radius:8px 8px 0 0; transition:all .18s;
-    }
-    .tab-btn.active { color:var(--rojo); border-bottom-color:var(--rojo); background:#fff3e0; }
-    .tab-btn:hover:not(.active) { background:#fafafa; color:var(--rojo); }
-    .tab-panel { display:none; }
-    .tab-panel.active { display:block; }
- 
-    /* ── Card ── */
-    .card { background:var(--card); border-radius:12px;
-      box-shadow:0 1px 4px rgba(0,0,0,.09); padding:26px; margin-bottom:20px; }
-    .card-title {
-      font-size:1rem; font-weight:700; color:var(--rojo);
-      border-left:4px solid var(--naranja); padding-left:10px; margin-bottom:20px;
-    }
- 
-    /* ── Form ── */
-    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-    .form-grid .span2 { grid-column:1/-1; }
-    .form-grid .span3 { grid-column:1/-1; }
-    .fld { display:flex; flex-direction:column; gap:5px; }
-    .fld label { font-size:.79rem; font-weight:700; color:#555;
-      text-transform:uppercase; letter-spacing:.04em; }
-    .fld input, .fld select, .fld textarea {
-      padding:9px 12px; border:1.5px solid var(--border); border-radius:7px;
-      font-size:.92rem; font-family:inherit; background:#fafafa; transition:border-color .18s;
-    }
-    .fld input:focus, .fld select:focus, .fld textarea:focus {
-      outline:none; border-color:var(--rojo); background:#fff;
-    }
-    .fld .hint { font-size:.76rem; color:var(--muted); margin-top:2px; }
-    .form-actions { display:flex; gap:10px; margin-top:20px; flex-wrap:wrap; }
- 
-    /* ── Botones ── */
-    .btn { padding:10px 22px; border:none; border-radius:7px; cursor:pointer;
-      font-weight:700; font-size:.9rem; font-family:inherit; transition:all .18s; }
-    .btn-primary   { background:var(--rojo); color:#fff; }
-    .btn-primary:hover   { background:var(--naranja); }
-    .btn-secondary { background:#f0f0f0; color:#555; border:1.5px solid var(--border); }
-    .btn-secondary:hover { background:#ffe0b2; border-color:var(--naranja); }
-    .btn-danger    { background:#fff; color:#c62828; border:1.5px solid #ef9a9a; }
-    .btn-danger:hover    { background:#ffebee; }
-    .btn-icon { padding:5px 12px; font-size:.8rem; border-radius:6px; }
- 
-    /* ── Mensajes ── */
-    .alerta { padding:11px 16px; border-radius:7px; font-size:.88rem; font-weight:600;
-      margin-bottom:16px; display:none; }
-    .alerta.ok  { background:#e8f5e9; color:#2e7d32; border:1px solid #a5d6a7; display:block; }
-    .alerta.err { background:#ffebee; color:#c62828; border:1px solid #ef9a9a; display:block; }
-    .alerta.warn{ background:#fff8e1; color:#f57f17; border:1px solid #ffe082; display:block; }
- 
-    /* ── Buscador ── */
-    .busqueda { display:flex; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
-    .busqueda input, .busqueda select {
-      flex:1; min-width:140px; padding:9px 12px;
-      border:1.5px solid var(--border); border-radius:7px;
-      font-size:.88rem; font-family:inherit; background:#fafafa;
-    }
-    .busqueda input:focus, .busqueda select:focus { outline:none; border-color:var(--rojo); }
- 
-    /* ── Tabla ── */
-    .tabla-wrap { overflow-x:auto; }
-    table { width:100%; border-collapse:collapse; font-size:.87rem; }
-    thead tr { background:linear-gradient(135deg,var(--rojo2),var(--naranja)); }
-    th { padding:11px 14px; text-align:left; color:#fff;
-      font-size:.75rem; text-transform:uppercase; letter-spacing:.05em; font-weight:700; }
-    td { padding:10px 14px; border-bottom:1px solid #f0f0f0; vertical-align:middle; }
-    tbody tr:hover td { background:#fff8f0; }
-    .sin-datos { text-align:center; color:var(--muted); padding:32px; }
- 
-    /* ── Badges ── */
-    .badge { display:inline-block; padding:3px 11px; border-radius:20px; font-size:.73rem; font-weight:700; }
-    .b-admin   { background:#fce4ec; color:#880e4f; }
-    .b-docente { background:#e3f2fd; color:#0d47a1; }
-    .b-bien    { background:#e8f5e9; color:#1b5e20; }
-    .b-dir     { background:#fff3e0; color:#e65100; }
-    .b-dec     { background:#ede7f6; color:#4a148c; }
-    .b-activo  { background:#d4edda; color:#155724; }
-    .b-inactivo{ background:#f8d7da; color:#721c24; }
-    .b-est-act { background:#d4edda; color:#155724; }
-    .b-est-ina { background:#e2e3e5; color:#383d41; }
- 
-    /* ── Avatar ── */
-    .avatar {
-      width:32px; height:32px; border-radius:50%; display:inline-flex;
-      align-items:center; justify-content:center;
-      font-size:.78rem; font-weight:700; color:#fff; flex-shrink:0;
-    }
-    .av-admin { background:#880e4f; }
-    .av-docente{ background:#0d47a1; }
-    .av-bien  { background:#1b5e20; }
-    .av-dir   { background:#e65100; }
-    .av-dec   { background:#4a148c; }
-    .av-est   { background:#b71c1c; }
-    .td-user  { display:flex; align-items:center; gap:10px; }
- 
-    /* ── Modal ── */
-    .modal-overlay {
-      display:none; position:fixed; inset:0;
-      background:rgba(0,0,0,.48); z-index:200;
-      align-items:center; justify-content:center;
-    }
-    .modal-overlay.open { display:flex; }
-    .modal-box {
-      background:#fff; border-radius:14px; padding:28px;
-      width:100%; max-width:580px; max-height:92vh;
-      overflow-y:auto; box-shadow:0 10px 40px rgba(0,0,0,.22);
-    }
-    .modal-box h3 { color:var(--rojo); font-size:1rem; margin-bottom:18px; }
-    .modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }
- 
-    /* ── Confirm strip ── */
-    .confirm-box {
-      background:#fff8f0; border:1px solid #ffe0b2;
-      border-radius:9px; padding:16px; margin-bottom:14px; display:none;
-    }
-    .confirm-box.open { display:block; }
-    .confirm-box p { font-size:.88rem; color:#e65100; font-weight:600; margin-bottom:12px; }
-    .confirm-box .btns { display:flex; gap:8px; }
- 
-    /* ── Sección tabs internos (usuarios) ── */
-    .mini-tabs { display:flex; gap:6px; margin-bottom:20px; }
-    .mini-tab {
-      padding:7px 18px; border:1.5px solid var(--border); border-radius:20px;
-      background:#fff; cursor:pointer; font-size:.85rem; font-weight:700;
-      color:var(--muted); transition:all .18s;
-    }
-    .mini-tab.active { background:var(--rojo); color:#fff; border-color:var(--rojo); }
-    .mini-panel { display:none; }
-    .mini-panel.active { display:block; }
- 
-    /* ── Separador de sección ── */
-    .section-sep {
-      display:flex; align-items:center; gap:12px;
-      margin:24px 0 18px; color:var(--muted); font-size:.82rem; font-weight:700;
-      text-transform:uppercase; letter-spacing:.06em;
-    }
-    .section-sep::before, .section-sep::after {
-      content:''; flex:1; height:1px; background:var(--border);
-    }
- 
-    @media(max-width:640px) {
-      .form-grid { grid-template-columns:1fr; }
-      .panel-header { flex-wrap:wrap; padding:12px 16px; }
-    }
+    :root { --rojo:#b71c1c; --rojo2:#ab1313; --naranja:#f57c00; --bg:#f4f4f4; --card:#fff; --border:#e0e0e0; --muted:#777; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:Arial,sans-serif;background:var(--bg);color:#333;}
+    .panel-header{background:linear-gradient(135deg,var(--rojo2),var(--naranja));color:#fff;padding:0 28px;display:flex;align-items:center;gap:16px;min-height:68px;}
+    .panel-header img{width:48px;height:48px;border-radius:50%;border:2px solid rgba(255,255,255,.45);}
+    .panel-header h1{font-size:1.15rem;font-weight:700;}
+    .panel-header p{font-size:.8rem;opacity:.85;margin-top:2px;}
+    .spacer{flex:1;}
+    .btn-cerrar{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.4);padding:7px 18px;border-radius:6px;cursor:pointer;font-size:.85rem;text-decoration:none;}
+    .btn-cerrar:hover{background:rgba(255,255,255,.32);}
+    .wrap{max-width:1200px;margin:28px auto;padding:0 16px;}
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:26px;}
+    .stat{background:var(--card);border-radius:10px;padding:16px 12px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.08);}
+    .stat-n{font-size:2rem;font-weight:700;color:var(--rojo);line-height:1;}
+    .stat-l{font-size:.76rem;color:var(--muted);margin-top:5px;}
+    .tabs{display:flex;gap:4px;border-bottom:2px solid var(--border);margin-bottom:22px;overflow-x:auto;}
+    .tab-btn{padding:10px 20px;border:none;background:none;cursor:pointer;font-size:.9rem;font-weight:700;color:var(--muted);white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-2px;border-radius:8px 8px 0 0;transition:all .18s;}
+    .tab-btn.active{color:var(--rojo);border-bottom-color:var(--rojo);background:#fff3e0;}
+    .tab-btn:hover:not(.active){background:#fafafa;color:var(--rojo);}
+    .tab-panel{display:none;}
+    .tab-panel.active{display:block;}
+    .mini-tabs{display:flex;gap:6px;margin-bottom:20px;}
+    .mini-tab{padding:7px 18px;border:1.5px solid var(--border);border-radius:20px;background:#fff;cursor:pointer;font-size:.85rem;font-weight:700;color:var(--muted);transition:all .18s;}
+    .mini-tab.active{background:var(--rojo);color:#fff;border-color:var(--rojo);}
+    .mini-panel{display:none;}
+    .mini-panel.active{display:block;}
+    .card{background:var(--card);border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.09);padding:26px;margin-bottom:20px;}
+    .card-title{font-size:1rem;font-weight:700;color:var(--rojo);border-left:4px solid var(--naranja);padding-left:10px;margin-bottom:20px;}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    .form-grid .span2{grid-column:1/-1;}
+    .fld{display:flex;flex-direction:column;gap:5px;}
+    .fld label{font-size:.79rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.04em;}
+    .fld input,.fld select,.fld textarea{padding:9px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:.92rem;font-family:inherit;background:#fafafa;transition:border-color .18s;}
+    .fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--rojo);background:#fff;}
+    .fld .hint{font-size:.76rem;color:var(--muted);margin-top:2px;}
+    .form-actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;}
+    .btn{padding:10px 22px;border:none;border-radius:7px;cursor:pointer;font-weight:700;font-size:.9rem;font-family:inherit;transition:all .18s;}
+    .btn-primary{background:var(--rojo);color:#fff;}
+    .btn-primary:hover{background:var(--naranja);}
+    .btn-secondary{background:#f0f0f0;color:#555;border:1.5px solid var(--border);}
+    .btn-secondary:hover{background:#ffe0b2;border-color:var(--naranja);}
+    .btn-danger{background:#fff;color:#c62828;border:1.5px solid #ef9a9a;}
+    .btn-danger:hover{background:#ffebee;}
+    .btn-icon{padding:5px 12px;font-size:.8rem;border-radius:6px;}
+    .alerta{padding:11px 16px;border-radius:7px;font-size:.88rem;font-weight:600;margin-bottom:16px;display:none;}
+    .alerta.ok{background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;display:block;}
+    .alerta.err{background:#ffebee;color:#c62828;border:1px solid #ef9a9a;display:block;}
+    .busqueda{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
+    .busqueda input,.busqueda select{flex:1;min-width:140px;padding:9px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:.88rem;font-family:inherit;background:#fafafa;}
+    .busqueda input:focus,.busqueda select:focus{outline:none;border-color:var(--rojo);}
+    .tabla-wrap{overflow-x:auto;}
+    table{width:100%;border-collapse:collapse;font-size:.87rem;}
+    thead tr{background:linear-gradient(135deg,var(--rojo2),var(--naranja));}
+    th{padding:11px 14px;text-align:left;color:#fff;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;font-weight:700;}
+    td{padding:10px 14px;border-bottom:1px solid #f0f0f0;vertical-align:middle;}
+    tbody tr:hover td{background:#fff8f0;}
+    .sin-datos{text-align:center;color:var(--muted);padding:32px;}
+    .badge{display:inline-block;padding:3px 11px;border-radius:20px;font-size:.73rem;font-weight:700;}
+    .b-admin{background:#fce4ec;color:#880e4f;}
+    .b-docente{background:#e3f2fd;color:#0d47a1;}
+    .b-bien{background:#e8f5e9;color:#1b5e20;}
+    .b-dir{background:#fff3e0;color:#e65100;}
+    .b-dec{background:#ede7f6;color:#4a148c;}
+    .b-activo{background:#d4edda;color:#155724;}
+    .b-inactivo{background:#f8d7da;color:#721c24;}
+    .b-rep{background:#fff3cd;color:#856404;}
+    .b-seg{background:#d4edda;color:#155724;}
+    .b-cer{background:#e2e3e5;color:#383d41;}
+    .avatar{width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;color:#fff;flex-shrink:0;}
+    .av-admin{background:#880e4f;}.av-docente{background:#0d47a1;}.av-bien{background:#1b5e20;}
+    .av-dir{background:#e65100;}.av-dec{background:#4a148c;}.av-est{background:#b71c1c;}
+    .td-user{display:flex;align-items:center;gap:10px;}
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:200;align-items:center;justify-content:center;}
+    .modal-overlay.open{display:flex;}
+    .modal-box{background:#fff;border-radius:14px;padding:28px;width:100%;max-width:580px;max-height:92vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.22);}
+    .modal-box h3{color:var(--rojo);font-size:1rem;margin-bottom:18px;}
+    .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .spin{display:inline-block;width:14px;height:14px;border:2px solid #eee;border-top-color:var(--rojo);border-radius:50%;animation:spin .6s linear infinite;}
+    @media(max-width:640px){.form-grid{grid-template-columns:1fr;}}
   </style>
 </head>
 <body>
- 
-<!-- ══ HEADER ══ -->
 <header class="panel-header">
   <img src="escudo-unilibre.png" alt="Unilibre">
-  <div>
-    <h1>Panel Administrador</h1>
-    <p id="hdrNombre">Sistema de Alertas Académicas</p>
-  </div>
+  <div><h1>Panel Administrador</h1><p id="hdrNombre">Sistema de Alertas Académicas</p></div>
   <div class="spacer"></div>
   <a href="Index.html" class="btn-cerrar" onclick="logout()">Cerrar sesión</a>
 </header>
- 
 <div class="wrap">
- 
-  <!-- ══ STATS ══ -->
   <div class="stats-grid">
-    <div class="stat"><div class="stat-n" id="stUsuarios">0</div><div class="stat-l">Usuarios del sistema</div></div>
-    <div class="stat"><div class="stat-n" id="stEstudiantes">0</div><div class="stat-l">Estudiantes registrados</div></div>
-    <div class="stat"><div class="stat-n" id="stReportes">0</div><div class="stat-l">Reportes totales</div></div>
-    <div class="stat"><div class="stat-n" id="stPendientes">0</div><div class="stat-l">Casos pendientes</div></div>
+    <div class="stat"><div class="stat-n" id="stUsuarios">—</div><div class="stat-l">Usuarios</div></div>
+    <div class="stat"><div class="stat-n" id="stEstudiantes">—</div><div class="stat-l">Estudiantes</div></div>
+    <div class="stat"><div class="stat-n" id="stReportes">—</div><div class="stat-l">Reportes</div></div>
+    <div class="stat"><div class="stat-n" id="stPendientes">—</div><div class="stat-l">Pendientes</div></div>
   </div>
- 
-  <!-- ══ TABS PRINCIPALES ══ -->
   <div class="tabs">
     <button class="tab-btn active" onclick="tab('usuarios',this)">👥 Usuarios</button>
     <button class="tab-btn"        onclick="tab('estudiantes',this)">🎓 Estudiantes</button>
     <button class="tab-btn"        onclick="tab('reportes',this)">📋 Reportes</button>
   </div>
- 
-  <!-- ════════════════════════════════════
-       TAB: USUARIOS
-  ════════════════════════════════════ -->
+
+  <!-- TAB USUARIOS -->
   <div id="tp-usuarios" class="tab-panel active">
- 
-    <!-- Mini tabs: Registrar / Listado -->
     <div class="mini-tabs">
       <button class="mini-tab active" onclick="miniTab('u-nuevo','usuarios',this)">➕ Nuevo usuario</button>
       <button class="mini-tab"        onclick="miniTab('u-lista','usuarios',this)">📋 Listado</button>
     </div>
- 
-    <!-- Nuevo usuario -->
     <div id="u-nuevo" class="mini-panel active">
       <div class="card">
         <div class="card-title">Registrar nuevo usuario del sistema</div>
         <div id="msgUsr" class="alerta"></div>
         <form id="frmUsr" onsubmit="crearUsuario(event)">
           <div class="form-grid">
-            <div class="fld">
-              <label>Tipo de usuario *</label>
-              <select id="u_rol">
-                <option value="administrador">Administrador</option>
-                <option value="docente">Docente</option>
-                <option value="bienestar">Bienestar</option>
-                <option value="director_bienestar">Director de Bienestar</option>
-                <option value="decanatura">Decanatura</option>
-              </select>
-            </div>
-            <div class="fld">
-              <label>Nombre de usuario *</label>
-              <input id="u_nombre" type="text" placeholder="Ej: docente2" required>
-              <span class="hint">Sin espacios ni caracteres especiales</span>
-            </div>
-            <div class="fld">
-              <label>Contraseña *</label>
-              <input id="u_pass" type="password" placeholder="Mínimo 4 caracteres" required minlength="4">
-            </div>
-            <div class="fld">
-              <label>Confirmar contraseña *</label>
-              <input id="u_pass2" type="password" placeholder="Repite la contraseña" required>
-            </div>
-            <div class="fld span2">
-              <label>Correo institucional</label>
-              <input id="u_correo" type="email" placeholder="usuario@unilibre.edu.co">
-            </div>
+            <div class="fld"><label>Tipo de usuario *</label><select id="u_rol"><option value="administrador">Administrador</option><option value="docente">Docente</option><option value="bienestar">Bienestar</option><option value="director_bienestar">Director de Bienestar</option><option value="decanatura">Decanatura</option><option value="director_programa">Director de Programa</option></select></div>
+            <div class="fld"><label>Nombre de usuario *</label><input id="u_nombre" type="text" placeholder="Ej: docente3" required><span class="hint">Sin espacios ni caracteres especiales</span></div>
+            <div class="fld"><label>Documento *</label><input id="u_doc" type="text" required></div>
+            <div class="fld"><label>Nombres *</label><input id="u_nombres" type="text" required></div>
+            <div class="fld"><label>Apellidos *</label><input id="u_apellidos" type="text" required></div>
+            <div class="fld"><label>Contraseña *</label><input id="u_pass" type="password" placeholder="Mínimo 4 caracteres" required minlength="4"></div>
+            <div class="fld"><label>Teléfono</label><input id="u_tel" type="text"></div>
+            <div class="fld"><label>Correo institucional</label><input id="u_correo" type="email" placeholder="usuario@unilibre.edu.co"></div>
           </div>
           <div class="form-actions">
             <button type="submit" class="btn btn-primary">Registrar usuario</button>
@@ -278,102 +136,37 @@
         </form>
       </div>
     </div>
- 
-    <!-- Listado usuarios -->
     <div id="u-lista" class="mini-panel">
       <div class="card">
         <div class="card-title">Usuarios registrados</div>
         <div id="msgUsrLista" class="alerta"></div>
         <div class="busqueda">
-          <input  id="buNom"  type="text"   placeholder="🔍 Buscar usuario…"  oninput="filtrarUsuarios()">
-          <select id="buRol"  onchange="filtrarUsuarios()">
-            <option value="">Todos los roles</option>
-            <option value="administrador">Administrador</option>
-            <option value="docente">Docente</option>
-            <option value="bienestar">Bienestar</option>
-            <option value="director_bienestar">Director de Bienestar</option>
-            <option value="decanatura">Decanatura</option>
-          </select>
-          <select id="buAct" onchange="filtrarUsuarios()">
-            <option value="">Todos</option>
-            <option value="1">Activos</option>
-            <option value="0">Inactivos</option>
-          </select>
+          <input id="buNom" type="text" placeholder="🔍 Buscar usuario…" oninput="filtrarUsuarios()">
+          <select id="buRol" onchange="filtrarUsuarios()"><option value="">Todos los roles</option><option value="administrador">Administrador</option><option value="docente">Docente</option><option value="bienestar">Bienestar</option><option value="director_bienestar">Director de Bienestar</option><option value="decanatura">Decanatura</option><option value="director_programa">Director de Programa</option></select>
         </div>
-        <div class="tabla-wrap">
-          <table>
-            <thead><tr>
-              <th>#</th><th>Usuario</th><th>Rol</th><th>Correo</th><th>Estado</th><th>Acciones</th>
-            </tr></thead>
-            <tbody id="tbodyUsr"></tbody>
-          </table>
-        </div>
+        <div class="tabla-wrap"><table><thead><tr><th>#</th><th>Usuario</th><th>Rol</th><th>Correo</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="tbodyUsr"></tbody></table></div>
       </div>
     </div>
- 
-  </div><!-- /tp-usuarios -->
- 
-  <!-- ════════════════════════════════════
-       TAB: ESTUDIANTES
-  ════════════════════════════════════ -->
+  </div>
+
+  <!-- TAB ESTUDIANTES -->
   <div id="tp-estudiantes" class="tab-panel">
- 
     <div class="mini-tabs">
       <button class="mini-tab active" onclick="miniTab('e-nuevo','estudiantes',this)">➕ Nuevo estudiante</button>
       <button class="mini-tab"        onclick="miniTab('e-lista','estudiantes',this)">📋 Listado</button>
     </div>
- 
-    <!-- Nuevo estudiante -->
     <div id="e-nuevo" class="mini-panel active">
       <div class="card">
         <div class="card-title">Registrar nuevo estudiante</div>
         <div id="msgEst" class="alerta"></div>
         <form id="frmEst" onsubmit="crearEstudiante(event)">
           <div class="form-grid">
-            <div class="fld">
-              <label>Documento de identidad *</label>
-              <input id="e_doc"  type="text" placeholder="Número de documento" required>
-            </div>
-            <div class="fld">
-              <label>Nombres *</label>
-              <input id="e_nom"  type="text" placeholder="Nombres completos" required>
-            </div>
-            <div class="fld">
-              <label>Apellidos *</label>
-              <input id="e_ape"  type="text" placeholder="Apellidos completos" required>
-            </div>
-            <div class="fld">
-              <label>Carrera *</label>
-              <input id="e_car"  type="text" placeholder="Ej: Ingeniería de Sistemas" required>
-            </div>
-            <div class="fld">
-              <label>Semestre</label>
-              <select id="e_sem">
-                <option value="">— Seleccionar —</option>
-                <option value="1">1º semestre</option>
-                <option value="2">2º semestre</option>
-                <option value="3">3º semestre</option>
-                <option value="4">4º semestre</option>
-                <option value="5">5º semestre</option>
-                <option value="6">6º semestre</option>
-                <option value="7">7º semestre</option>
-                <option value="8">8º semestre</option>
-                <option value="9">9º semestre</option>
-                <option value="10">10º semestre</option>
-              </select>
-            </div>
-            <div class="fld">
-              <label>Período académico</label>
-              <input id="e_per" type="text" placeholder="Ej: 2025-1">
-            </div>
-            <div class="fld">
-              <label>Teléfono</label>
-              <input id="e_tel" type="text" placeholder="Número de contacto">
-            </div>
-            <div class="fld">
-              <label>Correo institucional</label>
-              <input id="e_cor" type="email" placeholder="est@unilibre.edu.co">
-            </div>
+            <div class="fld"><label>Documento de identidad *</label><input id="e_doc" type="text" required></div>
+            <div class="fld"><label>Nombres *</label><input id="e_nom" type="text" required></div>
+            <div class="fld"><label>Apellidos *</label><input id="e_ape" type="text" required></div>
+            <div class="fld"><label>Carrera *</label><input id="e_car" type="text" placeholder="Ej: Ingeniería de Sistemas" required></div>
+            <div class="fld"><label>Teléfono</label><input id="e_tel" type="text"></div>
+            <div class="fld"><label>Correo institucional</label><input id="e_cor" type="email" placeholder="est@unilibre.edu.co"></div>
           </div>
           <div class="form-actions">
             <button type="submit" class="btn btn-primary">Registrar estudiante</button>
@@ -382,199 +175,118 @@
         </form>
       </div>
     </div>
- 
-    <!-- Listado estudiantes -->
     <div id="e-lista" class="mini-panel">
       <div class="card">
         <div class="card-title">Estudiantes registrados</div>
         <div id="msgEstLista" class="alerta"></div>
         <div class="busqueda">
-          <input  id="beNom" type="text"   placeholder="🔍 Buscar por nombre o documento…" oninput="filtrarEstudiantes()">
-          <input  id="beCar" type="text"   placeholder="🔍 Buscar por carrera…"            oninput="filtrarEstudiantes()">
-          <select id="beEst" onchange="filtrarEstudiantes()">
-            <option value="">Todos los estados</option>
-            <option value="Activo">Activo</option>
-            <option value="Inactivo">Inactivo</option>
-            <option value="Retirado">Retirado</option>
-          </select>
+          <input id="beNom" type="text" placeholder="🔍 Buscar por nombre o documento…" oninput="filtrarEstudiantes()">
+          <input id="beCar" type="text" placeholder="🔍 Buscar por carrera…" oninput="filtrarEstudiantes()">
         </div>
-        <div class="tabla-wrap">
-          <table>
-            <thead><tr>
-              <th>#</th><th>Estudiante</th><th>Documento</th>
-              <th>Carrera</th><th>Semestre</th><th>Contacto</th><th>Estado</th><th>Acciones</th>
-            </tr></thead>
-            <tbody id="tbodyEst"></tbody>
-          </table>
-        </div>
+        <div class="tabla-wrap"><table><thead><tr><th>#</th><th>Estudiante</th><th>Documento</th><th>Carrera</th><th>Contacto</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="tbodyEst"></tbody></table></div>
       </div>
     </div>
- 
-  </div><!-- /tp-estudiantes -->
- 
-  <!-- ════════════════════════════════════
-       TAB: REPORTES
-  ════════════════════════════════════ -->
+  </div>
+
+  <!-- TAB REPORTES -->
   <div id="tp-reportes" class="tab-panel">
     <div class="card">
       <div class="card-title">📋 Vista global de todos los reportes</div>
       <div class="busqueda">
-        <input  id="brEst"  type="text"   placeholder="🔍 Estudiante…"  oninput="filtrarReportes()">
-        <input  id="brMat"  type="text"   placeholder="🔍 Materia…"     oninput="filtrarReportes()">
-        <select id="brEst2" onchange="filtrarReportes()">
-          <option value="">Todos los estados</option>
-          <option value="Reportado">Reportado</option>
-          <option value="En revisión">En revisión</option>
-          <option value="En seguimiento">En seguimiento</option>
-          <option value="Remitido">Remitido</option>
-          <option value="Cerrado">Cerrado</option>
-        </select>
+        <input id="brEst" type="text" placeholder="🔍 Estudiante…" oninput="filtrarReportes()">
+        <input id="brMat" type="text" placeholder="🔍 Materia…" oninput="filtrarReportes()">
+        <select id="brEst2" onchange="filtrarReportes()"><option value="">Todos los estados</option><option>Reportado</option><option>En revisión</option><option>En seguimiento</option><option>Remitido</option><option>Cerrado</option></select>
         <button class="btn btn-secondary btn-icon" onclick="limpiarRep()">Limpiar</button>
         <button class="btn btn-icon" style="background:#1b5e20;color:#fff" onclick="exportarCSV()">⬇ Exportar CSV</button>
       </div>
-      <div class="tabla-wrap">
-        <table>
-          <thead><tr>
-            <th>#</th><th>Estudiante</th><th>Materia</th>
-            <th>Docente</th><th>Motivo</th><th>Estado</th><th>Fecha</th><th>Acción</th>
-          </tr></thead>
-          <tbody id="tbodyRep"></tbody>
-        </table>
-      </div>
+      <div class="tabla-wrap"><table><thead><tr><th>#</th><th>Estudiante</th><th>Materia</th><th>Docente</th><th>Motivo</th><th>Estado</th><th>Fecha</th><th>Acción</th></tr></thead><tbody id="tbodyRep"></tbody></table></div>
     </div>
   </div>
- 
-</div><!-- /wrap -->
- 
-<!-- ══ MODAL: Editar usuario ══ -->
+</div>
+
+<!-- MODALES -->
 <div class="modal-overlay" id="modalEditUsr">
-  <div class="modal-box">
-    <h3>✏️ Editar usuario</h3>
-    <div id="msgEditUsr" class="alerta"></div>
-    <input type="hidden" id="eu_idx">
+  <div class="modal-box"><h3>✏️ Editar usuario</h3><div id="msgEditUsr" class="alerta"></div><input type="hidden" id="eu_id">
     <div class="form-grid">
-      <div class="fld">
-        <label>Rol</label>
-        <select id="eu_rol">
-          <option value="administrador">Administrador</option>
-          <option value="docente">Docente</option>
-          <option value="bienestar">Bienestar</option>
-          <option value="director_bienestar">Director de Bienestar</option>
-          <option value="decanatura">Decanatura</option>
-        </select>
-      </div>
-      <div class="fld">
-        <label>Nombre de usuario</label>
-        <input id="eu_nombre" type="text" required>
-      </div>
-      <div class="fld span2">
-        <label>Correo</label>
-        <input id="eu_correo" type="email">
-      </div>
-      <div class="fld span2">
-        <label>Nueva contraseña <span style="font-weight:400;color:var(--muted)">(dejar vacío para no cambiar)</span></label>
-        <input id="eu_pass" type="password" placeholder="Nueva contraseña…">
-      </div>
-      <div class="fld span2">
-        <label>Estado</label>
-        <select id="eu_activo">
-          <option value="1">Activo</option>
-          <option value="0">Inactivo</option>
-        </select>
-      </div>
+      <div class="fld"><label>Rol</label><select id="eu_rol"><option value="administrador">Administrador</option><option value="docente">Docente</option><option value="bienestar">Bienestar</option><option value="director_bienestar">Director de Bienestar</option><option value="decanatura">Decanatura</option><option value="director_programa">Director de Programa</option></select></div>
+      <div class="fld"><label>Nombre de usuario</label><input id="eu_nombre" type="text" required></div>
+      <div class="fld"><label>Nombres</label><input id="eu_nombres" type="text"></div>
+      <div class="fld"><label>Apellidos</label><input id="eu_apellidos" type="text"></div>
+      <div class="fld span2"><label>Correo</label><input id="eu_correo" type="email"></div>
+      <div class="fld span2"><label>Nueva contraseña <span style="font-weight:400;color:var(--muted)">(vacío = no cambiar)</span></label><input id="eu_pass" type="password"></div>
+      <div class="fld span2"><label>Estado</label><select id="eu_activo"><option value="1">Activo</option><option value="0">Inactivo</option></select></div>
     </div>
-    <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="cerrarModal('modalEditUsr')">Cancelar</button>
-      <button class="btn btn-primary"   onclick="guardarUsuario()">Guardar cambios</button>
-    </div>
+    <div class="modal-actions"><button class="btn btn-secondary" onclick="cerrarModal('modalEditUsr')">Cancelar</button><button class="btn btn-primary" onclick="guardarUsuario()">Guardar cambios</button></div>
   </div>
 </div>
- 
-<!-- ══ MODAL: Editar estudiante ══ -->
+
 <div class="modal-overlay" id="modalEditEst">
-  <div class="modal-box">
-    <h3>✏️ Editar estudiante</h3>
-    <div id="msgEditEst" class="alerta"></div>
-    <input type="hidden" id="ee_idx">
+  <div class="modal-box"><h3>✏️ Editar estudiante</h3><div id="msgEditEst" class="alerta"></div><input type="hidden" id="ee_id">
     <div class="form-grid">
-      <div class="fld">
-        <label>Nombres *</label>
-        <input id="ee_nom" type="text" required>
-      </div>
-      <div class="fld">
-        <label>Apellidos *</label>
-        <input id="ee_ape" type="text" required>
-      </div>
-      <div class="fld">
-        <label>Carrera *</label>
-        <input id="ee_car" type="text" required>
-      </div>
-      <div class="fld">
-        <label>Semestre</label>
-        <select id="ee_sem">
-          <option value="">—</option>
-          <option value="1">1º</option><option value="2">2º</option>
-          <option value="3">3º</option><option value="4">4º</option>
-          <option value="5">5º</option><option value="6">6º</option>
-          <option value="7">7º</option><option value="8">8º</option>
-          <option value="9">9º</option><option value="10">10º</option>
-        </select>
-      </div>
-      <div class="fld">
-        <label>Teléfono</label>
-        <input id="ee_tel" type="text">
-      </div>
-      <div class="fld">
-        <label>Correo</label>
-        <input id="ee_cor" type="email">
-      </div>
-      <div class="fld span2">
-        <label>Estado</label>
-        <select id="ee_est">
-          <option value="Activo">Activo</option>
-          <option value="Inactivo">Inactivo</option>
-          <option value="Retirado">Retirado</option>
-        </select>
-      </div>
+      <div class="fld"><label>Nombres *</label><input id="ee_nom" required></div>
+      <div class="fld"><label>Apellidos *</label><input id="ee_ape" required></div>
+      <div class="fld"><label>Carrera *</label><input id="ee_car" required></div>
+      <div class="fld"><label>Teléfono</label><input id="ee_tel"></div>
+      <div class="fld span2"><label>Correo</label><input id="ee_cor" type="email"></div>
     </div>
-    <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="cerrarModal('modalEditEst')">Cancelar</button>
-      <button class="btn btn-primary"   onclick="guardarEstudiante()">Guardar cambios</button>
-    </div>
+    <div class="modal-actions"><button class="btn btn-secondary" onclick="cerrarModal('modalEditEst')">Cancelar</button><button class="btn btn-primary" onclick="guardarEstudiante()">Guardar cambios</button></div>
   </div>
 </div>
- 
-<!-- ══ MODAL: Eliminar ══ -->
+
 <div class="modal-overlay" id="modalEliminar">
-  <div class="modal-box" style="max-width:400px">
-    <h3>🗑️ Confirmar eliminación</h3>
-    <input type="hidden" id="del_tipo">
-    <input type="hidden" id="del_idx">
-    <p style="font-size:.92rem;color:#555;margin-bottom:20px">
-      ¿Confirmas que deseas eliminar a
-      <strong id="del_nombre" style="color:var(--rojo)"></strong>?
-      Esta acción no se puede deshacer.
-    </p>
-    <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="cerrarModal('modalEliminar')">Cancelar</button>
-      <button class="btn btn-danger"    onclick="confirmarEliminar()">Sí, eliminar</button>
-    </div>
+  <div class="modal-box" style="max-width:400px"><h3>🗑️ Confirmar eliminación</h3><input type="hidden" id="del_tipo"><input type="hidden" id="del_id">
+    <p style="font-size:.92rem;color:#555;margin-bottom:20px">¿Confirmas que deseas eliminar a <strong id="del_nombre" style="color:var(--rojo)"></strong>? Esta acción no se puede deshacer.</p>
+    <div class="modal-actions"><button class="btn btn-secondary" onclick="cerrarModal('modalEliminar')">Cancelar</button><button class="btn btn-danger" onclick="confirmarEliminar()">Sí, eliminar</button></div>
   </div>
 </div>
- 
-<!-- ══ MODAL: Ver reporte detalle ══ -->
+
 <div class="modal-overlay" id="modalRepDet">
-  <div class="modal-box">
-    <h3>📄 Detalle del reporte</h3>
-    <div id="repDetContenido" style="font-size:.9rem;line-height:1.9;color:#444"></div>
-    <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="cerrarModal('modalRepDet')">Cerrar</button>
-    </div>
+  <div class="modal-box"><h3>📄 Detalle del reporte</h3><div id="repDetContenido" style="font-size:.9rem;line-height:1.9;color:#444"></div>
+    <div class="modal-actions"><button class="btn btn-secondary" onclick="cerrarModal('modalRepDet')">Cerrar</button></div>
   </div>
 </div>
- 
 
 <script src="api.js"></script>
-<script src="admin.js"></script>
+<script>
+const sesion = API.sesion.obtener();
+if(!sesion){window.location.href='Index.html';}
+document.getElementById('hdrNombre').textContent='Bienvenido/a: '+sesion.nombre;
+function logout(){API.sesion.cerrar();}
+function msg(id,tipo,txt){const el=document.getElementById(id);el.className='alerta '+tipo;el.textContent=txt;setTimeout(()=>el.className='alerta',5000);}
+function cerrarModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+const ROLES={administrador:{label:'Administrador',cls:'b-admin',av:'av-admin'},docente:{label:'Docente',cls:'b-docente',av:'av-docente'},bienestar:{label:'Bienestar',cls:'b-bien',av:'av-bien'},director_bienestar:{label:'Dir. Bienestar',cls:'b-dir',av:'av-dir'},decanatura:{label:'Decanatura',cls:'b-dec',av:'av-dec'},director_programa:{label:'Dir. Programa',cls:'b-dir',av:'av-dir'}};
+const rolCls=r=>ROLES[r]?.cls||'b-admin';
+const avCls=r=>ROLES[r]?.av||'av-admin';
+const rolLbl=r=>ROLES[r]?.label||r;
+const inic=n=>(n||'??').substring(0,2).toUpperCase();
+function tab(nombre,btn){document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById('tp-'+nombre).classList.add('active');btn.classList.add('active');if(nombre==='usuarios')cargarUsuarios();if(nombre==='estudiantes')cargarEstudiantes();if(nombre==='reportes')cargarReportes();}
+function miniTab(id,grupo,btn){document.querySelectorAll(`#tp-${grupo} .mini-panel`).forEach(p=>p.classList.remove('active'));document.querySelectorAll(`#tp-${grupo} .mini-tab`).forEach(b=>b.classList.remove('active'));document.getElementById(id).classList.add('active');btn.classList.add('active');if(id==='u-lista')cargarUsuarios();if(id==='e-lista')cargarEstudiantes();}
+async function actualizarStats(){try{const[u,e,r]=await Promise.all([API.usuarios.listar(),API.estudiantes.listar(),API.reportes.listar()]);document.getElementById('stUsuarios').textContent=u.length;document.getElementById('stEstudiantes').textContent=e.length;document.getElementById('stReportes').textContent=r.length;document.getElementById('stPendientes').textContent=r.filter(x=>x.estado==='Reportado').length;}catch(e){console.error(e);}}
+let usrData=[];
+async function cargarUsuarios(){document.getElementById('tbodyUsr').innerHTML='<tr><td colspan="6" class="sin-datos">Cargando…</td></tr>';try{usrData=await API.usuarios.listar();renderUsuarios(usrData);}catch(e){msg('msgUsrLista','err','❌ '+e.message);}}
+function filtrarUsuarios(){const nom=document.getElementById('buNom').value.toLowerCase();const rol=document.getElementById('buRol').value;renderUsuarios(usrData.filter(u=>(!nom||u.nombre?.toLowerCase().includes(nom)||u.nombres?.toLowerCase().includes(nom))&&(!rol||u.rol===rol)));}
+function renderUsuarios(datos){const tbody=document.getElementById('tbodyUsr');if(!datos.length){tbody.innerHTML='<tr><td colspan="6" class="sin-datos">Sin usuarios registrados.</td></tr>';return;}tbody.innerHTML=datos.map((u,i)=>`<tr><td>${i+1}</td><td><div class="td-user"><span class="avatar ${avCls(u.rol)}">${inic(u.nombres||u.nombre)}</span><div><strong>${u.nombre}</strong><br><span style="font-size:.78rem;color:var(--muted)">${u.nombres||''} ${u.apellidos||''}</span></div></div></td><td><span class="badge ${rolCls(u.rol)}">${rolLbl(u.rol)}</span></td><td style="font-size:.83rem;color:var(--muted)">${u.correo||'—'}</td><td><span class="badge ${u.estado==1?'b-activo':'b-inactivo'}">${u.estado==1?'Activo':'Inactivo'}</span></td><td style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-secondary btn-icon" onclick='abrirEditUsr(${JSON.stringify(u)})'>✏️ Editar</button><button class="btn btn-danger btn-icon" onclick="abrirEliminar('usr',${u.id},'${(u.nombre||'').replace(/'/g,"\\'")}')">🗑️</button></td></tr>`).join('');}
+async function crearUsuario(e){e.preventDefault();const btn=e.submitter;btn.disabled=true;btn.textContent='Guardando…';try{await API.usuarios.crear({nombre:document.getElementById('u_nombre').value.trim(),password:document.getElementById('u_pass').value,documento:document.getElementById('u_doc').value.trim(),nombres:document.getElementById('u_nombres').value.trim(),apellidos:document.getElementById('u_apellidos').value.trim(),rol:document.getElementById('u_rol').value,telefono:document.getElementById('u_tel').value.trim(),correo:document.getElementById('u_correo').value.trim()});msg('msgUsr','ok','✅ Usuario registrado correctamente.');document.getElementById('frmUsr').reset();await actualizarStats();}catch(e){msg('msgUsr','err','❌ '+e.message);}btn.disabled=false;btn.textContent='Registrar usuario';}
+function abrirEditUsr(u){document.getElementById('eu_id').value=u.id;document.getElementById('eu_rol').value=u.rol;document.getElementById('eu_nombre').value=u.nombre;document.getElementById('eu_nombres').value=u.nombres||'';document.getElementById('eu_apellidos').value=u.apellidos||'';document.getElementById('eu_correo').value=u.correo||'';document.getElementById('eu_pass').value='';document.getElementById('eu_activo').value=u.estado==1?'1':'0';document.getElementById('modalEditUsr').classList.add('open');}
+async function guardarUsuario(){const id=parseInt(document.getElementById('eu_id').value);const datos={rol:document.getElementById('eu_rol').value,nombre:document.getElementById('eu_nombre').value.trim(),nombres:document.getElementById('eu_nombres').value.trim(),apellidos:document.getElementById('eu_apellidos').value.trim(),correo:document.getElementById('eu_correo').value.trim(),activo:parseInt(document.getElementById('eu_activo').value)};const p=document.getElementById('eu_pass').value;if(p)datos.password=p;try{await API.usuarios.actualizar(id,datos);cerrarModal('modalEditUsr');msg('msgUsrLista','ok','✅ Usuario actualizado.');await cargarUsuarios();await actualizarStats();}catch(e){msg('msgEditUsr','err','❌ '+e.message);}}
+let estData=[];
+async function cargarEstudiantes(){document.getElementById('tbodyEst').innerHTML='<tr><td colspan="7" class="sin-datos">Cargando…</td></tr>';try{estData=await API.estudiantes.listar();renderEstudiantes(estData);}catch(e){msg('msgEstLista','err','❌ '+e.message);}}
+function filtrarEstudiantes(){const nom=document.getElementById('beNom').value.toLowerCase();const car=document.getElementById('beCar').value.toLowerCase();renderEstudiantes(estData.filter(e=>(!nom||`${e.nombres} ${e.apellidos} ${e.documento}`.toLowerCase().includes(nom))&&(!car||(e.carrera||'').toLowerCase().includes(car))));}
+function renderEstudiantes(datos){const tbody=document.getElementById('tbodyEst');if(!datos.length){tbody.innerHTML='<tr><td colspan="7" class="sin-datos">Sin estudiantes registrados.</td></tr>';return;}tbody.innerHTML=datos.map((e,i)=>`<tr><td>${i+1}</td><td><div class="td-user"><span class="avatar av-est">${inic(e.nombres)}</span><div><strong>${e.nombres} ${e.apellidos}</strong></div></div></td><td style="font-size:.83rem">${e.documento}</td><td style="font-size:.83rem">${e.carrera||'—'}</td><td style="font-size:.8rem;color:var(--muted)">${e.telefono?'📞 '+e.telefono+'<br>':''}${e.correo?'✉️ '+e.correo:'—'}</td><td><span class="badge ${e.estado==='Activo'?'b-activo':'b-inactivo'}">${e.estado||'Activo'}</span></td><td style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-secondary btn-icon" onclick='abrirEditEst(${JSON.stringify(e)})'>✏️ Editar</button><button class="btn btn-danger btn-icon" onclick="abrirEliminar('est',${e.id},'${(e.nombres+' '+e.apellidos).replace(/'/g,"\\'")}')">🗑️</button></td></tr>`).join('');}
+async function crearEstudiante(e){e.preventDefault();const btn=e.submitter;btn.disabled=true;btn.textContent='Guardando…';try{await API.estudiantes.crear({documento:document.getElementById('e_doc').value.trim(),nombres:document.getElementById('e_nom').value.trim(),apellidos:document.getElementById('e_ape').value.trim(),carrera:document.getElementById('e_car').value.trim(),telefono:document.getElementById('e_tel').value.trim(),correo:document.getElementById('e_cor').value.trim()});msg('msgEst','ok','✅ Estudiante registrado correctamente.');document.getElementById('frmEst').reset();await actualizarStats();}catch(e){msg('msgEst','err','❌ '+e.message);}btn.disabled=false;btn.textContent='Registrar estudiante';}
+function abrirEditEst(e){document.getElementById('ee_id').value=e.id;document.getElementById('ee_nom').value=e.nombres;document.getElementById('ee_ape').value=e.apellidos;document.getElementById('ee_car').value=e.carrera||'';document.getElementById('ee_tel').value=e.telefono||'';document.getElementById('ee_cor').value=e.correo||'';document.getElementById('modalEditEst').classList.add('open');}
+async function guardarEstudiante(){const id=parseInt(document.getElementById('ee_id').value);try{await API.estudiantes.actualizar(id,{nombres:document.getElementById('ee_nom').value.trim(),apellidos:document.getElementById('ee_ape').value.trim(),carrera:document.getElementById('ee_car').value.trim(),telefono:document.getElementById('ee_tel').value.trim(),correo:document.getElementById('ee_cor').value.trim()});cerrarModal('modalEditEst');msg('msgEstLista','ok','✅ Estudiante actualizado.');await cargarEstudiantes();await actualizarStats();}catch(e){msg('msgEditEst','err','❌ '+e.message);}}
+function abrirEliminar(tipo,id,nombre){document.getElementById('del_tipo').value=tipo;document.getElementById('del_id').value=id;document.getElementById('del_nombre').textContent=nombre;document.getElementById('modalEliminar').classList.add('open');}
+async function confirmarEliminar(){const tipo=document.getElementById('del_tipo').value;const id=parseInt(document.getElementById('del_id').value);try{if(tipo==='usr'){await API.usuarios.eliminar(id);cerrarModal('modalEliminar');msg('msgUsrLista','ok','🗑️ Usuario desactivado.');await cargarUsuarios();}else{await API.estudiantes.eliminar(id);cerrarModal('modalEliminar');msg('msgEstLista','ok','🗑️ Estudiante eliminado.');await cargarEstudiantes();}await actualizarStats();}catch(e){alert('❌ '+e.message);}}
+let repData=[];
+async function cargarReportes(){document.getElementById('tbodyRep').innerHTML='<tr><td colspan="8" class="sin-datos">Cargando…</td></tr>';try{repData=await API.reportes.listar();renderReportes(repData);}catch(e){console.error(e);}}
+function filtrarReportes(){const est=document.getElementById('brEst').value.toLowerCase();const mat=document.getElementById('brMat').value.toLowerCase();const est2=document.getElementById('brEst2').value;renderReportes(repData.filter(r=>(!est||r.estudiante?.toLowerCase().includes(est))&&(!mat||r.materia?.toLowerCase().includes(mat))&&(!est2||r.estado===est2)));}
+function limpiarRep(){['brEst','brMat'].forEach(id=>document.getElementById(id).value='');document.getElementById('brEst2').value='';renderReportes(repData);}
+function renderReportes(datos){const tbody=document.getElementById('tbodyRep');if(!datos.length){tbody.innerHTML='<tr><td colspan="8" class="sin-datos">Sin reportes registrados.</td></tr>';return;}tbody.innerHTML=datos.map((r,i)=>{const f=r.fecha_registro?new Date(r.fecha_registro).toLocaleDateString('es-CO'):'—';return`<tr><td>${i+1}</td><td><strong>${r.estudiante||'—'}</strong></td><td>${r.materia||'—'}</td><td>${r.docente||'N/A'}</td><td>${r.motivo||'—'}</td><td><span class="badge b-rep">${r.estado||'—'}</span></td><td style="font-size:.8rem;color:var(--muted);white-space:nowrap">${f}</td><td><button class="btn btn-secondary btn-icon" onclick='verReporte(${JSON.stringify(r)})'>Ver</button></td></tr>`;}).join('');}
+function verReporte(r){const seg=r.seguimiento;document.getElementById('repDetContenido').innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:.88rem"><tr><td style="padding:5px 0;color:var(--muted);width:38%"><strong>Estudiante</strong></td><td>${r.estudiante||'—'}</td></tr><tr><td style="padding:5px 0;color:var(--muted)"><strong>Materia</strong></td><td>${r.materia||'—'}</td></tr><tr><td style="padding:5px 0;color:var(--muted)"><strong>Docente</strong></td><td>${r.docente||'—'}</td></tr><tr><td style="padding:5px 0;color:var(--muted)"><strong>Motivo</strong></td><td>${r.motivo||'—'}</td></tr><tr><td style="padding:5px 0;color:var(--muted)"><strong>Estado</strong></td><td>${r.estado||'—'}</td></tr><tr><td style="padding:5px 0;color:var(--muted)"><strong>Observaciones</strong></td><td>${r.observaciones||'—'}</td></tr></table>${seg?`<div style="background:#e8f5e9;border-radius:8px;padding:14px;margin-top:16px"><p style="font-weight:700;color:#1b5e20;font-size:.85rem;margin-bottom:8px">Seguimiento</p><p><strong>Intervención:</strong> ${seg.intervencion||'—'}</p><p><strong>Observaciones:</strong> ${seg.observaciones||'—'}</p><p><strong>Profesional:</strong> ${seg.profesional||'—'}</p></div>`:'<p style="color:var(--muted);font-size:.85rem;margin-top:14px">Sin seguimiento registrado.</p>'}`;document.getElementById('modalRepDet').classList.add('open');}
+function exportarCSV(){if(!repData.length){alert('No hay datos para exportar.');return;}const hdr=['#','Estudiante','Materia','Docente','Motivo','Estado','Fecha'];const rows=repData.map((r,i)=>[i+1,r.estudiante,r.materia,r.docente||'N/A',r.motivo,r.estado,r.fecha_registro?new Date(r.fecha_registro).toLocaleDateString('es-CO'):''].map(v=>`"${v}"`).join(','));const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+[hdr.join(','),...rows].join('\n')],{type:'text/csv;charset=utf-8;'}));a.download='reportes_admin_'+new Date().toLocaleDateString('es-CO').replace(/\//g,'-')+'.csv';a.click();}
+actualizarStats();cargarUsuarios();
+</script>
 </body>
 </html>

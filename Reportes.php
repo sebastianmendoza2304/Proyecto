@@ -56,7 +56,31 @@ try {
     // ── POST — Crear reporte ────────────────────────────
     if ($metodo === 'POST') {
         $d = leerJSON();
-        requerir($d, 'estudiante_id', 'docente_id', 'materia_id', 'motivo_id', 'observaciones');
+        requerir($d, 'estudiante_id', 'docente_id', 'observaciones');
+
+        // Resolver materia_id: puede venir como id o como nombre
+        if (empty($d['materia_id']) && !empty($d['materia_nombre'])) {
+            $mStmt = $pdo->prepare('SELECT id_materia FROM materia WHERE nombre_materia = ? LIMIT 1');
+            $mStmt->execute([trim($d['materia_nombre'])]);
+            $m = $mStmt->fetch();
+            // Si no existe, la creamos al vuelo
+            if (!$m) {
+                $pdo->prepare('INSERT INTO materia (nombre_materia, codigo_materia) VALUES (?,?)')->execute([trim($d['materia_nombre']), strtoupper(substr(md5($d['materia_nombre']),0,6))]);
+                $d['materia_id'] = (int)$pdo->lastInsertId();
+            } else {
+                $d['materia_id'] = (int)$m['id_materia'];
+            }
+        }
+        if (empty($d['materia_id'])) $d['materia_id'] = 1;
+
+        // Resolver motivo_id: puede venir como id o como nombre
+        if (empty($d['motivo_id']) && !empty($d['motivo_nombre'])) {
+            $moStmt = $pdo->prepare('SELECT id_motivo FROM motivo WHERE nombre_motivo = ? LIMIT 1');
+            $moStmt->execute([trim($d['motivo_nombre'])]);
+            $mo = $moStmt->fetch();
+            $d['motivo_id'] = $mo ? (int)$mo['id_motivo'] : 1;
+        }
+        if (empty($d['motivo_id'])) $d['motivo_id'] = 1;
 
         // Obtener semestre activo
         $sem = $pdo->query('SELECT id_semestre FROM `semestre_acacémico` WHERE activo = 1 LIMIT 1')->fetch();
