@@ -141,7 +141,7 @@ function renderNotificaciones(){
   if(!items.length){el.innerHTML='<span class="notif-vacia">Sin notificaciones nuevas.</span>';return;}
   el.innerHTML=items.map(r=>{
     const esNuevo=r.estado==='Reportado';
-    return`<div class="notif-item ${esNuevo?'notif-nuevo':'notif-cerrado'}"><span class="notif-dot ${esNuevo?'dot-nuevo':'dot-cerrado'}"></span>${esNuevo?'📥 Nuevo caso:':'✅ Caso cerrado:'} <strong>${r.estudiante}</strong> — ${r.materia||'—'}<span style="margin-left:auto;font-size:.78rem;opacity:.7">${r.fecha_registro?new Date(r.fecha_registro).toLocaleDateString('es-CO'):''}</span></div>`;
+    return`<div class="notif-item ${esNuevo?'notif-nuevo':'notif-cerrado'}"><span class="notif-dot ${esNuevo?'dot-nuevo':'dot-cerrado'}"></span>${esNuevo?'📥 Nuevo caso:':'✅ Caso cerrado:'} <strong>${r.estudiante}</strong> — ${r.materia||'—'}<span style="margin-left:auto;font-size:.78rem;opacity:.7">${r.fecha_registro?r.fecha_registro ? r.fecha_registro.substring(0,10).split('-').reverse().join('/') : '—':''}</span></div>`;
   }).join('');
 }
 function renderTabla(datos){
@@ -149,7 +149,7 @@ function renderTabla(datos){
   if(!datos.length){tbody.innerHTML='<tr><td colspan="8" class="sin-datos">No se encontraron reportes.</td></tr>';return;}
   tbody.innerHTML=datos.map((r,i)=>{
     const bCls={'Reportado':'badge-reportado','En revisión':'badge-revision','En seguimiento':'badge-seguimiento','Remitido':'badge-remitido','Cerrado':'badge-cerrado'}[r.estado]||'badge-reportado';
-    const fecha=r.fecha_registro?new Date(r.fecha_registro).toLocaleDateString('es-CO'):'—';
+    const fecha=r.fecha_registro?r.fecha_registro ? r.fecha_registro.substring(0,10).split('-').reverse().join('/') : '—':'—';
     return`<tr><td>${i+1}</td><td><strong>${r.estudiante||'—'}</strong></td><td>${r.materia||'—'}</td><td>${r.docente||'N/A'}</td><td>${r.motivo||'—'}</td><td><span class="badge ${bCls}">${r.estado}</span></td><td style="font-size:.8rem;color:#888">${fecha}</td><td><button class="btn btn-secondary" style="padding:4px 12px;font-size:.8rem" onclick='verDetalle(${JSON.stringify(r)})'>Ver</button></td></tr>`;
   }).join('');
 }
@@ -182,7 +182,7 @@ function verDetalle(r){
     <div class="detalle-item"><div class="detalle-label">Docente</div><div class="detalle-val">${r.docente||'N/D'}</div></div>
     <div class="detalle-item"><div class="detalle-label">Motivo</div><div class="detalle-val">${r.motivo||'—'}</div></div>
     <div class="detalle-item"><div class="detalle-label">Estado</div><div class="detalle-val">${r.estado}</div></div>
-    <div class="detalle-item"><div class="detalle-label">Fecha</div><div class="detalle-val">${r.fecha_registro?new Date(r.fecha_registro).toLocaleDateString('es-CO'):'N/D'}</div></div>
+    <div class="detalle-item"><div class="detalle-label">Fecha</div><div class="detalle-val">${r.fecha_registro?r.fecha_registro ? r.fecha_registro.substring(0,10).split('-').reverse().join('/') : '—':'N/D'}</div></div>
     <div class="detalle-item"><div class="detalle-label">Remitido a</div><div class="detalle-val">${r.remitido_a||'—'}</div></div>
     <div class="detalle-item full"><div class="detalle-label">Observaciones docente</div><div class="detalle-val">${r.observaciones||'—'}</div></div>
     ${seg?`<div class="detalle-item full" style="background:#e8f5e9"><div class="detalle-label">Seguimiento bienestar (${seg.fecha||''})</div><div class="detalle-val"><strong>Intervención:</strong> ${seg.intervencion||'—'}<br><strong>Observaciones:</strong> ${seg.observaciones||'—'}<br><strong>Recomendaciones:</strong> ${seg.recomendaciones||'—'}<br><strong>Profesional:</strong> ${seg.profesional||'—'}</div></div>`:''}`;
@@ -193,7 +193,7 @@ document.getElementById('modalDetalle').addEventListener('click',function(e){if(
 function exportarCSV(){
   if(!todos.length){alert('No hay datos para exportar.');return;}
   const cabecera=['ID','Estudiante','Materia','Docente','Motivo','Estado','Fecha'];
-  const filas=todos.map((r,i)=>[i+1,r.estudiante,r.materia,r.docente||'N/A',r.motivo,r.estado,r.fecha_registro?new Date(r.fecha_registro).toLocaleDateString('es-CO'):''].join(','));
+  const filas=todos.map((r,i)=>[i+1,r.estudiante,r.materia,r.docente||'N/A',r.motivo,r.estado,r.fecha_registro?r.fecha_registro ? r.fecha_registro.substring(0,10).split('-').reverse().join('/') : '—':''].join(','));
   const csv=[cabecera.join(','),...filas].join('\n');
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='reportes_academicos.csv';a.click();

@@ -360,7 +360,7 @@ function renderTabla(datos){
   if(!datos.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Sin reportes registrados aún.</td></tr>';return;}
   tbody.innerHTML=datos.map((r,i)=>{
     const bCls={'Reportado':'badge-reportado','En revisión':'badge-revision','En seguimiento':'badge-seguimiento','Remitido':'badge-remitido','Cerrado':'badge-cerrado'}[r.estado]||'badge-reportado';
-    const fecha=r.fecha_registro?new Date(r.fecha_registro).toLocaleDateString('es-CO'):'—';
+    const fecha=r.fecha_registro?r.fecha_registro ? r.fecha_registro.substring(0,10).split('-').reverse().join('/') : '—':'—';
     return`<tr><td>${i+1}</td><td><strong>${r.estudiante||'—'}</strong><br><span style="font-size:.78rem;color:#999">${r.documento||''}</span></td><td>${r.materia||'—'}</td><td>${r.motivo||'—'}</td><td><span class="badge ${bCls}">${r.estado}</span></td><td style="font-size:.8rem;color:#888">${fecha}</td><td><button class="btn btn-secondary btn-sm" onclick='abrirModal(${JSON.stringify(r)})'>Editar</button></td></tr>`;
   }).join('');
 }

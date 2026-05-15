@@ -209,7 +209,7 @@ function renderTabla(datos){
   if(!datos.length){tbody.innerHTML='<tr><td colspan="9" class="sin-datos">Sin casos registrados.</td></tr>';return;}
   tbody.innerHTML=datos.map((r,i)=>{
     const seg=r.seguimiento;
-    const fecha=r.fecha_registro?new Date(r.fecha_registro).toLocaleDateString('es-CO'):'—';
+    const fecha=r.fecha_registro?r.fecha_registro ? r.fecha_registro.substring(0,10).split('-').reverse().join('/') : '—':'—';
     return`<tr>
       <td>${i+1}</td>
       <td><strong>${r.estudiante||'—'}</strong></td>
@@ -232,7 +232,7 @@ function verDetalle(r){
     <div class="det-item"><div class="det-lbl">Docente</div><div class="det-val">${r.docente||'—'}</div></div>
     <div class="det-item"><div class="det-lbl">Motivo</div><div class="det-val">${r.motivo||'—'}</div></div>
     <div class="det-item"><div class="det-lbl">Estado</div><div class="det-val"><span class="badge ${badgeCls(r.estado)}">${r.estado}</span></div></div>
-    <div class="det-item"><div class="det-lbl">Fecha</div><div class="det-val">${r.fecha_registro?new Date(r.fecha_registro).toLocaleDateString('es-CO'):'—'}</div></div>
+    <div class="det-item"><div class="det-lbl">Fecha</div><div class="det-val">${r.fecha_registro?r.fecha_registro ? r.fecha_registro.substring(0,10).split('-').reverse().join('/') : '—':'—'}</div></div>
     <div class="det-item"><div class="det-lbl">Remitido a</div><div class="det-val">${r.remitido_a||'—'}</div></div>
     <div class="det-item span2"><div class="det-lbl">Observaciones docente</div><div class="det-val">${r.observaciones||'—'}</div></div>
     ${seg?`<div class="det-seg span2"><div class="det-lbl">Seguimiento — ${seg.fecha||''}</div><div class="det-val" style="margin-top:6px;line-height:1.8"><strong>Intervención:</strong> ${seg.intervencion||'—'}<br><strong>Observaciones:</strong> ${seg.observaciones||'—'}<br><strong>Recomendaciones:</strong> ${seg.recomendaciones||'—'}<br><strong>Profesional:</strong> ${seg.profesional||'—'}</div></div>`:`<div class="det-item span2" style="color:var(--muted);font-size:.85rem">Sin seguimiento registrado.</div>`}`;
@@ -261,7 +261,7 @@ function renderAlertas(){
   const r=todos;
   const sinSeg=r.filter(x=>x.estado==='Reportado'&&!x.seguimiento);
   const elCrit=document.getElementById('alertasCriticas');
-  elCrit.innerHTML=sinSeg.length?sinSeg.map(r=>`<div class="alerta-item alerta-crit"><span style="font-size:1.3rem">🚨</span><div style="flex:1"><strong style="color:var(--rojo)">${r.estudiante}</strong><span style="font-size:.83rem;color:var(--text-sec)"> — ${r.materia||'—'}</span><br><span style="font-size:.8rem;color:var(--text-sec)">Motivo: ${r.motivo||'—'} | Fecha: ${r.fecha_registro?new Date(r.fecha_registro).toLocaleDateString('es-CO'):'N/D'}</span></div><span class="badge b-reportado">Sin intervención</span></div>`).join(''):'<p style="color:var(--verde);font-weight:700;font-size:.88rem">✅ Sin casos críticos pendientes.</p>';
+  elCrit.innerHTML=sinSeg.length?sinSeg.map(r=>`<div class="alerta-item alerta-crit"><span style="font-size:1.3rem">🚨</span><div style="flex:1"><strong style="color:var(--rojo)">${r.estudiante}</strong><span style="font-size:.83rem;color:var(--text-sec)"> — ${r.materia||'—'}</span><br><span style="font-size:.8rem;color:var(--text-sec)">Motivo: ${r.motivo||'—'} | Fecha: ${r.fecha_registro?r.fecha_registro ? r.fecha_registro.substring(0,10).split('-').reverse().join('/') : '—':'N/D'}</span></div><span class="badge b-reportado">Sin intervención</span></div>`).join(''):'<p style="color:var(--verde);font-weight:700;font-size:.88rem">✅ Sin casos críticos pendientes.</p>';
   const remitidos=r.filter(x=>x.estado==='Remitido');
   const elRem=document.getElementById('alertasRemitidos');
   elRem.innerHTML=remitidos.length?remitidos.map(r=>`<div class="alerta-item alerta-warn"><span style="font-size:1.3rem">⚠️</span><div style="flex:1"><strong style="color:#7a5500">${r.estudiante}</strong><span style="font-size:.83rem;color:var(--text-sec)"> — ${r.materia||'—'}</span><br><span style="font-size:.8rem;color:var(--text-sec)">Remitido a: ${r.remitido_a||'N/D'}</span></div><span class="badge b-remitido">Remitido</span></div>`).join(''):'<p style="color:var(--verde);font-weight:700;font-size:.88rem">✅ Sin casos remitidos actualmente.</p>';
@@ -269,7 +269,7 @@ function renderAlertas(){
 function exportarCSV(){
   if(!todos.length){alert('No hay datos.');return;}
   const hdr=['#','Estudiante','Materia','Docente','Motivo','Estado','Fecha'];
-  const rows=todos.map((r,i)=>[i+1,r.estudiante,r.materia,r.docente||'N/A',r.motivo,r.estado,r.fecha_registro?new Date(r.fecha_registro).toLocaleDateString('es-CO'):''].map(v=>`"${v}"`).join(','));
+  const rows=todos.map((r,i)=>[i+1,r.estudiante,r.materia,r.docente||'N/A',r.motivo,r.estado,r.fecha_registro?r.fecha_registro ? r.fecha_registro.substring(0,10).split('-').reverse().join('/') : '—':''].map(v=>`"${v}"`).join(','));
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+[hdr.join(','),...rows].join('\n')],{type:'text/csv;charset=utf-8;'}));a.download='casos_programa_'+new Date().toLocaleDateString('es-CO').replace(/\//g,'-')+'.csv';a.click();
 }
 init();

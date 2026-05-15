@@ -93,15 +93,11 @@ try {
         $chk->execute([$d['documento']]);
         if ($chk->fetch()) responder('Ya existe un estudiante con ese documento.', false, 409);
 
-        // Necesitamos un usuario_rol; usamos el primero disponible o 1 por defecto
-        $ur = $pdo->query('SELECT id_usuario_rol FROM usuario_rol LIMIT 1')->fetch();
-        $urId = $ur ? $ur['id_usuario_rol'] : 1;
-
         $stmt = $pdo->prepare(
             'INSERT INTO estudiante
                (documento_identidad, nombres, apellidos, carrera_cursada,
-                telefono, correo_institucional, `estado_académico`, usuario_rol)
-             VALUES (?,?,?,?,?,?,?,?)'
+                telefono, correo_institucional, `estado_académico`)
+             VALUES (?,?,?,?,?,?,?)'
         );
         $stmt->execute([
             trim($d['documento']),
@@ -111,7 +107,6 @@ try {
             trim($d['telefono'] ?? ''),
             trim($d['correo']   ?? ''),
             $d['estado'] ?? 'Activo',
-            $urId,
         ]);
 
         responder(['id' => (int)$pdo->lastInsertId(), 'mensaje' => 'Estudiante registrado correctamente.'], true, 201);

@@ -82,29 +82,25 @@ try {
         }
         if (empty($d['motivo_id'])) $d['motivo_id'] = 1;
 
-        // Obtener semestre activo
-        $sem = $pdo->query('SELECT id_semestre FROM `semestre_acacémico` WHERE activo = 1 LIMIT 1')->fetch();
-        $semestreId = $sem ? $sem['id_semestre'] : 1;
+        // Obtener semestre activo (si existe la tabla)
+        $semestreId = 1;
+        try {
+            $sem = $pdo->query("SELECT id_semestre_academico FROM semestre_academico WHERE activo = 1 LIMIT 1")->fetch();
+            if ($sem) $semestreId = $sem['id_semestre_academico'];
+        } catch (Exception $e) { /* tabla no existe o nombre distinto, usar 1 */ }
 
-        // Crear caso automáticamente
-        $pdo->prepare('INSERT INTO caso (id_estudiante, descripcion, prioridad) VALUES (?,?,?)')
-            ->execute([(int)$d['estudiante_id'], 'Caso generado por reporte', 'Media']);
-        $casoId = (int)$pdo->lastInsertId();
-
+        // Insertar reporte (sin tabla caso — eliminada por ser redundante con reporte_riesgo)
         $stmt = $pdo->prepare(
             'INSERT INTO reporte_riesgo
                (id_estudiante, id_docente, id_materia, id_motivo,
-                `id_semestre_académico`, caso, observaciones, estado,
-                fecha_registro, hora_registro)
-             VALUES (?,?,?,?,?,?,?,?, CURDATE(), CURTIME())'
+                observaciones, estado, fecha_registro, hora_registro)
+             VALUES (?,?,?,?,?,?, CURDATE(), CURTIME())'
         );
         $stmt->execute([
             (int)$d['estudiante_id'],
             (int)$d['docente_id'],
             (int)$d['materia_id'],
             (int)$d['motivo_id'],
-            $semestreId,
-            $casoId,
             trim($d['observaciones']),
             $d['estado'] ?? 'Reportado',
         ]);
