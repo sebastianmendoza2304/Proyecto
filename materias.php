@@ -49,6 +49,26 @@ try {
 
     if ($metodo === 'POST') {
         $d = leerJSON();
+
+        // Crear nueva materia en el sistema
+        if (!empty($d['crear_materia'])) {
+            requerir($d, 'nombre');
+            $nombre  = trim($d['nombre']);
+            $codigo  = strtoupper(trim($d['codigo'] ?? substr(md5($nombre),0,6)));
+            // Ver si ya existe
+            $chk = $pdo->prepare("SELECT id_materia FROM materia WHERE nombre_materia = ?");
+            $chk->execute([$nombre]);
+            $exist = $chk->fetch();
+            if ($exist) {
+                responder(['id' => (int)$exist['id_materia'], 'mensaje' => 'Materia ya existe.'], true, 200);
+            }
+            $pdo->prepare("INSERT INTO materia (nombre_materia, codigo_materia) VALUES (?,?)")
+                ->execute([$nombre, $codigo]);
+            $newId = (int)$pdo->lastInsertId();
+            responder(['id' => $newId, 'mensaje' => 'Materia creada correctamente.'], true, 201);
+        }
+
+        // Asignar materia a docente
         requerir($d, 'docente_id', 'materia_id');
         $stmt = $pdo->prepare(
             "INSERT IGNORE INTO docente_materia (id_docente, id_materia) VALUES (?,?)"

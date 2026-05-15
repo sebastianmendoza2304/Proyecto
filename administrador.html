@@ -287,6 +287,120 @@ function renderReportes(datos){const tbody=document.getElementById('tbodyRep');i
 function verReporte(r){const seg=r.seguimiento;document.getElementById('repDetContenido').innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:.88rem"><tr><td style="padding:5px 0;color:var(--muted);width:38%"><strong>Estudiante</strong></td><td>${r.estudiante||'—'}</td></tr><tr><td style="padding:5px 0;color:var(--muted)"><strong>Materia</strong></td><td>${r.materia||'—'}</td></tr><tr><td style="padding:5px 0;color:var(--muted)"><strong>Docente</strong></td><td>${r.docente||'—'}</td></tr><tr><td style="padding:5px 0;color:var(--muted)"><strong>Motivo</strong></td><td>${r.motivo||'—'}</td></tr><tr><td style="padding:5px 0;color:var(--muted)"><strong>Estado</strong></td><td>${r.estado||'—'}</td></tr><tr><td style="padding:5px 0;color:var(--muted)"><strong>Observaciones</strong></td><td>${r.observaciones||'—'}</td></tr></table>${seg?`<div style="background:#e8f5e9;border-radius:8px;padding:14px;margin-top:16px"><p style="font-weight:700;color:#1b5e20;font-size:.85rem;margin-bottom:8px">Seguimiento</p><p><strong>Intervención:</strong> ${seg.intervencion||'—'}</p><p><strong>Observaciones:</strong> ${seg.observaciones||'—'}</p><p><strong>Profesional:</strong> ${seg.profesional||'—'}</p></div>`:'<p style="color:var(--muted);font-size:.85rem;margin-top:14px">Sin seguimiento registrado.</p>'}`;document.getElementById('modalRepDet').classList.add('open');}
 function exportarCSV(){if(!repData.length){alert('No hay datos para exportar.');return;}const hdr=['#','Estudiante','Materia','Docente','Motivo','Estado','Fecha'];const rows=repData.map((r,i)=>[i+1,r.estudiante,r.materia,r.docente||'N/A',r.motivo,r.estado,r.fecha_registro?r.fecha_registro ? r.fecha_registro.substring(0,10).split('-').reverse().join('/') : '—':''].map(v=>`"${v}"`).join(','));const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+[hdr.join(','),...rows].join('\n')],{type:'text/csv;charset=utf-8;'}));a.download='reportes_admin_'+new Date().toLocaleDateString('es-CO').replace(/\//g,'-')+'.csv';a.click();}
 actualizarStats();cargarUsuarios();
+
+/* ════════════════ MATERIAS ════════════════ */
+let todasMaterias = [];
+
+async function initMaterias() {
+  // Cargar docentes en el select
+  try {
+    const docentes = await API.usuarios.listar({rol: 'docente'});
+    const sel = document.getElementById('selDocente');
+    sel.innerHTML = '<option value="">— Selecciona un docente —</option>' +
+      docentes.map(d => `<option value="${d.id}">${d.nombre} — ${d.nombres||''} ${d.apellidos||''}</option>`).join('');
+  } catch(e) { msg('msgMat','err','❌ Error cargando docentes: '+e.message); }
+
+  // Cargar TODAS las materias del sistema
+  try {
+    const resp = await fetch('materias.php').then(r=>r.json());
+    if (!resp.ok) throw new Error(resp.data);
+    todasMaterias = resp.data;
+    const selM = document.getElementById('selMateria');
+    selM.innerHTML = '<option value="">— Selecciona una materia —</option>' +
+      todasMaterias.map(m => `<option value="${m.id}">${m.nombre}${m.codigo?' ('+m.codigo+')':''}</option>`).join('');
+  } catch(e) { document.getElementById('selMateria').innerHTML = '<option>Error al cargar materias</option>'; }
+}
+
+async function cargarMateriasDocente() {
+  const docId = document.getElementById('selDocente').value;
+  const el = document.getElementById('listaMateriasDocente');
+  if (!docId) { el.innerHTML = '<p style="color:var(--muted);font-size:.85rem">Selecciona un docente.</p>'; return; }
+  el.innerHTML = '<p style="color:var(--muted);font-size:.85rem">Cargando…</p>';
+  try {
+    const resp = await fetch(`materias.php?docente_id=${docId}`).then(r=>r.json());
+    if (!resp.ok) throw new Error(resp.data);
+    const mats = resp.data;
+    if (!mats.length) {
+      el.innerHTML = '<p style="color:#e65100;font-size:.85rem">⚠️ Sin materias asignadas.</p>';
+      return;
+    }
+    el.innerHTML = mats.map(m => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#fff;border:1px solid var(--border);border-radius:6px;margin-bottom:6px;font-size:.87rem">
+        <span><strong>${m.nombre}</strong>${m.codigo?' <span style="color:var(--muted);font-size:.78rem">('+m.codigo+')</span>':''}</span>
+        <button class="btn btn-danger btn-icon" onclick="quitarMateria(${m.id},${docId})" title="Quitar materia">✕</button>
+      </div>`).join('');
+  } catch(e) { el.innerHTML = '<p style="color:#c62828;font-size:.85rem">❌ '+e.message+'</p>'; }
+}
+
+async function asignarMateria() {
+  const docId = document.getElementById('selDocente').value;
+  const matId = document.getElementById('selMateria').value;
+  if (!docId) { msg('msgMat','warn','⚠️ Selecciona un docente primero.'); return; }
+  if (!matId) { msg('msgMat','warn','⚠️ Selecciona una materia.'); return; }
+  try {
+    const resp = await fetch('materias.php', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({docente_id: parseInt(docId), materia_id: parseInt(matId)})
+    }).then(r=>r.json());
+    if (!resp.ok) throw new Error(resp.data);
+    msg('msgMat','ok','✅ Materia asignada correctamente.');
+    await cargarMateriasDocente();
+  } catch(e) { msg('msgMat','err','❌ '+e.message); }
+}
+
+async function quitarMateria(matId, docId) {
+  if (!confirm('¿Quitar esta materia al docente?')) return;
+  try {
+    const resp = await fetch(`materias.php?id=${matId}&docente_id=${docId}`, {method:'DELETE'}).then(r=>r.json());
+    if (!resp.ok) throw new Error(resp.data);
+    msg('msgMat','ok','✅ Materia quitada.');
+    await cargarMateriasDocente();
+  } catch(e) { msg('msgMat','err','❌ '+e.message); }
+}
+
+async function crearMateria() {
+  const nombre = document.getElementById('nuevaMatNombre').value.trim();
+  const codigo = document.getElementById('nuevaMatCodigo').value.trim();
+  const docId  = document.getElementById('selDocente').value;
+  if (!nombre) { msg('msgMat','warn','⚠️ Escribe el nombre de la materia.'); return; }
+  try {
+    // Crear materia
+    const resp = await fetch('materias.php', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({crear_materia: true, nombre, codigo})
+    }).then(r=>r.json());
+    if (!resp.ok) throw new Error(resp.data);
+    const nuevaId = resp.data.id;
+    // Si hay docente seleccionado, asignarla
+    if (docId && nuevaId) {
+      await fetch('materias.php', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({docente_id: parseInt(docId), materia_id: nuevaId})
+      }).then(r=>r.json());
+    }
+    document.getElementById('nuevaMatNombre').value = '';
+    document.getElementById('nuevaMatCodigo').value = '';
+    msg('msgMat','ok','✅ Materia creada'+(docId?' y asignada al docente.':'.'));
+    await initMaterias();
+    if (docId) await cargarMateriasDocente();
+  } catch(e) { msg('msgMat','err','❌ '+e.message); }
+}
+
+// Override tab() to init materias when switching
+const _tabOrig = tab;
+function tab(nombre, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tp-'+nombre).classList.add('active');
+  btn.classList.add('active');
+  if(nombre==='usuarios')cargarUsuarios();
+  if(nombre==='estudiantes')cargarEstudiantes();
+  if(nombre==='reportes')cargarReportes();
+  if(nombre==='materias')initMaterias();
+}
 </script>
 </body>
 </html>
