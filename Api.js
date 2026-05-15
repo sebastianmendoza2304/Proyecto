@@ -85,5 +85,14 @@ const API = (() => {
     get id()    { return this.obtener()?.id     || null; },
   };
 
-  return { login, usuarios, estudiantes, reportes, seguimientos, sesion };
+  // ── PERÍODOS ──────────────────────────────────────────
+  const periodos = {
+    listar:   ()      => req('periodos.php'),
+    activo:   ()      => req('periodos.php?activo=1'),
+    crear:    (d)     => req('periodos.php',        { method: 'POST', body: JSON.stringify(d) }),
+    activar:  (id)    => req(`periodos.php?id=${id}`, { method: 'PUT',  body: JSON.stringify({ activo: 1 }) }),
+    actualizar:(id,d) => req(`periodos.php?id=${id}`, { method: 'PUT',  body: JSON.stringify(d) }),
+  };
+
+  return { login, usuarios, estudiantes, reportes, seguimientos, periodos, sesion };
 })();

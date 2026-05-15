@@ -73,6 +73,9 @@
   <div class="header-right"><a href="index.html" class="btn-logout" onclick="cerrarSesion()">Cerrar sesión</a></div>
 </div>
 <div class="main">
+  <!-- Período activo -->
+  <div id="periodoActivo" style="background:#fff3e0;border:1px solid #ffe0b2;border-radius:8px;padding:10px 16px;margin-bottom:16px;font-size:.88rem;color:#7a5500;font-weight:500"></div>
+
   <div class="stats">
     <div class="stat-card"><div class="stat-num" id="statTotal">—</div><div class="stat-label">Total casos</div></div>
     <div class="stat-card"><div class="stat-num" id="statNuevos">—</div><div class="stat-label">Nuevos</div></div>
@@ -198,6 +201,18 @@ function exportarCSV(){
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='reportes_academicos.csv';a.click();
 }
+
+// ── Período activo ──────────────────────────────────
+async function mostrarPeriodoActivo() {
+  try {
+    const resp = await fetch('periodos.php?activo=1').then(r=>r.json());
+    if (resp.ok && resp.data) {
+      const el = document.getElementById('periodoActivo');
+      if (el) el.innerHTML = `📅 Período activo: <strong>${resp.data.nombre}</strong>${resp.data.descripcion?' — '+resp.data.descripcion:''}`;
+    }
+  } catch(e) { /* silencioso si periodos.php aún no existe */ }
+}
+mostrarPeriodoActivo();
 init();
 </script>
 </body>

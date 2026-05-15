@@ -93,6 +93,9 @@
   <a href="Index.html" class="btn-cerrar" onclick="logout()">Cerrar sesión</a>
 </header>
 <div class="wrap">
+  <!-- Período activo -->
+  <div id="periodoActivo" style="background:#fff3e0;border:1px solid #ffe0b2;border-radius:8px;padding:10px 16px;margin-bottom:16px;font-size:.88rem;color:#7a5500;font-weight:500"></div>
+
   <div class="stats-grid">
     <div class="stat"><div class="stat-n" id="stTotal">—</div><div class="stat-l">Casos en carrera</div></div>
     <div class="stat"><div class="stat-n" id="stPend">—</div><div class="stat-l">Pendientes</div></div>
@@ -272,6 +275,18 @@ function exportarCSV(){
   const rows=todos.map((r,i)=>[i+1,r.estudiante,r.materia,r.docente||'N/A',r.motivo,r.estado,r.fecha_registro?r.fecha_registro ? r.fecha_registro.substring(0,10).split('-').reverse().join('/') : '—':''].map(v=>`"${v}"`).join(','));
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+[hdr.join(','),...rows].join('\n')],{type:'text/csv;charset=utf-8;'}));a.download='casos_programa_'+new Date().toLocaleDateString('es-CO').replace(/\//g,'-')+'.csv';a.click();
 }
+
+// ── Período activo ──────────────────────────────────
+async function mostrarPeriodoActivo() {
+  try {
+    const resp = await fetch('periodos.php?activo=1').then(r=>r.json());
+    if (resp.ok && resp.data) {
+      const el = document.getElementById('periodoActivo');
+      if (el) el.innerHTML = `📅 Período activo: <strong>${resp.data.nombre}</strong>${resp.data.descripcion?' — '+resp.data.descripcion:''}`;
+    }
+  } catch(e) { /* silencioso si periodos.php aún no existe */ }
+}
+mostrarPeriodoActivo();
 init();
 </script>
 </body>

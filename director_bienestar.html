@@ -140,7 +140,10 @@
 
 <div class="main">
 
-  <div class="stats">
+    <!-- Período activo -->
+  <div id="periodoActivo" style="background:#fff3e0;border:1px solid #ffe0b2;border-radius:8px;padding:10px 16px;margin-bottom:16px;font-size:.88rem;color:#7a5500;font-weight:500"></div>
+
+<div class="stats">
     <div class="stat-card"><div class="stat-num" id="statTotal">—</div><div class="stat-label">Total casos</div></div>
     <div class="stat-card"><div class="stat-num" id="statPendientes">—</div><div class="stat-label">Pendientes</div></div>
     <div class="stat-card"><div class="stat-num" id="statEnProceso">—</div><div class="stat-label">En proceso</div></div>
@@ -281,6 +284,16 @@
     <h3>⚙️ Actualizar estado del caso</h3>
     <p class="modal-sub" id="modalSubtitle"></p>
     <div id="infoCasoModal" class="caso-info"></div>
+
+    <!-- HISTORIAL DE INTERVENCIONES -->
+    <div id="historialInterv" style="margin-bottom:14px;display:none">
+      <div style="font-size:.82rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">
+        📋 Historial de intervenciones
+      </div>
+      <div id="listaInterv" style="max-height:200px;overflow-y:auto;border:1px solid #e0e0e0;border-radius:8px;padding:10px;background:#fafafa"></div>
+    </div>
+    <hr style="border:none;border-top:1px solid #e0e0e0;margin-bottom:14px">
+    <p style="font-size:.85rem;font-weight:700;color:#b71c1c;margin-bottom:12px">➕ Nueva intervención</p>
     <div class="form-grid">
       <input type="hidden" id="modalReporteId">
       <div class="form-group">
@@ -413,13 +426,40 @@
   // ── Modal gestión (RU-11 + RU-12) ───────────────────
   async function abrirModal(id){
     try{
-      const r = await API.reportes.obtener(id);
+      const [r, segs] = await Promise.all([
+        API.reportes.obtener(id),
+        API.seguimientos.listar({ reporte_id: id })
+      ]);
       document.getElementById('modalReporteId').value = id;
       document.getElementById('modalSubtitle').textContent = `#${r.id} — ${r.estudiante} | ${r.materia}`;
       document.getElementById('infoCasoModal').innerHTML = `
-        <p><strong>Motivo:</strong> ${X(r.motivo)}</p>
-        <p><strong>Estado actual:</strong> ${X(r.estado)}</p>
-        <p><strong>Observaciones:</strong> ${X(r.observaciones||'—')}</p>`;
+        <p><strong>Estudiante:</strong> ${X(r.estudiante)} &nbsp;|&nbsp; <strong>Doc:</strong> ${X(r.documento||'—')}</p>
+        <p><strong>Materia:</strong> ${X(r.materia)} &nbsp;|&nbsp; <strong>Docente:</strong> ${X(r.docente||'—')}</p>
+        <p><strong>Motivo:</strong> ${X(r.motivo)} &nbsp;|&nbsp; <strong>Estado:</strong> ${X(r.estado)}</p>
+        <p><strong>Observaciones docente:</strong> ${X(r.observaciones||'—')}</p>
+        ${r.remitido_a ? `<p><strong>Remitido a:</strong> ${X(r.remitido_a)}</p>` : ''}`;
+
+      // Historial de intervenciones
+      const histEl  = document.getElementById('historialInterv');
+      const listaEl = document.getElementById('listaInterv');
+      if (segs && segs.length > 0) {
+        histEl.style.display = 'block';
+        listaEl.innerHTML = segs.map((s,i) => `
+          <div style="border-left:3px solid #f57c00;padding:10px 12px;margin-bottom:8px;background:#fff;border-radius:0 6px 6px 0;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+              <strong style="color:#b71c1c;font-size:.88rem">Intervención #${i+1}</strong>
+              <span style="font-size:.78rem;color:#888">${X(s.fecha||'—')}</span>
+            </div>
+            <p style="margin:3px 0;font-size:.86rem"><strong>Tipo:</strong> ${X(s.intervencion||'—')}</p>
+            <p style="margin:3px 0;font-size:.86rem"><strong>Profesional:</strong> ${X(s.profesional||'—')}</p>
+            ${s.observaciones ? `<p style="margin:3px 0;font-size:.86rem"><strong>Observaciones:</strong> ${X(s.observaciones)}</p>` : ''}
+            ${s.recomendaciones ? `<p style="margin:3px 0;font-size:.86rem;color:#2e7d32"><strong>Recomendaciones:</strong> ${X(s.recomendaciones)}</p>` : ''}
+          </div>`).join('');
+      } else {
+        histEl.style.display = 'block';
+        listaEl.innerHTML = '<p style="color:#aaa;font-size:.85rem;text-align:center;padding:10px">Sin intervenciones registradas aún.</p>';
+      }
+
       document.getElementById('modalEstado').value = r.estado;
       document.getElementById('modalRemitidoA').value  = r.remitido_a||'';
       document.getElementById('modalMotivoRem').value  = r.motivo_remision||'';
@@ -594,6 +634,18 @@
   }
 
   init();
+
+// ── Período activo ──
+async function mostrarPeriodoActivo() {
+  try {
+    const resp = await fetch('periodos.php?activo=1').then(r=>r.json());
+    if (resp.ok && resp.data) {
+      const el = document.getElementById('periodoActivo');
+      if (el) el.innerHTML = `📅 Período activo: <strong>${resp.data.nombre}</strong>${resp.data.descripcion?' — '+resp.data.descripcion:''}`;
+    }
+  } catch(e) {}
+}
+mostrarPeriodoActivo();
 </script>
 </body>
 </html>
