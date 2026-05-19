@@ -71,30 +71,8 @@ try {
         $reporte = $chkRep->fetch();
         if (!$reporte) responder('Reporte no encontrado.', false, 404);
 
-        // Insertar seguimiento (id_caso usa el mismo id del reporte como referencia)
-        // Si la columna id_caso fue eliminada junto con la tabla caso, omitirla:
-        $colsCaso = $pdo->query(
-            "SELECT COLUMN_NAME FROM information_schema.COLUMNS
-             WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='seguimiento' AND COLUMN_NAME='id_caso'"
-        )->fetch();
-
-        if ($colsCaso) {
-            $stmt = $pdo->prepare(
-                'INSERT INTO seguimiento
-                   (id_caso, `fecha_intervención`, `hora_intervención`,
-                    `tipo_intervención`, observaciones, recomendaciones,
-                    id_reporte, id_profesional)
-                 VALUES (?, CURDATE(), CURTIME(), ?, ?, ?, ?, ?)'
-            );
-            $stmt->execute([
-                (int)$d['reporte_id'],   // usamos id_reporte como id_caso
-                trim($d['intervencion']),
-                trim($d['observaciones']   ?? ''),
-                trim($d['recomendaciones'] ?? ''),
-                (int)$d['reporte_id'],
-                (int)$d['profesional_id'],
-            ]);
-        } else {
+        // Insertar seguimiento SIN id_caso (tabla caso fue eliminada)
+        {
             $stmt = $pdo->prepare(
                 'INSERT INTO seguimiento
                    (`fecha_intervención`, `hora_intervención`,
@@ -180,4 +158,3 @@ try {
 } catch (PDOException $e) {
     responder('Error de base de datos: ' . $e->getMessage(), false, 500);
 }
-// cambios en la carpeta de php
