@@ -106,6 +106,8 @@
     <button class="tab-btn active" onclick="tab('usuarios',this)">👥 Usuarios</button>
     <button class="tab-btn"        onclick="tab('estudiantes',this)">🎓 Estudiantes</button>
     <button class="tab-btn"        onclick="tab('reportes',this)">📋 Reportes</button>
+    <button class="tab-btn"        onclick="tab('materias',this)">📚 Materias docente</button>
+    <button class="tab-btn"        onclick="tab('periodos',this)">📅 Períodos académicos</button>
   </div>
 
   <!-- TAB USUARIOS -->
@@ -203,6 +205,46 @@
     </div>
   </div>
 </div>
+
+  <!-- TAB MATERIAS -->
+  <div id="tp-materias" class="tab-panel">
+    <div class="card">
+      <div class="card-title">📚 Asignar materias a docentes</div>
+      <div id="msgMat" class="alerta"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
+        <!-- Columna izquierda: docente y sus materias -->
+        <div>
+          <div class="fld" style="margin-bottom:12px">
+            <label>Seleccionar docente</label>
+            <select id="selDocente" onchange="cargarMateriasDocente()">
+              <option value="">— Selecciona un docente —</option>
+            </select>
+          </div>
+          <div style="background:#f9f9f9;border:1.5px solid var(--border);border-radius:8px;padding:14px;min-height:120px">
+            <p style="font-size:.82rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px">Materias asignadas</p>
+            <div id="listaMateriasDocente"><p style="color:var(--muted);font-size:.85rem">Selecciona un docente para ver sus materias.</p></div>
+          </div>
+        </div>
+        <!-- Columna derecha: asignar / crear -->
+        <div>
+          <div class="fld" style="margin-bottom:12px">
+            <label>Agregar materia al docente</label>
+            <select id="selMateria">
+              <option value="">— Selecciona una materia —</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="asignarMateria()" style="width:100%;margin-bottom:16px">➕ Asignar materia seleccionada</button>
+          <hr style="border:none;border-top:1px solid var(--border);margin-bottom:16px">
+          <p style="font-size:.82rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px">Crear nueva materia en el sistema</p>
+          <div class="form-grid" style="grid-template-columns:1fr 1fr;gap:10px">
+            <div class="fld"><label>Nombre</label><input id="nuevaMatNombre" placeholder="Ej: Cálculo I"></div>
+            <div class="fld"><label>Código</label><input id="nuevaMatCodigo" placeholder="MAT101"></div>
+          </div>
+          <button class="btn btn-secondary" onclick="crearMateria()" style="width:100%;margin-top:10px">Crear y asignar al docente seleccionado</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- TAB PERÍODOS -->
   <div id="tp-periodos" class="tab-panel">
@@ -307,7 +349,7 @@ const rolCls=r=>ROLES[r]?.cls||'b-admin';
 const avCls=r=>ROLES[r]?.av||'av-admin';
 const rolLbl=r=>ROLES[r]?.label||r;
 const inic=n=>(n||'??').substring(0,2).toUpperCase();
-function tab(nombre,btn){document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById('tp-'+nombre).classList.add('active');btn.classList.add('active');if(nombre==='usuarios')cargarUsuarios();if(nombre==='estudiantes')cargarEstudiantes();if(nombre==='reportes')cargarReportes();}
+function tab(nombre,btn){document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById('tp-'+nombre).classList.add('active');btn.classList.add('active');if(nombre==='usuarios')cargarUsuarios();if(nombre==='estudiantes')cargarEstudiantes();if(nombre==='reportes')cargarReportes();if(nombre==='materias')initMaterias();if(nombre==='periodos')initPeriodos();}
 function miniTab(id,grupo,btn){document.querySelectorAll(`#tp-${grupo} .mini-panel`).forEach(p=>p.classList.remove('active'));document.querySelectorAll(`#tp-${grupo} .mini-tab`).forEach(b=>b.classList.remove('active'));document.getElementById(id).classList.add('active');btn.classList.add('active');if(id==='u-lista')cargarUsuarios();if(id==='e-lista')cargarEstudiantes();}
 async function actualizarStats(){try{const[u,e,r]=await Promise.all([API.usuarios.listar(),API.estudiantes.listar(),API.reportes.listar()]);document.getElementById('stUsuarios').textContent=u.length;document.getElementById('stEstudiantes').textContent=e.length;document.getElementById('stReportes').textContent=r.length;document.getElementById('stPendientes').textContent=r.filter(x=>x.estado==='Reportado').length;}catch(e){console.error(e);}}
 let usrData=[];
