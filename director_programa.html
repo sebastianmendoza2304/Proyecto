@@ -90,6 +90,11 @@
   <img src="escudo-unilibre.png" alt="Universidad Libre">
   <div><h1>Panel Director de Programa</h1><p id="hdrNombre">Sistema de Alertas Académicas</p></div>
   <div class="spacer"></div>
+  
+<div id="periodoActivo" style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);
+  border-radius:6px;padding:5px 14px;font-size:.82rem;color:#fff;margin-left:auto;white-space:nowrap">
+  📅 Cargando período…
+</div>
   <a href="Index.html" class="btn-cerrar" onclick="logout()">Cerrar sesión</a>
 </header>
 <div class="wrap">
@@ -288,6 +293,22 @@ async function mostrarPeriodoActivo() {
 }
 mostrarPeriodoActivo();
 init();
+
+// Mostrar período activo en el header
+async function mostrarPeriodoActivo() {
+  try {
+    const resp = await fetch('periodos.php?activo=1').then(r=>r.json());
+    const el = document.getElementById('periodoActivo');
+    if (!el) return;
+    if (resp.ok && resp.data) {
+      el.textContent = '📅 Período: ' + resp.data.nombre;
+    } else {
+      el.textContent = '⚠️ Sin período activo';
+      el.style.background = 'rgba(255,200,0,.25)';
+    }
+  } catch(e) { const el=document.getElementById('periodoActivo'); if(el) el.textContent=''; }
+}
+mostrarPeriodoActivo();
 </script>
 </body>
 </html>

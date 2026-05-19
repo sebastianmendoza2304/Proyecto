@@ -96,3 +96,4 @@ const API = (() => {
 
   return { login, usuarios, estudiantes, reportes, seguimientos, periodos, sesion };
 })();
+// cambios en carpeta

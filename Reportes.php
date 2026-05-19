@@ -46,6 +46,10 @@ try {
             $sql .= ' AND (estudiante LIKE ? OR materia LIKE ? OR docente LIKE ?)';
             $params[] = $like; $params[] = $like; $params[] = $like;
         }
+        if (!empty($_GET['periodo_id'])) {
+            $sql .= ' AND id_periodo = ?';
+            $params[] = (int)$_GET['periodo_id'];
+        }
 
         $sql .= ' ORDER BY fecha_registro DESC';
         $stmt = $pdo->prepare($sql);
@@ -90,17 +94,26 @@ try {
         } catch (Exception $e) { /* tabla no existe o nombre distinto, usar 1 */ }
 
         // Insertar reporte (sin tabla caso — eliminada por ser redundante con reporte_riesgo)
+        // Obtener período activo automáticamente
+        $periodoId = null;
+        try {
+            $pStmt = $pdo->query("SELECT id FROM periodo_academico WHERE activo = 1 LIMIT 1");
+            $per = $pStmt->fetch();
+            if ($per) $periodoId = (int)$per['id'];
+        } catch(Exception $e) { /* tabla no existe aún */ }
+
         $stmt = $pdo->prepare(
             'INSERT INTO reporte_riesgo
                (id_estudiante, id_docente, id_materia, id_motivo,
-                observaciones, estado, fecha_registro, hora_registro)
-             VALUES (?,?,?,?,?,?, CURDATE(), CURTIME())'
+                id_periodo, observaciones, estado, fecha_registro, hora_registro)
+             VALUES (?,?,?,?,?,?,?, CURDATE(), CURTIME())'
         );
         $stmt->execute([
             (int)$d['estudiante_id'],
             (int)$d['docente_id'],
             (int)$d['materia_id'],
             (int)$d['motivo_id'],
+            $periodoId,
             trim($d['observaciones']),
             $d['estado'] ?? 'Reportado',
         ]);

@@ -180,3 +180,4 @@ try {
 } catch (PDOException $e) {
     responder('Error de base de datos: ' . $e->getMessage(), false, 500);
 }
+// cambios en la carpeta de php

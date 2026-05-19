@@ -592,14 +592,32 @@
       const total   = dat.reportes.length;
       const docUniq = [...new Set(dat.reportes.map(r=>r.docente).filter(Boolean))].length;
       const matUniq = [...new Set(dat.reportes.map(r=>r.materia).filter(Boolean))].length;
-      const filas   = dat.reportes.map(r=>`
-        <div class="reporte-fila">
-          <span>${ICON[r.estado]||'⚪'}</span>
-          <span class="rf-docente">👨‍🏫 ${X(r.docente||'N/A')}</span>
-          <span class="rf-materia">📚 ${X(r.materia)}</span>
-          <span><span class="badge ${BADGE[r.estado]||'badge-reportado'}">${X(r.estado)}</span></span>
-          <span class="rf-fecha">🗓 ${X(r.fecha||'')}</span>
-        </div>`).join('');
+      const filas = dat.reportes.map((r,ri) => {
+        const rId = r.id;
+        const segHtml = r.seguimiento ? `
+          <div style="margin-top:8px;background:#e8f5e9;border-radius:6px;padding:10px 12px;font-size:.83rem">
+            <p style="font-weight:700;color:#2e7d32;margin-bottom:6px">📋 Intervención registrada</p>
+            <p style="margin:3px 0"><strong>Tipo:</strong> ${X(r.seguimiento.intervencion||r.seguimiento.tipo_intervencion||'—')}</p>
+            <p style="margin:3px 0"><strong>Profesional:</strong> ${X(r.seguimiento.profesional||'—')}</p>
+            <p style="margin:3px 0"><strong>Observaciones:</strong> ${X(r.seguimiento.observaciones||'—')}</p>
+            <p style="margin:3px 0;color:#1b5e20"><strong>Recomendaciones:</strong> ${X(r.seguimiento.recomendaciones||'—')}</p>
+            <p style="margin:3px 0;color:#888;font-size:.78rem">${X(r.seguimiento.fecha||'')}</p>
+          </div>` : `<p style="color:#e65100;font-size:.82rem;margin-top:6px">⚠️ Sin intervención registrada aún</p>`;
+        return `
+        <div class="reporte-fila" style="flex-direction:column;align-items:stretch;padding:10px 14px">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <span>${ICON[r.estado]||'⚪'}</span>
+            <span class="rf-docente">👨‍🏫 ${X(r.docente||'N/A')}</span>
+            <span class="rf-materia">📚 ${X(r.materia)}</span>
+            <span><span class="badge ${BADGE[r.estado]||'badge-reportado'}">${X(r.estado)}</span></span>
+            <span class="rf-fecha">🗓 ${X(r.fecha_registro ? r.fecha_registro.substring(0,10).split('-').reverse().join('/') : '')}</span>
+            <button onclick="toggleDetalle('seg_${rId}')" style="margin-left:auto;font-size:.78rem;padding:3px 10px;border:1px solid #ddd;border-radius:5px;background:#fff;cursor:pointer;color:#b71c1c">
+              ${r.seguimiento ? '🔍 Ver intervención' : '📝 Sin intervención'}
+            </button>
+          </div>
+          <div id="seg_${rId}" style="display:none">${segHtml}</div>
+        </div>`;
+      }).join('');
       return `
         <div class="est-card">
           <div class="est-card-header">
@@ -634,6 +652,11 @@
   }
 
   init();
+
+  function toggleDetalle(id) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  }
 
 // ── Período activo ──
 async function mostrarPeriodoActivo() {
