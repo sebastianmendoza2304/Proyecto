@@ -78,9 +78,10 @@ try {
         if (empty($d['materia_id'])) $d['materia_id'] = 1;
 
         // Resolver motivo_id: puede venir como id o como nombre
-        if (empty($d['motivo_id']) && !empty($d['motivo_nombre'])) {
-            $moStmt = $pdo->prepare('SELECT id_motivo FROM motivo WHERE nombre_motivo = ? LIMIT 1');
-            $moStmt->execute([trim($d['motivo_nombre'])]);
+        $motivoNombre = trim($d['motivo_nombre'] ?? $d['motivo'] ?? '');
+        if (empty($d['motivo_id']) && $motivoNombre !== '') {
+            $moStmt = $pdo->prepare('SELECT id_motivo FROM motivo WHERE LOWER(nombre_motivo) = LOWER(?) LIMIT 1');
+            $moStmt->execute([$motivoNombre]);
             $mo = $moStmt->fetch();
             $d['motivo_id'] = $mo ? (int)$mo['id_motivo'] : 1;
         }

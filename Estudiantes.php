@@ -31,6 +31,7 @@ try {
                         documento_identidad AS documento,
                         nombres, apellidos,
                         carrera_cursada AS carrera,
+                        semestre_actual AS semestre,
                         telefono,
                         correo_institucional AS correo,
                         `estado_académico` AS estado
@@ -47,6 +48,7 @@ try {
             $stmt = $pdo->prepare(
                 'SELECT id_estudiante AS id, documento_identidad AS documento,
                         nombres, apellidos, carrera_cursada AS carrera,
+                        semestre_actual AS semestre,
                         telefono, correo_institucional AS correo, `estado_académico` AS estado
                  FROM estudiante WHERE documento_identidad = ?'
             );
@@ -59,6 +61,7 @@ try {
         // Filtros combinados
         $sql = 'SELECT id_estudiante AS id, documento_identidad AS documento,
                        nombres, apellidos, carrera_cursada AS carrera,
+                       semestre_actual AS semestre,
                        telefono, correo_institucional AS correo, `estado_académico` AS estado
                 FROM estudiante WHERE 1=1';
         $params = [];
@@ -96,14 +99,15 @@ try {
         $stmt = $pdo->prepare(
             'INSERT INTO estudiante
                (documento_identidad, nombres, apellidos, carrera_cursada,
-                telefono, correo_institucional, `estado_académico`)
-             VALUES (?,?,?,?,?,?,?)'
+                semestre_actual, telefono, correo_institucional, `estado_académico`)
+             VALUES (?,?,?,?,?,?,?,?)'
         );
         $stmt->execute([
             trim($d['documento']),
             trim($d['nombres']),
             trim($d['apellidos']),
             trim($d['carrera']),
+            isset($d['semestre']) ? (int)$d['semestre'] : null,
             trim($d['telefono'] ?? ''),
             trim($d['correo']   ?? ''),
             $d['estado'] ?? 'Activo',
@@ -125,6 +129,7 @@ try {
             'nombres'   => 'nombres = ?',
             'apellidos' => 'apellidos = ?',
             'carrera'   => 'carrera_cursada = ?',
+            'semestre'  => 'semestre_actual = ?',
             'telefono'  => 'telefono = ?',
             'correo'    => 'correo_institucional = ?',
             'estado'    => '`estado_académico` = ?',
