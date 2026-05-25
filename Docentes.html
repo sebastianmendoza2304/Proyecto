@@ -258,21 +258,21 @@ function renderAutocomplete(lista){
   const el=document.getElementById('listaEstudiantes');
   if(!lista.length){el.innerHTML='<div class="autocomplete-item"><span class="ac-nombre" style="color:#aaa">Sin resultados</span></div>';el.style.display='block';return;}
   el.innerHTML=lista.map(e=>`
-    <div class="autocomplete-item" onclick="seleccionarEstudiante(${e.id},'${(e.nombres+' '+e.apellidos).replace(/'/g,"\\'")}','${e.documento}','${(e.carrera||'').replace(/'/g,"\\'")}')">
+    <div class="autocomplete-item" onclick="seleccionarEstudiante(${e.id},'${(e.nombres+' '+e.apellidos).replace(/'/g,"\\'")}','${e.documento}','${(e.carrera||'').replace(/'/g,"\\'")}','${e.semestre||''}')">
       <span class="ac-nombre">${e.nombres} ${e.apellidos}</span>
-      <span class="ac-detalle">Doc: ${e.documento} | Carrera: ${e.carrera||'N/A'}</span>
+      <span class="ac-detalle">Doc: ${e.documento} | Carrera: ${e.carrera||'N/A'}${e.semestre?' | Semestre: '+e.semestre+'°':''}</span>
     </div>`).join('');
   el.style.display='block';
 }
 
-function seleccionarEstudiante(id,nombre,doc,carrera){
+function seleccionarEstudiante(id,nombre,doc,carrera,semestre){
   document.getElementById('estudiante_id').value=id;
   document.getElementById('estudiante_nombre').value=nombre;
   document.getElementById('estudiante_doc').value=doc;
   document.getElementById('buscarEstudiante').style.display='none';
   document.getElementById('listaEstudiantes').style.display='none';
   const disp=document.getElementById('estSeleccionado');
-  document.getElementById('estNombreDisplay').innerHTML=`<strong>${nombre}</strong> — Doc: ${doc} <span style="font-size:.78rem;color:#666;margin-left:8px">Carrera: ${carrera||'N/A'}</span>`;
+  document.getElementById('estNombreDisplay').innerHTML=`<strong>${nombre}</strong> — Doc: ${doc} <span style="font-size:.78rem;color:#666;margin-left:8px">Carrera: ${carrera||'N/A'}${semestre?' | Semestre: '+semestre+'°':''}</span>`;
   disp.style.display='block';
 }
 
@@ -335,7 +335,7 @@ async function registrarReporte(e){
       estudiante_id: parseInt(estId),
       docente_id:    sesion.id,
       materia_id:    parseInt(matId),
-      motivo_id:     1,  // Se mapea por nombre en el backend
+      // motivo_id se resuelve en el backend por motivo_nombre
       motivo_nombre: document.getElementById('motivo').value,
       observaciones: document.getElementById('observaciones').value.trim(),
     });
